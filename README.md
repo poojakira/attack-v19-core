@@ -1,0 +1,73 @@
+# MITRE ATT&CK v19 Core
+
+Standalone importable Python package for MITRE ATT&CK v19 data models across Enterprise, Mobile, and ICS domains.
+
+## Installation
+
+```bash
+pip install -r requirements.txt
+```
+
+Requires ATT&CK STIX bundles in `~/attack_data/`:
+- `enterprise-attack.json`
+- `mobile-attack.json`
+- `ics-attack.json`
+
+## Usage
+
+```python
+from attack_core import ATTACKLoader, ATTACKIndex, Domain
+
+loader = ATTACKLoader()
+index = ATTACKIndex(loader)
+
+# Look up technique by ID
+technique = index.get("T1059")
+print(technique.name)  # "Command and Scripting Interpreter"
+
+# Search by keyword
+results = index.search("credential dumping")
+for r in results:
+    print(f"{r.attack_id}: {r.name}")
+
+# Get all techniques in a tactic
+initial_access = index.by_tactic("TA0001")
+
+# Get all techniques for a platform
+windows_techs = index.by_platform("Windows")
+
+# Count assertions (v19 canonical counts)
+assert index.count_techniques(Domain.ENTERPRISE) == 222
+assert index.count_subtechniques(Domain.ENTERPRISE) == 475
+```
+
+## Data Model
+
+All models are Pydantic v2 dataclasses:
+
+- `Tactic` - ATT&CK tactics (TA0001-TA0101)
+- `Technique` - Base techniques (Txxxx)
+- `SubTechnique` - Sub-techniques (Txxxx.xxx)
+- `Group` - Threat groups (Gxxxx)
+- `Software` - Malware/Tools (Sxxxx)
+- `Mitigation` - Mitigations (Mxxxx)
+- `DataSource` - Data sources (DSxxxx)
+- `ATTACKMapping` - Reusable mapping block for detections
+
+## Domains
+
+| Domain | Tactics | Techniques | Sub-techniques |
+|--------|---------|------------|----------------|
+| Enterprise | 15 | 222 | 475 |
+| Mobile | 12 | ~100 | ~200 |
+| ICS | 12 | ~100 | ~150 |
+
+## Testing
+
+```bash
+pytest tests/ -v
+```
+
+## License
+
+MIT
