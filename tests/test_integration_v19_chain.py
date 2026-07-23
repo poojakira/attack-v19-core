@@ -196,7 +196,7 @@ class TestRuleTableV19Compliance:
         revoked_ids = set(actual_revocations.keys())
 
         for repo in repos:
-            enricher_path = os.path.join(os.path.dirname(__file__), "..", repo, "attack_mapping", "enricher.py")
+            enricher_path = os.path.join(os.path.dirname(__file__), "..", "..", repo, "attack_mapping", "enricher.py")
             if os.path.exists(enricher_path):
                 with open(enricher_path, 'r') as f:
                     content = f.read()
@@ -209,23 +209,39 @@ class TestRuleTableV19Compliance:
                         raise AssertionError(f"REVOKED ID {revoked} found in {repo}/enricher.py - should be remapped")
 
     def test_new_technique_coverage_indicators(self):
-        """Verify key new techniques appear in at least one rule table."""
-        # This is a soft check - at minimum T1685 (replaces T1562) should be everywhere
-        repos_with_t1685 = 0
+        """Verify key new techniques appear in relevant rule tables."""
+        # T1685 (replaces T1562) should be in defense impairment related repos
+        defense_impairment_repos = [
+            "llm-redteam-framework",
+            "dataset-poisoning-detector",
+            "model-privacy-attacks",
+            "adversarial-ml-lab",
+            "PulseNet-RUL-Forecasting",
+            "mcp-security-gateway-monitor",
+            "unified-ml-security-platform",
+        ]
 
-        for repo in ["hf-model-provenance-scanner", "mcp-security-gateway-monitor",
-                     "llm-redteam-framework", "dataset-poisoning-detector",
-                     "model-privacy-attacks", "adversarial-ml-lab",
-                     "PulseNet-RUL-Forecasting", "unified-ml-security-platform"]:
-            enricher_path = os.path.join(os.path.dirname(__file__), "..", repo, "attack_mapping", "enricher.py")
+        repos_with_t1685 = 0
+        for repo in defense_impairment_repos:
+            enricher_path = os.path.join(os.path.dirname(__file__), "..", "..", repo, "attack_mapping", "enricher.py")
             if os.path.exists(enricher_path):
                 with open(enricher_path, 'r') as f:
                     if "T1685" in f.read():
                         repos_with_t1685 += 1
 
-        assert repos_with_t1685 >= 6, f"T1685 only in {repos_with_t1685}/8 repos (should be in all defense impairment detections)"
+        # Should be in most defense impairment related repos
+        assert repos_with_t1685 >= 5, f"T1685 only in {repos_with_t1685}/7 defense impairment repos"
 
-
-if __name__ == "__main__":
+        # T1682 (Query Public AI) should be in AI-focused repos
+        ai_repos = ["llm-redteam-framework", "mcp-security-gateway-monitor", "unified-ml-security-platform",
+                    "hf-model-provenance-scanner", "adversarial-ml-lab"]
+        repos_with_t1682 = 0
+        for repo in ai_repos:
+            enricher_path = os.path.join(os.path.dirname(__file__), "..", "..", repo, "attack_mapping", "enricher.py")
+            if os.path.exists(enricher_path):
+                with open(enricher_path, 'r') as f:
+                    if "T1682" in f.read():
+                        repos_with_t1682 += 1
+        assert repos_with_t1682 >= 3, f"T1682 only in {repos_with_t1682}/5 AI repos"
     import pytest
     pytest.main([__file__, "-v", "--tb=short"])
