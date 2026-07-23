@@ -1,5 +1,9 @@
 # MITRE ATT&CK v19 Core
 
+[![CI](https://github.com/poojakira/attack-v19-core/actions/workflows/ci.yml/badge.svg)](https://github.com/poojakira/attack-v19-core/actions/workflows/ci.yml)
+[![Python >=3.10](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Standalone importable Python package for MITRE ATT&CK v19 data models across Enterprise, Mobile, and ICS domains.
 
 ## Installation
