@@ -1,7 +1,9 @@
 from __future__ import annotations
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field
+
 from enum import Enum
+from typing import Dict, List, Optional
+
+from pydantic import BaseModel, Field
 
 
 class Domain(str, Enum):
@@ -102,6 +104,7 @@ class ATTACKMapping(BaseModel):
     """
     Reusable mapping block - attach to any detection finding, alert, or artifact.
     """
+
     tactic_id: str
     tactic_name: str
     technique_id: str
@@ -113,3 +116,9 @@ class ATTACKMapping(BaseModel):
     data_sources: List[str] = Field(default_factory=list)
     platforms: List[str] = Field(default_factory=list)
     url: Optional[str] = None
+    source_technique_id: Optional[str] = None
+    resolved_technique_id: Optional[str] = None
+    parent_technique_id: Optional[str] = None
+    parent_technique_name: Optional[str] = None
+    was_normalized: bool = False
+    was_revoked: bool = False

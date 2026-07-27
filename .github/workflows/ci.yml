@@ -21,7 +21,7 @@ concurrency:
 env:
   PYTHON_VERSION: "3.12"
   RUFF_VERSION: "0.8.4"
-  PYRIGHT_VERSION: "1.1.40"
+  PYRIGHT_VERSION: "1.1.388"
   BANDIT_VERSION: "1.8.3"
   PIP_AUDIT_VERSION: "2.10.1"
   CYCLONEDX_VERSION: "5.1.1"
@@ -45,10 +45,10 @@ jobs:
         run: pip install ruff==${{ env.RUFF_VERSION }}
 
       - name: Run Ruff Linter
-        run: ruff check attack_core tests --output-format=github
+        run: ruff check attack_core tests scripts --output-format=github
 
       - name: Run Ruff Formatter Check
-        run: ruff format --check attack_core tests
+        run: ruff format --check attack_core tests scripts
 
   typecheck:
     name: Type Check (Pyright)
@@ -72,7 +72,7 @@ jobs:
           pip install -e ".[dev]" 2>&1 | tail -5
 
       - name: Run Pyright
-        run: PYTHONPATH=attack_core pyright attack_core tests
+        run: PYTHONPATH=attack_core pyright attack_core tests scripts
 
   security:
     name: Security Audit

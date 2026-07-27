@@ -4,31 +4,32 @@ Standalone importable package for ATT&CK v19 Enterprise, Mobile, and ICS domains
 """
 
 from .constants import (
-    ENTERPRISE_TACTICS,
-    ENTERPRISE_TACTIC_COUNT,
-    ENTERPRISE_TECHNIQUE_COUNT,
-    ENTERPRISE_SUBTECHNIQUE_COUNT,
-    MOBILE_TACTIC_COUNT,
-    ICS_TACTIC_COUNT,
     DOMAINS,
+    ENTERPRISE_SUBTECHNIQUE_COUNT,
+    ENTERPRISE_TACTIC_COUNT,
+    ENTERPRISE_TACTICS,
+    ENTERPRISE_TECHNIQUE_COUNT,
+    ICS_TACTIC_COUNT,
+    MOBILE_TACTIC_COUNT,
     PLATFORMS_ENTERPRISE,
-    PLATFORMS_MOBILE,
     PLATFORMS_ICS,
+    PLATFORMS_MOBILE,
 )
+from .index import ATTACKIndex
+from .loader import ATTACKLoader
+from .mapping import ATTACKMappingBuilder, MappingResolution
+from .matrix import ATTACKMatrix
 from .models import (
+    ATTACKMapping,
+    DataSource,
     Domain,
+    Group,
+    Mitigation,
+    Software,
+    SubTechnique,
     Tactic,
     Technique,
-    SubTechnique,
-    Group,
-    Software,
-    Mitigation,
-    DataSource,
-    ATTACKMapping,
 )
-from .loader import ATTACKLoader
-from .index import ATTACKIndex
-from .matrix import ATTACKMatrix
 
 __version__ = "19.1.0"
 __all__ = [
@@ -41,6 +42,8 @@ __all__ = [
     "Mitigation",
     "DataSource",
     "ATTACKMapping",
+    "ATTACKMappingBuilder",
+    "MappingResolution",
     "ATTACKLoader",
     "ATTACKIndex",
     "ATTACKMatrix",
