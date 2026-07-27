@@ -8,7 +8,7 @@ ENTERPRISE_TACTICS = [
     ("TA0002", "Execution"),
     ("TA0003", "Persistence"),
     ("TA0004", "Privilege Escalation"),
-    ("TA0005", "Stealth"),            # WAS "Defense Evasion" — RENAMED v19
+    ("TA0005", "Stealth"),  # WAS "Defense Evasion" — RENAMED v19
     ("TA0006", "Credential Access"),
     ("TA0007", "Discovery"),
     ("TA0008", "Lateral Movement"),
@@ -22,36 +22,36 @@ ENTERPRISE_TACTICS = [
 ]
 
 # Counts remain the same — tactic count is still 15
-ENTERPRISE_TACTIC_COUNT       = 15
-ENTERPRISE_TECHNIQUE_COUNT    = 222
+ENTERPRISE_TACTIC_COUNT = 15
+ENTERPRISE_TECHNIQUE_COUNT = 222
 ENTERPRISE_SUBTECHNIQUE_COUNT = 475
 
 MOBILE_TACTIC_COUNT = 12
-ICS_TACTIC_COUNT    = 12
+ICS_TACTIC_COUNT = 12
 
 # New v19 tactic IDs for reference
-TACTIC_STEALTH            = "TA0005"  # renamed from Defense Evasion
+TACTIC_STEALTH = "TA0005"  # renamed from Defense Evasion
 TACTIC_DEFENSE_IMPAIRMENT = "TA0112"  # new
 
 # Revoked technique IDs — map old → new for migration
 V19_REVOCATION_MAP = {
     # Old Defense Evasion techniques revoked and replaced
-    "T1562":        "T1685",       # Impair Defenses → Disable or Modify Tools
-    "T1562.001":    "T1685",       # Disable or Modify Tools (sub collapsed to parent)
-    "T1562.002":    "T1685.001",   # Disable Windows Event Logging → T1685/001
-    "T1562.006":    "T1685.002",   # Indicator Blocking → T1685 (Modify or Spoof Tool UI)
-    "T1089":        "T1685",       # Disable Security Tools (legacy) → T1685
-    "T1070.001":    "T1685.005",   # Clear Windows Event Logs → T1685/005
-    "T1070.002":    "T1685.006",   # Clear Linux/Mac Logs → T1685/006
-    "T1054":        "T1685",       # Indicator Blocking (legacy) → T1685
+    "T1562": "T1685",  # Impair Defenses → Disable or Modify Tools
+    "T1562.001": "T1685",  # Disable or Modify Tools (sub collapsed to parent)
+    "T1562.002": "T1685.001",  # Disable Windows Event Logging → T1685.001
+    "T1562.006": "T1685.002",  # Indicator Blocking → T1685 (Modify or Spoof Tool UI)
+    "T1089": "T1685",  # Disable Security Tools (legacy) → T1685
+    "T1070.001": "T1685.005",  # Clear Windows Event Logs → T1685.005
+    "T1070.002": "T1685.006",  # Clear Linux/Mac Logs → T1685.006
+    "T1054": "T1685",  # Indicator Blocking (legacy) → T1685
     # ICS revocations — sub-techniques now exist
-    "T0843":        "T0843",       # Program Download — still valid, sub-techs added below
-    "T0873":        "T0873",       # Project File Infection — still valid, sub-tech added
-    "T0846":        "T0846",       # Remote System Discovery — still valid, sub-techs added
+    "T0843": "T0843",  # Program Download — still valid, sub-techs added below
+    "T0873": "T0873",  # Project File Infection — still valid, sub-tech added
+    "T0846": "T0846",  # Remote System Discovery — still valid, sub-techs added
     # Social Engineering sub-techs replaced standalone techniques
-    "T1534":        "T1684.001",   # Internal Spearphishing → Social Engineering: Impersonation
+    "T1534": "T1684.001",  # Internal Spearphishing → Social Engineering: Impersonation
     # Email Spoofing standalone → sub-technique
-    "T1566.003":    "T1684.002",   # (if referenced) → Social Engineering: Email Spoofing
+    "T1566.003": "T1684.002",  # (if referenced) → Social Engineering: Email Spoofing
 }
 
 # New v19 technique IDs — add to any lookup that needs them
@@ -59,18 +59,18 @@ V19_NEW_TECHNIQUES = {
     # Enterprise — new in v19
     "T1682": "Query Public AI Services",
     "T1683": "Generate Content",
-    "T1683/001": "Generate Content: Written Content",
-    "T1683/002": "Generate Content: Audio-Visual Content",
+    "T1683.001": "Generate Content: Written Content",
+    "T1683.002": "Generate Content: Audio-Visual Content",
     "T1684": "Social Engineering",
-    "T1684/001": "Social Engineering: Impersonation",
-    "T1684/002": "Social Engineering: Email Spoofing",
+    "T1684.001": "Social Engineering: Impersonation",
+    "T1684.002": "Social Engineering: Email Spoofing",
     "T1685": "Disable or Modify Tools",
-    "T1685/001": "Disable or Modify Tools: Disable or Modify Windows Event Log",
-    "T1685/002": "Disable or Modify Tools: Disable or Modify Cloud Log",
-    "T1685/003": "Disable or Modify Tools: Modify or Spoof Tool UI",
-    "T1685/004": "Disable or Modify Tools: Disable or Modify Linux Audit System Log",
-    "T1685/005": "Disable or Modify Tools: Clear Windows Event Logs",
-    "T1685/006": "Disable or Modify Tools: Clear Linux or Mac System Logs",
+    "T1685.001": "Disable or Modify Tools: Disable or Modify Windows Event Log",
+    "T1685.002": "Disable or Modify Tools: Disable or Modify Cloud Log",
+    "T1685.003": "Disable or Modify Tools: Modify or Spoof Tool UI",
+    "T1685.004": "Disable or Modify Tools: Disable or Modify Linux Audit System Log",
+    "T1685.005": "Disable or Modify Tools: Clear Windows Event Logs",
+    "T1685.006": "Disable or Modify Tools: Clear Linux or Mac System Logs",
     "T1686": "Disable or Modify System Firewall",
     "T1686/001": "Disable or Modify System Firewall: Cloud Firewall",
     "T1686/002": "Disable or Modify System Firewall: Network Device Firewall",
@@ -79,7 +79,7 @@ V19_NEW_TECHNIQUES = {
     "T1688": "Safe Mode Boot",
     "T1689": "Downgrade Attack",
     "T1690": "Prevent Command History Logging",
-    "T1027/018": "Obfuscated Files or Information: Invisible Unicode",
+    "T1027.018": "Obfuscated Files or Information: Invisible Unicode",
     # ICS — new sub-techniques in v19
     "T1691": "Block Operational Technology Message",
     "T1691/001": "Block Operational Technology Message: Command Message",
@@ -98,15 +98,15 @@ V19_NEW_TECHNIQUES = {
     "T1695/002": "Block Communications: Ethernet",
     "T1695/003": "Block Communications: Wi-Fi",
     # ICS — new Program Download sub-techniques
-    "T0843/001": "Program Download: Download All",
-    "T0843/002": "Program Download: Online Edit",
-    "T0843/003": "Program Download: Program Append",
+    "T0843.001": "Program Download: Download All",
+    "T0843.002": "Program Download: Online Edit",
+    "T0843.003": "Program Download: Program Append",
     # ICS — new Project File Infection sub-technique
-    "T0873/001": "Project File Infection: Siemens Project File Format",
+    "T0873.001": "Project File Infection: Siemens Project File Format",
     # ICS — new Remote System Discovery sub-techniques
-    "T0846/001": "Remote System Discovery: Port Scan",
-    "T0846/002": "Remote System Discovery: Broadcast Discovery",
-    "T0846/003": "Remote System Discovery: Multicast Discovery",
+    "T0846.001": "Remote System Discovery: Port Scan",
+    "T0846.002": "Remote System Discovery: Broadcast Discovery",
+    "T0846.003": "Remote System Discovery: Multicast Discovery",
 }
 
 # New v19 CTI additions worth tracking
@@ -128,23 +128,38 @@ V19_NEW_CAMPAIGNS = [
 
 DOMAINS = {
     "enterprise": "enterprise-attack",
-    "mobile":     "mobile-attack",
-    "ics":        "ics-attack",
+    "mobile": "mobile-attack",
+    "ics": "ics-attack",
 }
 
 PLATFORMS_ENTERPRISE = [
-    "Windows", "macOS", "Linux",
-    "AWS", "Azure", "GCP",
-    "Containers", "Network", "PRE",
-    "Office 365", "Google Workspace", "SaaS",
+    "Windows",
+    "macOS",
+    "Linux",
+    "AWS",
+    "Azure",
+    "GCP",
+    "Containers",
+    "Network",
+    "PRE",
+    "Office 365",
+    "Google Workspace",
+    "SaaS",
     "IaaS",
 ]
 
 PLATFORMS_MOBILE = ["Android", "iOS"]
 
 PLATFORMS_ICS = [
-    "Control Server", "Data Historian", "Engineering Workstation",
-    "Field Controller/RTU/PLC/IED", "HMI", "Input/Output Server",
-    "Jump Server", "Operator Workstation", "Remote Desktop Protocol",
-    "Safety Instrumented System/Protection Relay", "Wireless Controller",
+    "Control Server",
+    "Data Historian",
+    "Engineering Workstation",
+    "Field Controller/RTU/PLC/IED",
+    "HMI",
+    "Input/Output Server",
+    "Jump Server",
+    "Operator Workstation",
+    "Remote Desktop Protocol",
+    "Safety Instrumented System/Protection Relay",
+    "Wireless Controller",
 ]

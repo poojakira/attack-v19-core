@@ -1,11 +1,10 @@
-import pytest
 from attack_core.constants import (
-    ENTERPRISE_TECHNIQUE_COUNT,
     ENTERPRISE_SUBTECHNIQUE_COUNT,
-    ENTERPRISE_TACTIC_COUNT
+    ENTERPRISE_TACTIC_COUNT,
+    ENTERPRISE_TECHNIQUE_COUNT,
 )
-from attack_core.loader import ATTACKLoader
 from attack_core.index import ATTACKIndex
+from attack_core.loader import ATTACKLoader
 from attack_core.models import Domain
 
 
@@ -13,16 +12,18 @@ def test_enterprise_technique_count():
     loader = ATTACKLoader()
     index = ATTACKIndex(loader)
     count = index.count_techniques(Domain.ENTERPRISE)
-    assert count == ENTERPRISE_TECHNIQUE_COUNT, \
-        f"Expected {ENTERPRISE_TECHNIQUE_COUNT} techniques, got {count}"
+    assert (
+        count == ENTERPRISE_TECHNIQUE_COUNT
+    ), f"Expected {ENTERPRISE_TECHNIQUE_COUNT} techniques, got {count}"
 
 
 def test_enterprise_subtechnique_count():
     loader = ATTACKLoader()
     index = ATTACKIndex(loader)
     count = index.count_subtechniques(Domain.ENTERPRISE)
-    assert count == ENTERPRISE_SUBTECHNIQUE_COUNT, \
-        f"Expected {ENTERPRISE_SUBTECHNIQUE_COUNT} sub-techniques, got {count}"
+    assert (
+        count == ENTERPRISE_SUBTECHNIQUE_COUNT
+    ), f"Expected {ENTERPRISE_SUBTECHNIQUE_COUNT} sub-techniques, got {count}"
 
 
 def test_enterprise_tactic_count():
@@ -30,8 +31,9 @@ def test_enterprise_tactic_count():
     index = ATTACKIndex(loader)
     tactics = [t for t in index._tactics.values() if t.domain == Domain.ENTERPRISE]
     count = len(tactics)
-    assert count == ENTERPRISE_TACTIC_COUNT, \
-        f"Expected {ENTERPRISE_TACTIC_COUNT} tactics, got {count}"
+    assert (
+        count == ENTERPRISE_TACTIC_COUNT
+    ), f"Expected {ENTERPRISE_TACTIC_COUNT} tactics, got {count}"
 
 
 def test_lookup_by_id():
@@ -72,7 +74,9 @@ def test_search():
     index = ATTACKIndex(loader)
     results = index.search("credential")
     assert len(results) > 0
-    assert any("credential" in r.name.lower() or "credential" in r.description.lower() for r in results)
+    assert any(
+        "credential" in r.name.lower() or "credential" in r.description.lower() for r in results
+    )
 
 
 def test_get_subtechniques_of():
