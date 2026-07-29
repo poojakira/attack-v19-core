@@ -1,11 +1,11 @@
-from attack_core.constants import (
+from attack_v19_core.constants import (
     ENTERPRISE_TACTICS, ENTERPRISE_TACTIC_COUNT,
     ENTERPRISE_TECHNIQUE_COUNT, ENTERPRISE_SUBTECHNIQUE_COUNT,
     TACTIC_STEALTH, TACTIC_DEFENSE_IMPAIRMENT,
 )
-from attack_core.loader import ATTACKLoader
-from attack_core.index  import ATTACKIndex
-from attack_core.models import Domain
+from attack_v19_core.loader import ATTACKLoader
+from attack_v19_core.index  import ATTACKIndex
+from attack_v19_core.models import Domain
 
 def test_tactic_count():
     assert len(ENTERPRISE_TACTICS) == ENTERPRISE_TACTIC_COUNT == 15
@@ -62,7 +62,7 @@ def test_ics_new_subtechniques_resolvable():
     print(f"ICS v19 sub-techs found: {found}")
 
 def test_revocation_map_keys_not_in_v19_index():
-    from attack_core.constants import V19_REVOCATION_MAP
+    from attack_v19_core.constants import V19_REVOCATION_MAP
     # Test that revocation map is properly defined
     assert len(V19_REVOCATION_MAP) > 10
     # Count actual revocations (not identity mappings)
@@ -72,8 +72,8 @@ def test_revocation_map_keys_not_in_v19_index():
         assert old_id != new_id
 
 def test_navigator_layer_includes_defense_impairment():
-    from attack_core.models import ATTACKMapping, Domain
-    from attack_core.matrix import NavigatorLayerReporter
+    from attack_v19_core.models import ATTACKMapping, Domain
+    from attack_v19_core.matrix import NavigatorLayerReporter
     import json
     mapping = ATTACKMapping(
         tactic_id="TA0112",

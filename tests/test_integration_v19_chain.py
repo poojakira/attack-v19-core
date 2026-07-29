@@ -10,14 +10,14 @@ import os
 # Add attack-v19-core to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "attack-v19-core"))
 
-from attack_core.constants import (
+from attack_v19_core.constants import (
     ENTERPRISE_TACTICS, V19_REVOCATION_MAP, V19_NEW_TECHNIQUES,
     TACTIC_STEALTH, TACTIC_DEFENSE_IMPAIRMENT
 )
-from attack_core.loader import ATTACKLoader
-from attack_core.index import ATTACKIndex
-from attack_core.models import ATTACKMapping, Domain
-from attack_core.matrix import NavigatorLayerReporter
+from attack_v19_core.loader import ATTACKLoader
+from attack_v19_core.index import ATTACKIndex
+from attack_v19_core.models import ATTACKMapping, Domain
+from attack_v19_core.matrix import NavigatorLayerReporter
 
 
 class TestV19EnricherChain:
@@ -164,7 +164,7 @@ class TestV19EnricherChain:
     def test_revoked_id_graceful_handling_in_mapping(self):
         """Building mapping with revoked ID should warn and remap."""
         # This tests the BaseDetector._build_mapping behavior
-        from attack_core.constants import V19_REVOCATION_MAP
+        from attack_v19_core.constants import V19_REVOCATION_MAP
 
         # Simulate what BaseDetector._build_mapping does
         revoked_id = "T1562.001"

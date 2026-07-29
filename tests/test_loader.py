@@ -1,6 +1,6 @@
 # tests/test_loader.py
-from attack_core.loader import ATTACKLoader
-from attack_core.models import Domain
+from attack_v19_core.loader import ATTACKLoader
+from attack_v19_core.models import Domain
 
 
 def test_loader_loads_all_domains():

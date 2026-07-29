@@ -1,11 +1,11 @@
 # tests/test_models.py
-from attack_core.constants import (
+from attack_v19_core.constants import (
     ENTERPRISE_TECHNIQUE_COUNT, ENTERPRISE_SUBTECHNIQUE_COUNT,
     ENTERPRISE_TACTIC_COUNT
 )
-from attack_core.loader import ATTACKLoader
-from attack_core.index import ATTACKIndex
-from attack_core.models import Domain
+from attack_v19_core.loader import ATTACKLoader
+from attack_v19_core.index import ATTACKIndex
+from attack_v19_core.models import Domain
 
 
 def test_enterprise_technique_count():
