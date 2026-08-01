@@ -13,15 +13,15 @@ BASE_URL = (
 BUNDLES = {
     "enterprise-attack.json": {
         "url": f"{BASE_URL}/enterprise-attack/enterprise-attack.json",
-        "sha256": "fc783039f17fba646f79448f1322996457c658a9474f6d14c3bc924a2cf1c97d",
+        "sha256": "bdf1ce86a4e604214c5076d37ae4dcb322678afc528df8492e6fdc1b554f5da3",
     },
     "mobile-attack.json": {
         "url": f"{BASE_URL}/mobile-attack/mobile-attack.json",
-        "sha256": "f61e0a1d9bc828f95df50463c73e48ea57df5d7b0c2d7982ebfa349409dfb785",
+        "sha256": "423cbceb604770c8997845151fe7cc4813de01033b8cc50c84dd3bd0d96d8322",
     },
     "ics-attack.json": {
         "url": f"{BASE_URL}/ics-attack/ics-attack.json",
-        "sha256": "02c991737cba05492e5d17c38643a2f1c1d7e3536bae43fa8d62b02fadcd9c0f",
+        "sha256": "a91f659d6d03095e84089630b098edb2ed9d5cd5b1ea41369b27846cd32f2a43",
     },
 }
 
