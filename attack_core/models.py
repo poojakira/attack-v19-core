@@ -48,6 +48,7 @@ class Technique(BaseModel):
     data_sources: List[str]
     mitigations: List[str]
     subtechniques: List[str] = Field(default_factory=list)
+    parent_id: Optional[str] = None
     detection: Optional[str] = None
     domain: Domain
     is_subtechnique: bool = False
