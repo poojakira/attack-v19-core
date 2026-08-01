@@ -7,6 +7,7 @@ on:
     branches: [main]
   schedule:
     - cron: '0 2 * * 1'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -27,118 +28,60 @@ env:
 
 jobs:
   lint:
-    name: Lint & Format
+    name: Lint and format
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
-      - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-
-      - name: Install Ruff
-        run: pip install ruff==${{ env.RUFF_VERSION }}
-
-      - name: Run Ruff Linter
-        run: ruff check attack_core tests scripts --output-format=github
-
-      - name: Run Ruff Formatter Check
-        run: ruff format --check attack_core tests scripts
+      - run: pip install ruff==${{ env.RUFF_VERSION }}
+      - run: ruff check attack_core tests scripts --output-format=github
+      - run: ruff format --check attack_core tests scripts
 
   typecheck:
-    name: Type Check (Pyright)
+    name: Type check
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: lint
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
-      - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pyright==${{ env.PYRIGHT_VERSION }}
-          pip install -e ".[dev]" 2>&1 | tail -5
-
-      - name: Run Pyright
-        run: PYTHONPATH=attack_core pyright attack_core tests scripts
+          pip install -e ".[dev]"
+      - run: PYTHONPATH=. pyright attack_core tests scripts
 
   security:
-    name: Security Audit
+    name: Security audit
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: lint
-    permissions:
-      security-events: write
-      contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
-      - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-
       - name: Install security tools
         run: |
           python -m pip install --upgrade pip
-          pip install bandit==${{ env.BANDIT_VERSION }}
-          pip install pip-audit==${{ env.PIP_AUDIT_VERSION }}
-          pip install cyclonedx-bom==${{ env.CYCLONEDX_VERSION }}
-          pip install -e ".[dev]" 2>&1 | tail -5
-
-      - name: Bandit SAST (fail on HIGH/MEDIUM)
-        run: |
-          bandit -r attack_core/ -ll -f json -o bandit-report.json
-          python -c "
-import json, sys
-with open('bandit-report.json') as f:
-    data = json.load(f)
-high_med = [r for r in data.get('results', []) if r['issue_severity'] in ('HIGH', 'MEDIUM')]
-if high_med:
-    print(f'FAIL: {len(high_med)} HIGH/MEDIUM findings')
-    for r in high_med:
-        print(f'  {r["filename"]}:{r["line_number"]} - {r["issue_text"]}')
-    sys.exit(1)
-print('PASS: No HIGH/MEDIUM Bandit findings')
-          "
-
-      - name: pip-audit (fail on known vulns)
-        run: |
-          pip-audit -r requirements.txt --skip-editable --format json -o pip-audit.json || true
-          python -c "
-import json, sys
-try:
-    with open('pip-audit.json') as f:
-        data = json.load(f)
-except:
-    data = []
-vulns = [v for v in data if v.get('vulns')]
-if vulns:
-    print(f'FAIL: {len(vulns)} packages with known vulnerabilities')
-    for v in vulns:
-        for vuln in v['vulns']:
-            print(f'  {v["name"]}=={v["version"]}: {vuln["id"]}')
-    sys.exit(1)
-print('PASS: No known vulnerabilities in dependencies')
-          "
-
-      - name: Generate CycloneDX SBOM
+          pip install bandit==${{ env.BANDIT_VERSION }} pip-audit==${{ env.PIP_AUDIT_VERSION }} cyclonedx-bom==${{ env.CYCLONEDX_VERSION }}
+          pip install -e ".[dev]"
+      - name: Bandit SAST
+        run: bandit -r attack_core -ll
+      - name: Dependency audit
+        run: pip-audit -r requirements.txt --skip-editable
+      - name: Generate SBOM
         run: cyclonedx-py environment --output-format JSON --outfile sbom.json
-
-      - name: Upload SBOM artifact
+      - name: Upload SBOM
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -146,33 +89,19 @@ print('PASS: No known vulnerabilities in dependencies')
           path: sbom.json
           retention-days: 90
 
-
   test:
-    name: Unit Tests
+    name: Unit tests
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     needs: [lint, typecheck]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
-      - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev]" 2>&1 | tail -5
-
-      - name: Run pytest
-        run: pytest tests/ -v --tb=short --maxfail=5
-
-      - name: Upload coverage
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: coverage-report
-          path: .coverage
-          retention-days: 30
+          pip install -e ".[dev]"
+      - run: pytest tests/ -v --tb=short --maxfail=5

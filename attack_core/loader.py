@@ -6,7 +6,16 @@ from typing import Dict, List
 
 from mitreattack.stix20 import MitreAttackData
 
-from .models import DataSource, Domain, Group, Mitigation, Software, SubTechnique, Tactic, Technique
+from .models import (
+    DataSource,
+    Domain,
+    Group,
+    Mitigation,
+    Software,
+    SubTechnique,
+    Tactic,
+    Technique,
+)
 
 _RAW_CACHE: Dict[Path, Dict[str, MitreAttackData]] = {}
 
@@ -71,7 +80,9 @@ class ATTACKLoader:
                     attack_id=ext.get("external_id", ""),
                     name=t["name"],
                     description=t.get("description", ""),
-                    tactic_ids=[kc["phase_name"] for kc in t.get("kill_chain_phases", [])],
+                    tactic_ids=[
+                        kc["phase_name"] for kc in t.get("kill_chain_phases", [])
+                    ],
                     platforms=t.get("x_mitre_platforms", []),
                     data_sources=t.get("x_mitre_data_sources", []),
                     mitigations=[],
@@ -98,7 +109,9 @@ class ATTACKLoader:
                     name=t["name"],
                     description=t.get("description", ""),
                     parent_id=parent_id,
-                    tactic_ids=[kc["phase_name"] for kc in t.get("kill_chain_phases", [])],
+                    tactic_ids=[
+                        kc["phase_name"] for kc in t.get("kill_chain_phases", [])
+                    ],
                     platforms=t.get("x_mitre_platforms", []),
                     data_sources=t.get("x_mitre_data_sources", []),
                     mitigations=[],
@@ -206,7 +219,9 @@ class ATTACKLoader:
                 continue
             ext = component.get("external_references", [{}])[0]
             log_sources = component.get("x_mitre_log_sources", [])
-            components = [source.get("name", "") for source in log_sources if source.get("name")]
+            components = [
+                source.get("name", "") for source in log_sources if source.get("name")
+            ]
             results.append(
                 DataSource(
                     stix_id=component["id"],

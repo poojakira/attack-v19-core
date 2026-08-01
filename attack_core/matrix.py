@@ -23,19 +23,28 @@ class ATTACKMatrix:
             techs = self.index.by_tactic(tac.attack_id)
             techs = [t for t in techs if t.domain == domain and not t.is_subtechnique]
             techs_sorted = sorted(techs, key=lambda t: t.attack_id)
-            tactic_data = {"tactic_id": tac.attack_id, "tactic_name": tac.name, "techniques": []}
+            tactic_data = {
+                "tactic_id": tac.attack_id,
+                "tactic_name": tac.name,
+                "techniques": [],
+            }
             for tech in techs_sorted:
                 subs = [
                     s
                     for s in self.index._by_id.values()
-                    if s.is_subtechnique and s.parent_id == tech.attack_id and s.domain == domain
+                    if s.is_subtechnique
+                    and s.parent_id == tech.attack_id
+                    and s.domain == domain
                 ]
                 tactic_data["techniques"].append(
                     {
                         "technique_id": tech.attack_id,
                         "technique_name": tech.name,
                         "subtechniques": [
-                            {"subtechnique_id": s.attack_id, "subtechnique_name": s.name}
+                            {
+                                "subtechnique_id": s.attack_id,
+                                "subtechnique_name": s.name,
+                            }
                             for s in subs
                         ],
                     }
@@ -168,7 +177,11 @@ class NavigatorLayerReporter:
             },
             "hideDisabled": False,
             "techniques": techniques,
-            "gradient": {"colors": ["#ffffff", "#ff6666"], "minValue": 0, "maxValue": 100},
+            "gradient": {
+                "colors": ["#ffffff", "#ff6666"],
+                "minValue": 0,
+                "maxValue": 100,
+            },
             "legendItems": [
                 {"label": "Detection coverage", "color": "#ff6666"},
             ],
