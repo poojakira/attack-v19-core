@@ -10,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "mitreattack-python==3.0.3",
+    "setuptools<81",
     "stix2==3.0.1",
     "taxii2-client==2.3.0",
     "networkx==3.3",
@@ -24,4 +25,4 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["attack_core*"]
+include = ["attack_core*", "attack_v19_core*"]
