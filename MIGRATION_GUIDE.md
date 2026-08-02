@@ -141,42 +141,83 @@ assert remap_technique_id("T1534") == "T1684.001"
 
 ## Step 4: Update Dependency
 
-### pyproject.toml / setup.py
+### Released dependency
+
+Use the v19 package version in project metadata when your package index provides it:
+
 ```toml
 [project]
 dependencies = [
-    "attack-v19-core>=1.0.0",  # Was attack-v18-core or similar
+    "attack-v19-core>=19.1.0",
 ]
 ```
 
-### Pin Exact Version for Reproducibility
+For a fully pinned release, use the same version as this repository's
+`pyproject.toml`:
+
 ```toml
 dependencies = [
-    "attack-v19-core==1.0.0",
+    "attack-v19-core==19.1.0",
 ]
+```
+
+### Local sibling checkout
+
+For development, install the local core checkout instead of relying on a
+network download. These commands assume the consumer repository and
+`attack-v19-core` are sibling directories.
+
+```powershell
+# Run from the consumer repository root.
+py -m pip install -e ..\attack-v19-core
+```
+
+```bash
+# Run from the consumer repository root.
+python -m pip install -e ../attack-v19-core
 ```
 
 ## Step 5: Run Migration Tests
 
-```bash
-# 1. Install updated core
-pip install -e ../attack-v19-core
+### 1. Validate the core package
 
-# 2. Run enricher tests
-pytest tests/test_attack_mapping.py -v
+Run this from the `attack-v19-core` repository root:
 
-# 3. Validate no revoked IDs in rule tables
-python -c "
-from attack_mapping.enricher import ATTACKEnricher
-from attack_core.constants import V19_REVOCATION_MAP
-
-enricher = ATTACKEnricher(...)
-all_tids = [tid for tids in enricher._rule_table.values() for tid in tids]
-revoked = [tid for tid in all_tids if tid in V19_REVOCATION_MAP]
-assert not revoked, f'Revoked IDs still in rule table: {revoked}'
-print('PASS: No revoked IDs in rule tables')
-"
+```powershell
+py -m pip install -e ".[dev]"
+py -m pytest -c pyproject.toml tests/test_v19_structure.py -v
 ```
+
+```bash
+python -m pip install -e ".[dev]"
+python -m pytest -c pyproject.toml tests/test_v19_structure.py -v
+```
+
+### 2. Validate a consumer repository
+
+Not every consumer repository has the same test layout. If the repository
+contains `tests/test_attack_mapping.py`, run it from that repository root:
+
+```powershell
+py -m pytest -c pyproject.toml tests/test_attack_mapping.py -v
+```
+
+```bash
+python -m pytest -c pyproject.toml tests/test_attack_mapping.py -v
+```
+
+If that file is absent, run the test command documented by that repository's
+README or runbook instead of copying this command blindly.
+
+### 3. Confirm the revocation map is available
+
+```powershell
+py -c "from attack_core.constants import V19_REVOCATION_MAP; print(f'Revocation mappings: {len(V19_REVOCATION_MAP)}')"
+```
+
+This confirms the shared mapping is installed. Checking whether a consumer's
+rule table still contains revoked IDs is consumer-specific; use that
+repository's mapping test or rule-table test for the final check.
 
 ## Step 6: Verify Dashboard/Alert Updates
 
@@ -195,10 +236,10 @@ print('PASS: No revoked IDs in rule tables')
 ## Rollback Plan
 
 If issues arise:
-1. Pin `attack-v19-core==0.1.0` (pre-v19) in dependencies
-2. Revert rule table changes
-3. Regenerate Navigator layers with v18 format
-4. Report issues to upstream
+1. Restore the last known compatible `attack-v19-core` version recorded in your lockfile or release manifest.
+2. Revert rule table changes.
+3. Regenerate Navigator layers with the prior ATT&CK format.
+4. Report issues to upstream.
 
 ## Support
 
