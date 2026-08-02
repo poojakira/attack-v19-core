@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=83,<84"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -10,12 +10,13 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "mitreattack-python==3.0.3",
-    "setuptools<81",
+    "setuptools>=83,<84",
     "stix2==3.0.1",
     "taxii2-client==2.3.0",
     "networkx==3.3",
     "pandas==2.2.2",
     "pydantic==2.7.4",
+    "lxml>=6.1.0",
 ]
 
 [project.optional-dependencies]
