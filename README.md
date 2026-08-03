@@ -1,5 +1,7 @@
 # attack-v19-core
 
+[![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-View-blue)](https://poojakira.github.io/mlsec-dashboards/attack-v19-core/)
+
 A Python library that provides typed data models and lookup utilities for MITRE ATT&CK v19 techniques across Enterprise, Mobile, and ICS domains.
 
 It parses ATT&CK STIX bundles into Pydantic v2 models, lets you search/filter techniques, and handles the 17 revoked technique IDs from v19 by automatically remapping them to their replacements.
