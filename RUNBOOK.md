@@ -1,34 +1,39 @@
 # Runbook
 
-## Engineering Update - 2026-07-27
+## What this is
 
-Repository: attack-v19-core
-Purpose: Private MITRE ATT&CK v19.1 mapping core
+`attack-v19-core` is the shared ATT&CK v19 data model library. Other repos in this project depend on it.
 
-## Build
+## Build and test locally
 
-- Install: make install
-- Lint: make lint
-- Format: make format
-- Test: make test
-- Package build: make build
-- Security scan: make security
-- Full local gate: make verify
+```bash
+make install    # Install dependencies into venv
+make lint       # Ruff linter
+make format     # Ruff auto-format
+make test       # pytest (52 tests as of last check)
+make build      # Build wheel
+make security   # Run security scan (bandit, pip-audit)
+make verify     # All of the above in sequence
+```
+
+## Data files
+
+The library downloads pinned MITRE ATT&CK v19.1 STIX bundles. Downloads are verified with SHA-256 checksums.
+
+Run `python scripts/download_attack_data.py` to fetch them.
 
 ## Dashboard
 
-Static 3D dashboard: dashboard/index.html. Serve with make dashboard after local static validation.
+There's a static HTML dashboard at `dashboard/index.html`. Serve it locally with `make dashboard`. It's for visual inspection only — not a test artifact.
 
-## Dependencies And Data
+## Things to check before pushing
 
-Downloads pinned MITRE ATT&CK v19.1 STIX bundles with SHA-256 verification.
+- Tests pass locally (`make test`)
+- Linter is clean (`make lint`)
+- Wheel builds without errors (`make build`)
+- CI will also run on Linux (GitHub Actions), so avoid Windows-only path assumptions
 
-## Validation Snapshot
+## Limitations
 
-Validated: Ruff passed, pytest passed (52 tests), wheel build passed.
-
-## Operating Limits
-
-- Re-check Linux and GitHub Actions after pushing to main.
-- Treat local dashboard scores as evidence indicators, not certifications.
-- Do not cite production readiness until clean CI, dependency audit, license status, and runtime smoke tests are current.
+- Local dashboard scores are informational, not a certification of anything.
+- Don't claim this is production-ready without current CI passing, dependency audit, and runtime smoke tests.
