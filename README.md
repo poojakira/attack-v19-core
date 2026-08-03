@@ -1,6 +1,6 @@
 # attack-v19-core
 
-[![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-View-blue)](https://poojakira.github.io/mlsec-dashboards/attack-v19-core/)
+[![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-View-blue)](https://poojakira.github.io/attack-v19-core/)
 
 A Python library that provides typed data models and lookup utilities for MITRE ATT&CK v19 techniques across Enterprise, Mobile, and ICS domains.
 
