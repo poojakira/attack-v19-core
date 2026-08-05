@@ -10,7 +10,7 @@ It parses ATT&CK STIX bundles into Pydantic v2 models, lets you search/filter te
 
 - 222 Enterprise techniques, 475 sub-techniques
 - 15 Enterprise tactics (including the v19 additions: TA0005 "Stealth" and TA0112 "Defense Impairment")
-- 17 revoked technique IDs auto-remapped via `V19_REVOCATION_MAP`
+- 17 revoked technique IDs auto-remapped via `V19_REVOCATION_MAP` (this count covers all IDs in the map, including both base techniques and sub-techniques that were revoked)
 - 48 new techniques added in v19
 
 ## Install
@@ -107,7 +107,7 @@ replacement = V19_REVOCATION_MAP.get("T1562.001")  # → "T1685"
 
 | Model | Description |
 |-------|-------------|
-| `Tactic` | ATT&CK tactic (TA0001–TA0112) |
+| `Tactic` | ATT&CK tactic (TA0001-TA0112) |
 | `Technique` | Base technique (Txxxx) |
 | `SubTechnique` | Sub-technique (Txxxx.xxx) |
 | `Group` | Threat group (Gxxxx) |
@@ -119,18 +119,18 @@ replacement = V19_REVOCATION_MAP.get("T1562.001")  # → "T1685"
 
 ### Constants
 
-- `ENTERPRISE_TACTICS` — ordered list of Enterprise tactic IDs
-- `V19_REVOCATION_MAP` — dict mapping revoked IDs to replacements
-- `PLATFORMS_ENTERPRISE`, `PLATFORMS_MOBILE`, `PLATFORMS_ICS` — valid platform strings
+- `ENTERPRISE_TACTICS` - ordered list of Enterprise tactic IDs
+- `V19_REVOCATION_MAP` - dict mapping 17 revoked IDs to their replacements
+- `PLATFORMS_ENTERPRISE`, `PLATFORMS_MOBILE`, `PLATFORMS_ICS` - valid platform strings
 
 ## v19 Breaking Changes
 
-If you're migrating from v18, the main things to know:
+If you are migrating from v18, the main things to know:
 
 - "Defense Evasion" (TA0005) was renamed to "Stealth"
 - A new tactic "Defense Impairment" (TA0112) was split out from the old TA0005
-- 12 techniques were revoked (T1562 and related IDs). The library remaps these automatically.
-- 48 new techniques were added (T1682–T1695 range, plus ICS sub-techniques)
+- **17 technique IDs were revoked and are auto-remapped.** This count covers all entries in `V19_REVOCATION_MAP`—it includes both base techniques (e.g. T1562) and their sub-techniques (e.g. T1562.001), plus other revoked IDs like T1070.001, T1070.002, T1534, and similar. Do not read it as "17 base-technique families"; some families contribute one ID, others contribute multiple. The library remaps all 17 transparently.
+- 48 new techniques were added (T1682-T1695 range, plus ICS sub-techniques)
 
 See [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for details.
 
