@@ -13,7 +13,7 @@ dependencies = [
     "setuptools>=83,<84",
     "stix2==3.0.1",
     "taxii2-client==2.3.0",
-    "networkx==3.3",
+    "networkx==3.4.2",
     "pandas==2.2.2",
     "pydantic==2.7.4",
     "lxml>=6.1.0",
