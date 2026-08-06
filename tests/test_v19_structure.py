@@ -40,7 +40,7 @@ def test_new_v19_techniques_resolvable():
         "T1688",
         "T1689",
         "T1690",
-        "T1027/018",
+        "T1027.018",
     ]
     for tid in new_ids:
         result = index.get(tid)
@@ -67,7 +67,7 @@ def test_revoked_techniques_not_in_index():
 def test_ics_new_subtechniques_resolvable():
     loader = ATTACKLoader()
     index = ATTACKIndex(loader)
-    ics_new = ["T1691", "T1692", "T1693", "T1694", "T1695", "T0843/001", "T0846/001"]
+    ics_new = ["T1691", "T1692", "T1693", "T1694", "T1695", "T0843.001", "T0846.001"]
     for tid in ics_new:
         result = index.get(tid)
         if result is not None:
