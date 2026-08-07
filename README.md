@@ -1,3 +1,6 @@
+> ℹ️ **UTILITY LIBRARY — Typed Pydantic models + v19 revocation map around [mitreattack-python](https://github.com/mitre-attack/mitreattack-python). The delta over using mitreattack-python directly is the V19_REVOCATION_MAP (17 remapped IDs) and typed Navigator layer generation. Used internally by other portfolio repos.**
+
+---
 # attack-v19-core
 
 [![Demo Dashboard (static)](https://img.shields.io/badge/Demo_Dashboard-Static-lightgrey)](https://poojakira.github.io/attack-v19-core/)
