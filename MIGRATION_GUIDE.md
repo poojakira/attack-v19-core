@@ -8,8 +8,8 @@ This guide helps downstream consumers migrate from ATT&CK v18 to v19.
 |----------|-----|-----|-----------------|
 | Tactic TA0005 | "Defense Evasion" | "Stealth" | Update display names, dashboards |
 | New Tactic | N/A | TA0112 "Defense Impairment" | Add to tactic lists, Navigator layers |
-| 17 Techniques | Active | Revoked | Remap rule tables (see table below) |
-| 48 Techniques | N/A | New | Add to rule tables, detection coverage |
+| 13 Techniques | Active | Revoked | Remap rule tables (see table below) |
+| 46 Techniques | N/A | New | Add to rule tables, detection coverage |
 
 ## Step 1: Update Tactic References
 
