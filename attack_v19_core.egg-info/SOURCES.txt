@@ -2,6 +2,8 @@ LICENSE
 README.md
 pyproject.toml
 attack_core/__init__.py
+attack_core/__main__.py
+attack_core/cli.py
 attack_core/constants.py
 attack_core/index.py
 attack_core/loader.py
@@ -16,6 +18,7 @@ attack_v19_core/models.py
 attack_v19_core.egg-info/PKG-INFO
 attack_v19_core.egg-info/SOURCES.txt
 attack_v19_core.egg-info/dependency_links.txt
+attack_v19_core.egg-info/entry_points.txt
 attack_v19_core.egg-info/requires.txt
 attack_v19_core.egg-info/top_level.txt
 tests/test_index.py
