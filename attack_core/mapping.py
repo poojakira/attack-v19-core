@@ -79,9 +79,7 @@ class ATTACKMappingBuilder:
             was_revoked=resolution.was_revoked,
         )
 
-    def build_many(
-        self, attack_ids: list[str], confidence: float
-    ) -> list[ATTACKMapping]:
+    def build_many(self, attack_ids: list[str], confidence: float) -> list[ATTACKMapping]:
         mappings = []
         for attack_id in attack_ids:
             mapping = self.build(attack_id, confidence)

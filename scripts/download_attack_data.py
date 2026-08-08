@@ -6,9 +6,7 @@ from pathlib import Path
 from urllib.request import urlopen
 
 ATTACK_STIX_TAG = "v19.1"
-BASE_URL = (
-    f"https://raw.githubusercontent.com/mitre-attack/attack-stix-data/{ATTACK_STIX_TAG}"
-)
+BASE_URL = f"https://raw.githubusercontent.com/mitre-attack/attack-stix-data/{ATTACK_STIX_TAG}"
 
 BUNDLES = {
     "enterprise-attack.json": {
@@ -61,18 +59,14 @@ def ensure_attack_data(data_dir: Path, *, force: bool = False) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        description="Download pinned MITRE ATT&CK v19.1 STIX bundles."
-    )
+    parser = argparse.ArgumentParser(description="Download pinned MITRE ATT&CK v19.1 STIX bundles.")
     parser.add_argument(
         "--data-dir",
         type=Path,
         default=Path.home() / "attack_data",
         help="Directory where enterprise/mobile/ics ATT&CK JSON bundles are stored.",
     )
-    parser.add_argument(
-        "--force", action="store_true", help="Re-download even if files exist."
-    )
+    parser.add_argument("--force", action="store_true", help="Re-download even if files exist.")
     args = parser.parse_args(argv)
     ensure_attack_data(args.data_dir, force=args.force)
     return 0

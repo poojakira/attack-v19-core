@@ -264,9 +264,7 @@ class TestRuleTableV19Compliance:
                 existing_defense_paths.append(enricher_path)
 
         if len(existing_defense_paths) < len(defense_impairment_repos):
-            pytest.skip(
-                "cross-repo ATT&CK coverage check requires sibling repositories"
-            )
+            pytest.skip("cross-repo ATT&CK coverage check requires sibling repositories")
 
         repos_with_t1685 = 0
         for enricher_path in existing_defense_paths:
@@ -275,9 +273,7 @@ class TestRuleTableV19Compliance:
                     repos_with_t1685 += 1
 
         # Should be in most defense impairment related repos
-        assert (
-            repos_with_t1685 >= 5
-        ), f"T1685 only in {repos_with_t1685}/7 defense impairment repos"
+        assert repos_with_t1685 >= 5, f"T1685 only in {repos_with_t1685}/7 defense impairment repos"
 
         # T1682 (Query Public AI) should be in AI-focused repos
         ai_repos = [
