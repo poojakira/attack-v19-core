@@ -9,14 +9,12 @@ description = "MITRE ATT&CK v19 Core Data Models"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "mitreattack-python==3.0.3",
-    "setuptools>=83,<84",
-    "stix2==3.0.1",
-    "taxii2-client==2.3.0",
-    "networkx==3.3",
-    "pandas==2.2.2",
-    "pydantic==2.7.4",
-    "lxml>=6.1.0",
+    "mitreattack-python>=3.0.0",
+    "stix2>=3.0.0",
+    "taxii2-client>=2.3.0",
+    "networkx>=3.0",
+    "pandas>=2.0",
+    "pydantic>=2.0",
 ]
 
 [project.scripts]
