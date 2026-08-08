@@ -16,29 +16,100 @@ It parses ATT&CK STIX bundles into Pydantic v2 models, lets you search/filter te
 - 13 revoked technique IDs auto-remapped via `V19_REVOCATION_MAP` (this count covers all IDs in the map, including both true revocations and identity mappings for ICS techniques that received new sub-techniques)
 - 46 new technique/sub-technique IDs added in v19 (23 Enterprise + 23 ICS)
 
-## Install
+## Installation
+
+### Prerequisites
+- Python 3.10 or newer
+- pip (comes with Python)
+- ATT&CK STIX bundle JSON files (downloaded automatically via included script)
+- Dependencies: mitreattack-python, pydantic, stix2, networkx, pandas (installed automatically)
+
+### Install from PyPI
+
+```powershell
+# Windows PowerShell
+py -m pip install attack-v19-core
+```
 
 ```bash
+# Linux / Mac
 pip install attack-v19-core
 ```
 
-Requires Python 3.10+.
+### Install from source (with dev dependencies)
 
-### Data files
+```powershell
+# Windows PowerShell
+git clone https://github.com/poojakira/attack-v19-core.git
+cd attack-v19-core
+py -m pip install -e ".[dev]"
+```
 
-The library needs ATT&CK STIX bundles. Download them to `~/attack_data/`:
+```bash
+# Linux / Mac
+git clone https://github.com/poojakira/attack-v19-core.git
+cd attack-v19-core
+pip install -e ".[dev]"
+```
 
+### Download ATT&CK data files
+
+The library needs ATT&CK STIX bundles. Download them with the included script:
+
+```powershell
+# Windows PowerShell
+py scripts/download_attack_data.py
+# Downloads to ~/attack_data/enterprise-attack.json, mobile-attack.json, ics-attack.json
+```
+
+```bash
+# Linux / Mac
+python scripts/download_attack_data.py
+```
+
+Or download manually to `~/attack_data/`:
 ```
 ~/attack_data/enterprise-attack.json
 ~/attack_data/mobile-attack.json
 ~/attack_data/ics-attack.json
 ```
 
-Or use the included download script:
+### Verify installation
+
+```powershell
+# Windows PowerShell
+py -c "from attack_core import ATTACKLoader, ATTACKIndex; from attack_core.constants import V19_REVOCATION_MAP; print(f'OK - {len(V19_REVOCATION_MAP)} revocations mapped')"
+```
 
 ```bash
-python scripts/download_attack_data.py
+# Linux / Mac
+python -c "from attack_core import ATTACKLoader, ATTACKIndex; from attack_core.constants import V19_REVOCATION_MAP; print(f'OK - {len(V19_REVOCATION_MAP)} revocations mapped')"
 ```
+
+### Run tests
+
+```powershell
+# Windows PowerShell
+py -m pytest tests/ -v
+# Expected: all tests passed
+```
+
+```bash
+# Linux / Mac
+pytest tests/ -v
+# Expected: all tests passed
+```
+
+### Common issues
+
+| Problem | Fix |
+|---------|-----|
+| `py` not recognized (Windows) | Use `python` instead, or install Python from python.org and ensure it's on PATH |
+| `FileNotFoundError: enterprise-attack.json` | Run `py scripts/download_attack_data.py` to download ATT&CK STIX bundles |
+| `ModuleNotFoundError: No module named 'mitreattack'` | Run `py -m pip install mitreattack-python==3.0.3` |
+| Permission denied on install | Use a virtual environment: `py -m venv .venv && .venv\Scripts\activate` |
+| `pydantic` validation errors | Ensure pydantic v2: `py -m pip install pydantic>=2.7` |
+| Tests fail on network timeout | The download script requires internet access to fetch STIX bundles from MITRE's GitHub |
 
 ## Usage
 
