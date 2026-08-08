@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TA0112 added**: "Defense Impairment" (new tactic, split from old TA0005)
 - Enterprise tactic count remains 15, but composition changed
 
-#### Technique Revocations (17 mappings in V19_REVOCATION_MAP)
+#### Technique Revocations (13 mappings in V19_REVOCATION_MAP)
 | Old ID | New ID | Notes |
 |--------|--------|-------|
 | T1562 | T1685 | Impair Defenses -> Disable or Modify Tools |
@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | T1534 | T1684.001 | Internal Spearphishing -> Social Engineering: Impersonation |
 | T1566.003 | T1684.002 | Email Spoofing -> Social Engineering: Email Spoofing |
 
-#### New v19 Techniques (48 IDs)
+#### New v19 Techniques (46 IDs)
 **Enterprise (12 parent + 13 sub-techniques):**
 - T1682: Query Public AI Services
 - T1683: Generate Content (T1683/001 Written, T1683/002 Audio-Visual)
@@ -58,7 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `NavigatorLayerReporter` class generating ATT&CK Navigator v4.9 layers with TA0112 support
 - `V19_REVOCATION_MAP` constant for automatic technique ID remapping
-- `V19_NEW_TECHNIQUES` constant with all 48 new technique IDs and names
+- `V19_NEW_TECHNIQUES` constant with all 46 new technique IDs and names
 - `V19_NEW_SOFTWARE` and `V19_NEW_CAMPAIGNS` CTI tracking constants
 - Comprehensive test suite in `tests/test_v19_structure.py` (8 tests)
 

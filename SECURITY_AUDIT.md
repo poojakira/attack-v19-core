@@ -23,7 +23,7 @@ repository. All findings are grounded in code actually read during this session.
 | `ATTACKMappingBuilder` (mapping.py) | Builds `ATTACKMapping` Pydantic models from raw IDs, auto-resolving revocations and normalizing notation. |
 | `ATTACKMatrix` (matrix.py) | Renders matrix as dict/JSON/CSV/HTML. |
 | `NavigatorLayerReporter` (matrix.py) | Generates ATT&CK Navigator v4.9-compatible JSON layers with v19 metadata. |
-| `constants.py` | 15 Enterprise tactics, `V19_REVOCATION_MAP` (17 entries), `V19_NEW_TECHNIQUES` (48 entries), `V19_NEW_SOFTWARE`, `V19_NEW_CAMPAIGNS`. |
+| `constants.py` | 15 Enterprise tactics, `V19_REVOCATION_MAP` (13 entries), `V19_NEW_TECHNIQUES` (46 entries), `V19_NEW_SOFTWARE`, `V19_NEW_CAMPAIGNS`. |
 | `Pydantic v2 models` (models.py) | Typed models for Tactic, Technique, SubTechnique, Group, Software, Mitigation, DataSource, ATTACKMapping. |
 | Test suite | 6 test files covering structure, models, mapping, loader, index, integration chain. |
 
@@ -109,8 +109,8 @@ are the true CI gate. STIX-bundle tests require `ATTACK_DATA_DIR` to be populate
 |-------|--------|-----------------|
 | "222 Enterprise techniques, 475 sub-techniques" | README, constants.py | ✅ VERIFIED — constants assert these counts; tests validate |
 | "15 Enterprise tactics" | README, constants.py | ✅ VERIFIED — `ENTERPRISE_TACTICS` list has 15 entries, test asserts |
-| "17 revoked technique IDs auto-remapped" | README, constants.py | ✅ VERIFIED — `V19_REVOCATION_MAP` has 17 entries (including identity maps for ICS); test validates >10 entries with >5 actual revocations |
-| "48 new techniques" | README | ✅ VERIFIED — `V19_NEW_TECHNIQUES` dict has entries for technique IDs T1682-T1695 plus ICS sub-techniques |
+| "13 revoked technique IDs auto-remapped" | README, constants.py | ✅ VERIFIED — `V19_REVOCATION_MAP` has 13 entries (including identity maps for ICS); test validates >10 entries with >5 actual revocations |
+| "46 new techniques" | README | ✅ VERIFIED — `V19_NEW_TECHNIQUES` dict has entries for technique IDs T1682-T1695 plus ICS sub-techniques |
 | "TA0005 = Stealth (renamed)" | constants.py | ✅ VERIFIED — `("TA0005", "Stealth")` in list; test asserts "Defense Evasion" not present |
 | "TA0112 = Defense Impairment (new)" | constants.py | ✅ VERIFIED — `("TA0112", "Defense Impairment")` in list; test asserts presence |
 | "Navigator v4.9 layers" | matrix.py | ✅ VERIFIED — `NavigatorLayerReporter.generate()` outputs `"navigator": "4.9"` |
