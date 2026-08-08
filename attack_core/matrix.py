@@ -32,9 +32,7 @@ class ATTACKMatrix:
                 subs = [
                     s
                     for s in self.index._by_id.values()
-                    if s.is_subtechnique
-                    and s.parent_id == tech.attack_id
-                    and s.domain == domain
+                    if s.is_subtechnique and s.parent_id == tech.attack_id and s.domain == domain
                 ]
                 tactic_data["techniques"].append(
                     {
