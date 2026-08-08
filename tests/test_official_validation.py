@@ -15,7 +15,6 @@ This file validates the library's constants against these official facts.
 import re
 
 import pytest
-
 from attack_core.constants import (
     ENTERPRISE_SUBTECHNIQUE_COUNT,
     ENTERPRISE_TACTIC_COUNT,
@@ -24,7 +23,6 @@ from attack_core.constants import (
     V19_NEW_TECHNIQUES,
     V19_REVOCATION_MAP,
 )
-
 
 # ---------------------------------------------------------------------------
 # Section 1: Tactic ID format validation
@@ -36,16 +34,16 @@ class TestTacticIDFormat:
 
     def test_all_tactic_ids_start_with_ta(self):
         for tactic_id, name in ENTERPRISE_TACTICS:
-            assert tactic_id.startswith("TA"), (
-                f"Tactic ID '{tactic_id}' ({name}) does not start with 'TA'"
-            )
+            assert tactic_id.startswith(
+                "TA"
+            ), f"Tactic ID '{tactic_id}' ({name}) does not start with 'TA'"
 
     def test_all_tactic_ids_have_valid_format(self):
         pattern = re.compile(r"^TA\d{4}$")
         for tactic_id, name in ENTERPRISE_TACTICS:
-            assert pattern.match(tactic_id), (
-                f"Tactic ID '{tactic_id}' ({name}) does not match TAxxxx format"
-            )
+            assert pattern.match(
+                tactic_id
+            ), f"Tactic ID '{tactic_id}' ({name}) does not match TAxxxx format"
 
     def test_tactic_count_is_15(self):
         """ATT&CK v19 has 15 Enterprise tactics (14 from v11 + TA0112 new)."""
@@ -72,9 +70,9 @@ class TestTacticIDFormat:
             "TA0043",  # Reconnaissance
             "TA0112",  # Defense Impairment (NEW in v19)
         }
-        assert tactic_ids == expected_ids, (
-            f"Missing: {expected_ids - tactic_ids}, Extra: {tactic_ids - expected_ids}"
-        )
+        assert (
+            tactic_ids == expected_ids
+        ), f"Missing: {expected_ids - tactic_ids}, Extra: {tactic_ids - expected_ids}"
 
 
 # ---------------------------------------------------------------------------
@@ -91,20 +89,23 @@ class TestTechniqueIDFormat:
 
     def test_all_new_technique_ids_valid_format(self):
         for tech_id in V19_NEW_TECHNIQUES:
-            assert self.TECHNIQUE_PATTERN.match(tech_id), (
-                f"Technique ID '{tech_id}' does not match Txxxx or Txxxx.yyy format"
-            )
+            assert self.TECHNIQUE_PATTERN.match(
+                tech_id
+            ), f"Technique ID '{tech_id}' does not match Txxxx or Txxxx.yyy format"
 
     def test_all_new_techniques_start_with_t(self):
         for tech_id in V19_NEW_TECHNIQUES:
-            assert tech_id.startswith("T"), (
-                f"Technique ID '{tech_id}' does not start with 'T'"
-            )
+            assert tech_id.startswith("T"), f"Technique ID '{tech_id}' does not start with 'T'"
 
     def test_subtechnique_parents_exist(self):
         """Every sub-technique (Txxxx.yyy) should have its parent (Txxxx) in the dict
         OR the parent should be a known pre-existing technique."""
-        pre_existing_parents = {"T1027", "T0843", "T0873", "T0846"}  # Parents that existed before v19
+        pre_existing_parents = {
+            "T1027",
+            "T0843",
+            "T0873",
+            "T0846",
+        }  # Parents that existed before v19
         for tech_id in V19_NEW_TECHNIQUES:
             if "." in tech_id:
                 parent_id = tech_id.split(".")[0]
@@ -129,9 +130,9 @@ class TestRevocationMapIntegrity:
             # Identity mappings (ICS techniques that got sub-techs added) are exceptions
             if V19_REVOCATION_MAP[old_id] == old_id:
                 continue
-            assert old_id not in V19_NEW_TECHNIQUES, (
-                f"Revoked ID '{old_id}' should not appear in V19_NEW_TECHNIQUES"
-            )
+            assert (
+                old_id not in V19_NEW_TECHNIQUES
+            ), f"Revoked ID '{old_id}' should not appear in V19_NEW_TECHNIQUES"
 
     def test_replacement_ids_are_resolvable(self):
         """Replacement IDs in V19_REVOCATION_MAP should be present in
@@ -150,20 +151,20 @@ class TestRevocationMapIntegrity:
         """Both keys and values in revocation map should be valid technique IDs."""
         pattern = re.compile(r"^T\d{4}(\.\d{3})?$")
         for old_id, new_id in V19_REVOCATION_MAP.items():
-            assert pattern.match(old_id), (
-                f"Revoked ID '{old_id}' does not match technique ID format"
-            )
-            assert pattern.match(new_id), (
-                f"Replacement ID '{new_id}' does not match technique ID format"
-            )
+            assert pattern.match(
+                old_id
+            ), f"Revoked ID '{old_id}' does not match technique ID format"
+            assert pattern.match(
+                new_id
+            ), f"Replacement ID '{new_id}' does not match technique ID format"
 
     def test_revocation_map_has_expected_count(self):
         """V19_REVOCATION_MAP tracks 13 remapped IDs.
         This includes both true revocations (old→new) and identity mappings
         for ICS techniques that received new sub-techniques."""
-        assert len(V19_REVOCATION_MAP) == 13, (
-            f"Expected 13 entries in V19_REVOCATION_MAP, got {len(V19_REVOCATION_MAP)}"
-        )
+        assert (
+            len(V19_REVOCATION_MAP) == 13
+        ), f"Expected 13 entries in V19_REVOCATION_MAP, got {len(V19_REVOCATION_MAP)}"
 
 
 # ---------------------------------------------------------------------------
@@ -205,8 +206,7 @@ class TestTechniqueCounts:
         """V19 added 46 new technique/sub-technique IDs per the official release notes.
         (23 Enterprise + 23 ICS, including new sub-techniques for existing ICS parents.)"""
         assert len(V19_NEW_TECHNIQUES) == 46, (
-            f"Expected 46 new techniques in V19_NEW_TECHNIQUES, "
-            f"got {len(V19_NEW_TECHNIQUES)}"
+            f"Expected 46 new techniques in V19_NEW_TECHNIQUES, " f"got {len(V19_NEW_TECHNIQUES)}"
         )
 
 
@@ -222,9 +222,9 @@ class TestSpecificTechniqueIDs:
     def test_t1059_command_scripting_interpreter_is_preexisting(self):
         """T1059 (Command and Scripting Interpreter) has existed since ATT&CK v1.
         It should NOT appear in V19_NEW_TECHNIQUES (it's not new)."""
-        assert "T1059" not in V19_NEW_TECHNIQUES, (
-            "T1059 is a pre-existing technique, should not be in V19_NEW_TECHNIQUES"
-        )
+        assert (
+            "T1059" not in V19_NEW_TECHNIQUES
+        ), "T1059 is a pre-existing technique, should not be in V19_NEW_TECHNIQUES"
 
     def test_t1059_001_powershell_is_subtechnique_of_t1059(self):
         """T1059.001 (PowerShell) is a sub-technique of T1059.
@@ -236,21 +236,17 @@ class TestSpecificTechniqueIDs:
 
     def test_t1195_supply_chain_compromise_is_preexisting(self):
         """T1195 (Supply Chain Compromise) has existed since ATT&CK v1."""
-        assert "T1195" not in V19_NEW_TECHNIQUES, (
-            "T1195 is a pre-existing technique, should not be in V19_NEW_TECHNIQUES"
-        )
-        assert "T1195" not in V19_REVOCATION_MAP, (
-            "T1195 was not revoked in v19"
-        )
+        assert (
+            "T1195" not in V19_NEW_TECHNIQUES
+        ), "T1195 is a pre-existing technique, should not be in V19_NEW_TECHNIQUES"
+        assert "T1195" not in V19_REVOCATION_MAP, "T1195 was not revoked in v19"
 
     def test_t1190_exploit_public_facing_application_is_preexisting(self):
         """T1190 (Exploit Public-Facing Application) has existed since ATT&CK v1."""
-        assert "T1190" not in V19_NEW_TECHNIQUES, (
-            "T1190 is a pre-existing technique, should not be in V19_NEW_TECHNIQUES"
-        )
-        assert "T1190" not in V19_REVOCATION_MAP, (
-            "T1190 was not revoked in v19"
-        )
+        assert (
+            "T1190" not in V19_NEW_TECHNIQUES
+        ), "T1190 is a pre-existing technique, should not be in V19_NEW_TECHNIQUES"
+        assert "T1190" not in V19_REVOCATION_MAP, "T1190 was not revoked in v19"
 
 
 # ---------------------------------------------------------------------------
@@ -275,24 +271,24 @@ class TestTacticRename:
     def test_ta0005_is_stealth(self):
         """TA0005 should be named 'Stealth' in v19 constants."""
         tactic_map = {tid: name for tid, name in ENTERPRISE_TACTICS}
-        assert tactic_map["TA0005"] == "Stealth", (
-            f"TA0005 should be 'Stealth' in v19, got '{tactic_map.get('TA0005')}'"
-        )
+        assert (
+            tactic_map["TA0005"] == "Stealth"
+        ), f"TA0005 should be 'Stealth' in v19, got '{tactic_map.get('TA0005')}'"
 
     def test_defense_evasion_not_present(self):
         """'Defense Evasion' was retired in v19 — should not appear as a tactic name."""
         tactic_names = [name for _, name in ENTERPRISE_TACTICS]
-        assert "Defense Evasion" not in tactic_names, (
-            "'Defense Evasion' should not appear in v19 ENTERPRISE_TACTICS"
-        )
+        assert (
+            "Defense Evasion" not in tactic_names
+        ), "'Defense Evasion' should not appear in v19 ENTERPRISE_TACTICS"
 
     def test_ta0112_is_defense_impairment(self):
         """TA0112 'Defense Impairment' is the new tactic split from old TA0005."""
         tactic_map = {tid: name for tid, name in ENTERPRISE_TACTICS}
         assert "TA0112" in tactic_map, "TA0112 should exist in ENTERPRISE_TACTICS"
-        assert tactic_map["TA0112"] == "Defense Impairment", (
-            f"TA0112 should be 'Defense Impairment', got '{tactic_map.get('TA0112')}'"
-        )
+        assert (
+            tactic_map["TA0112"] == "Defense Impairment"
+        ), f"TA0112 should be 'Defense Impairment', got '{tactic_map.get('TA0112')}'"
 
 
 # ---------------------------------------------------------------------------
@@ -337,9 +333,9 @@ class TestOfficialNewTechniques:
     )
     def test_enterprise_new_technique_present(self, tech_id, expected_name_fragment):
         """Each officially documented new Enterprise technique must be in V19_NEW_TECHNIQUES."""
-        assert tech_id in V19_NEW_TECHNIQUES, (
-            f"Official v19 technique '{tech_id}' missing from V19_NEW_TECHNIQUES"
-        )
+        assert (
+            tech_id in V19_NEW_TECHNIQUES
+        ), f"Official v19 technique '{tech_id}' missing from V19_NEW_TECHNIQUES"
         assert expected_name_fragment in V19_NEW_TECHNIQUES[tech_id], (
             f"Technique '{tech_id}' name should contain '{expected_name_fragment}', "
             f"got '{V19_NEW_TECHNIQUES[tech_id]}'"
@@ -373,9 +369,9 @@ class TestOfficialNewTechniques:
     )
     def test_ics_new_technique_present(self, tech_id, expected_name_fragment):
         """Each officially documented new ICS technique must be in V19_NEW_TECHNIQUES."""
-        assert tech_id in V19_NEW_TECHNIQUES, (
-            f"Official v19 ICS technique '{tech_id}' missing from V19_NEW_TECHNIQUES"
-        )
+        assert (
+            tech_id in V19_NEW_TECHNIQUES
+        ), f"Official v19 ICS technique '{tech_id}' missing from V19_NEW_TECHNIQUES"
         assert expected_name_fragment in V19_NEW_TECHNIQUES[tech_id], (
             f"ICS technique '{tech_id}' name should contain '{expected_name_fragment}', "
             f"got '{V19_NEW_TECHNIQUES[tech_id]}'"
