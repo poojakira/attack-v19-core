@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=83,<84"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "attack-v19-core"
+version = "19.1.0"
+description = "MITRE ATT&CK v19 Core Data Models"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mitreattack-python==3.0.3",
+    "setuptools>=83,<84",
+    "stix2==3.0.1",
+    "taxii2-client==2.3.0",
+    "networkx==3.3",
+    "pandas==2.2.2",
+    "pydantic==2.7.4",
+    "lxml>=6.1.0",
+]
+
+[project.scripts]
+attack-v19 = "attack_core.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["attack_core*", "attack_v19_core*"]
