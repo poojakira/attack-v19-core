@@ -127,7 +127,7 @@ Loaded 15 enterprise tactics
 pytest tests/ -v
 ```
 
-Expected: ~52 tests passing.
+Expected: 121 tests passing (1 skipped).
 
 **Full verification (lint + test + build + security):**
 ```powershell
