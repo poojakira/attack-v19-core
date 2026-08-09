@@ -84,26 +84,34 @@ Data saved to: data/
 
 ## Step 5: Run (Verify Library Works)
 
+The tactic/technique constants load with no STIX download, so they are the
+fastest sanity check that the package imported correctly.
+
 **Windows (PowerShell):**
 ```powershell
-# Quick sanity check — import and list techniques
-.\.venv\Scripts\python.exe -c "from attack_v19_core import TechniqueRegistry; r = TechniqueRegistry(); print(f'Loaded {len(r.techniques)} techniques')"
+# Quick sanity check — the v19 tactic set (no data download needed)
+.\.venv\Scripts\python.exe -c "from attack_v19_core import ENTERPRISE_TACTICS; print(f'Loaded {len(ENTERPRISE_TACTICS)} enterprise tactics')"
 
 # List all tactic names
-.\.venv\Scripts\python.exe -c "from attack_v19_core import TechniqueRegistry; r = TechniqueRegistry(); print([t.name for t in r.tactics])"
+.\.venv\Scripts\python.exe -c "from attack_v19_core import ENTERPRISE_TACTICS; print([name for _, name in ENTERPRISE_TACTICS])"
+
+# CLI: list the v19 revocation map (no data download needed)
+.\.venv\Scripts\python.exe -m attack_core revoked
 ```
 
 **Linux/macOS:**
 ```bash
-python -c "from attack_v19_core import TechniqueRegistry; r = TechniqueRegistry(); print(f'Loaded {len(r.techniques)} techniques')"
+python -c "from attack_v19_core import ENTERPRISE_TACTICS; print(f'Loaded {len(ENTERPRISE_TACTICS)} enterprise tactics')"
+python -m attack_core revoked
 ```
 
 Expected output:
 ```
-Loaded 234 techniques
+Loaded 15 enterprise tactics
 ```
 
-> **Note:** Exact technique count depends on ATT&CK v19.1 bundle content.
+> **Note:** Full technique lookup (`ATTACKIndex`/`ATTACKLoader`) requires the
+> STIX bundles from Step 4. The constant above needs no download.
 
 ---
 
