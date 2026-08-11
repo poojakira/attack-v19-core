@@ -21,6 +21,7 @@ from attack_core.constants import (
     ENTERPRISE_TACTICS,
     ENTERPRISE_TECHNIQUE_COUNT,
     V19_NEW_TECHNIQUES,
+    V19_RELEASE_REVOCATION_MAP,
     V19_REVOCATION_MAP,
 )
 
@@ -95,7 +96,9 @@ class TestTechniqueIDFormat:
 
     def test_all_new_techniques_start_with_t(self):
         for tech_id in V19_NEW_TECHNIQUES:
-            assert tech_id.startswith("T"), f"Technique ID '{tech_id}' does not start with 'T'"
+            assert tech_id.startswith(
+                "T"
+            ), f"Technique ID '{tech_id}' does not start with 'T'"
 
     def test_subtechnique_parents_exist(self):
         """Every sub-technique (Txxxx.yyy) should have its parent (Txxxx) in the dict
@@ -109,7 +112,9 @@ class TestTechniqueIDFormat:
         for tech_id in V19_NEW_TECHNIQUES:
             if "." in tech_id:
                 parent_id = tech_id.split(".")[0]
-                assert parent_id in V19_NEW_TECHNIQUES or parent_id in pre_existing_parents, (
+                assert (
+                    parent_id in V19_NEW_TECHNIQUES or parent_id in pre_existing_parents
+                ), (
                     f"Sub-technique '{tech_id}' has no parent '{parent_id}' "
                     f"in V19_NEW_TECHNIQUES or known pre-existing techniques"
                 )
@@ -158,13 +163,14 @@ class TestRevocationMapIntegrity:
                 new_id
             ), f"Replacement ID '{new_id}' does not match technique ID format"
 
-    def test_revocation_map_has_expected_count(self):
-        """V19_REVOCATION_MAP tracks 13 remapped IDs.
-        This includes both true revocations (old→new) and identity mappings
-        for ICS techniques that received new sub-techniques."""
-        assert (
-            len(V19_REVOCATION_MAP) == 13
-        ), f"Expected 13 entries in V19_REVOCATION_MAP, got {len(V19_REVOCATION_MAP)}"
+    def test_v19_release_revocation_map_has_expected_count(self):
+        """MITRE v19 lists 13 Enterprise and 9 ICS technique revocations."""
+        assert len(V19_RELEASE_REVOCATION_MAP) == 22
+        assert all(old != new for old, new in V19_RELEASE_REVOCATION_MAP.items())
+
+    def test_compatibility_map_contains_the_release_map(self):
+        for old_id, new_id in V19_RELEASE_REVOCATION_MAP.items():
+            assert V19_REVOCATION_MAP[old_id] == new_id
 
 
 # ---------------------------------------------------------------------------
@@ -206,7 +212,8 @@ class TestTechniqueCounts:
         """V19 added 46 new technique/sub-technique IDs per the official release notes.
         (23 Enterprise + 23 ICS, including new sub-techniques for existing ICS parents.)"""
         assert len(V19_NEW_TECHNIQUES) == 46, (
-            f"Expected 46 new techniques in V19_NEW_TECHNIQUES, " f"got {len(V19_NEW_TECHNIQUES)}"
+            f"Expected 46 new techniques in V19_NEW_TECHNIQUES, "
+            f"got {len(V19_NEW_TECHNIQUES)}"
         )
 
 
@@ -392,7 +399,9 @@ class TestDataIntegrity:
 
     def test_no_duplicate_tactic_names(self):
         tactic_names = [t[1] for t in ENTERPRISE_TACTICS]
-        assert len(tactic_names) == len(set(tactic_names)), "Duplicate tactic names found"
+        assert len(tactic_names) == len(
+            set(tactic_names)
+        ), "Duplicate tactic names found"
 
     def test_no_empty_technique_names(self):
         for tech_id, name in V19_NEW_TECHNIQUES.items():

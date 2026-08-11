@@ -1,243 +1,70 @@
-# Runbook — ATT&CK v19 Core
+# Operator Runbook
 
-Step-by-step guide to build, test, and use the shared ATT&CK v19 data model library.
+## Supported operating model
 
----
+`attack-v19-core` is an in-process utility. The operator owns the Python environment, read-only ATT&CK data directory, application logging, and rollback of dependent applications. There is no hosted service or autonomous action path.
 
-## Step 1: Prerequisites
+Supported runtime: Python 3.11 or 3.12 with dependencies resolved from `uv.lock`.
 
-- Python 3.10+ (`py --version` on Windows, `python3 --version` on Linux)
-- pip (bundled with Python)
-- Git
-- Internet access (for downloading MITRE ATT&CK STIX bundles on first run)
+## Provision
 
----
-
-## Step 2: Clone
-
-**Windows (PowerShell):**
-```powershell
-cd C:\Users\pooja\repos
+```bash
 git clone https://github.com/poojakira/attack-v19-core.git
 cd attack-v19-core
+uv sync --locked --extra dev
+uv run python scripts/download_attack_data.py
 ```
 
-**Linux/macOS:**
+The download succeeds only when all official v19.2 bundle hashes match. The default data directory is `~/attack_data`; override it with `ATTACK_DATA_DIR` for runtime use and `--data-dir` for download.
+
+## Pre-deployment verification
+
 ```bash
-cd ~/repos
-git clone https://github.com/poojakira/attack-v19-core.git
-cd attack-v19-core
+ATTACK_DATA_DIR="$HOME/attack_data" uv run pytest tests -q
+uv run ruff check attack_core tests scripts
+uv run ruff format --check attack_core tests scripts
+uv build
 ```
 
----
+Record the Git commit, Python version, `uv.lock` hash, bundle hashes, and complete command output. Do not convert a source-file count into a passing-test claim.
 
-## Step 3: Install
+## Runtime smoke test
 
-**Windows (PowerShell):**
-```powershell
-py -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --upgrade pip
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
-```
-
-**Linux/macOS:**
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -e ".[dev]"
+ATTACK_DATA_DIR="$HOME/attack_data" uv run attack-v19 lookup T1059
+ATTACK_DATA_DIR="$HOME/attack_data" uv run attack-v19 lookup T1562.009
 ```
 
-**Or use Makefile (if `make` available):**
-```powershell
-make install
-```
+Expected behavior:
 
----
+- `T1059` resolves from the pinned Enterprise bundle.
+- `T1562.009` resolves to `T1688` through the reviewed v19 release map.
+- Missing or corrupt bundles fail closed with an error; the loader does not download data implicitly.
 
-## Step 4: Download ATT&CK Data
+## Update ATT&CK data
 
-The library uses pinned MITRE ATT&CK v19.1 STIX bundles, verified with SHA-256 checksums.
+1. Confirm the release on MITRE's version history and official GitHub data repository.
+2. Change `ATTACK_STIX_TAG` and all three hashes in `scripts/download_attack_data.py`.
+3. Add or update hash tests.
+4. Review tactic, technique, sub-technique, and revocation changes.
+5. Run the complete verification against freshly downloaded bundles.
+6. Update README, migration guide, changelog, and evidence policy.
+7. Release only after independent review.
 
-**Windows (PowerShell):**
-```powershell
-.\.venv\Scripts\python.exe scripts/download_attack_data.py
-```
+Never bypass a hash mismatch. A mismatch means the configured artifact and downloaded bytes differ.
 
-**Linux/macOS:**
-```bash
-python scripts/download_attack_data.py
-```
+## Failure response
 
-Expected output:
-```
-Downloading ATT&CK Enterprise v19.1...
-SHA-256 verified: OK
-Downloading ATT&CK Mobile v19.1...
-SHA-256 verified: OK
-Downloading ATT&CK ICS v19.1...
-SHA-256 verified: OK
-Data saved to: data/
-```
+- Hash mismatch: retain the prior verified bundles; investigate the official release and URL. Do not update hashes from an unverified mirror.
+- Missing file: rerun the downloader with network access or restore the prior verified artifact.
+- Parse failure: preserve the failing bundle and traceback, compare its hash, and roll back the library or data release as a unit.
+- Downstream mapping regression: pin the prior commit and lock file, then reproduce with the same bundle hashes.
+- Dirty data directory: replace it from verified artifacts; do not modify STIX JSON in place.
 
----
+## Rollback
 
-## Step 5: Run (Verify Library Works)
+Deploy the prior reviewed Git commit with its matching `uv.lock` and ATT&CK bundle hashes. Re-run smoke tests before restoring traffic in the consuming application. No database migration is involved.
 
-The tactic/technique constants load with no STIX download, so they are the
-fastest sanity check that the package imported correctly.
+## Monitoring responsibility
 
-**Windows (PowerShell):**
-```powershell
-# Quick sanity check — the v19 tactic set (no data download needed)
-.\.venv\Scripts\python.exe -c "from attack_v19_core import ENTERPRISE_TACTICS; print(f'Loaded {len(ENTERPRISE_TACTICS)} enterprise tactics')"
-
-# List all tactic names
-.\.venv\Scripts\python.exe -c "from attack_v19_core import ENTERPRISE_TACTICS; print([name for _, name in ENTERPRISE_TACTICS])"
-
-# CLI: list the v19 revocation map (no data download needed)
-.\.venv\Scripts\python.exe -m attack_core revoked
-```
-
-**Linux/macOS:**
-```bash
-python -c "from attack_v19_core import ENTERPRISE_TACTICS; print(f'Loaded {len(ENTERPRISE_TACTICS)} enterprise tactics')"
-python -m attack_core revoked
-```
-
-Expected output:
-```
-Loaded 15 enterprise tactics
-```
-
-> **Note:** Full technique lookup (`ATTACKIndex`/`ATTACKLoader`) requires the
-> STIX bundles from Step 4. The constant above needs no download.
-
----
-
-## Step 6: Run Tests
-
-**Windows (PowerShell):**
-```powershell
-.\.venv\Scripts\python.exe -m pytest tests/ -v
-```
-
-**Linux/macOS:**
-```bash
-pytest tests/ -v
-```
-
-Expected: 121 tests passing (1 skipped).
-
-**Full verification (lint + test + build + security):**
-```powershell
-make verify
-```
-
----
-
-## Available Makefile Targets
-
-| Command | What it does |
-|---------|-------------|
-| `make install` | Install dependencies into venv |
-| `make test` | Run pytest (~52 tests) |
-| `make lint` | Run ruff linter |
-| `make format` | Auto-format with ruff |
-| `make build` | Build wheel package |
-| `make security` | Run bandit + pip-audit |
-| `make verify` | All of the above in sequence |
-| `make dashboard` | Serve dashboard at localhost:8080 |
-
----
-
-## View Dashboard
-
-```powershell
-py -m http.server 8080 --directory dashboard
-# Open http://localhost:8080
-```
-
-Or view hosted: https://poojakira.github.io/mlsec-dashboards/attack-v19-core/
-
-> **Note:** Dashboard is for visual inspection only — not a test artifact.
-
----
-
-## Usage as a Dependency
-
-Other repos in this portfolio depend on `attack-v19-core`. Install it from the local checkout:
-
-```powershell
-# From a sibling repo (e.g., adversarial-ml-lab)
-.\.venv\Scripts\python.exe -m pip install -e ..\attack-v19-core
-```
-
-Repos that depend on this:
-- `adversarial-ml-lab`
-- `model-privacy-attacks`
-- `llm-redteam-framework`
-- `unified-ml-security-platform`
-
----
-
-## Troubleshooting
-
-### Download Fails (Network Error)
-
-```
-ConnectionError: Failed to download ATT&CK bundle
-```
-
-**Fix:**
-1. Check internet connectivity.
-2. Check if MITRE's GitHub is accessible: https://github.com/mitre-attack/attack-stix-data
-3. If behind a proxy:
-   ```powershell
-   $env:HTTPS_PROXY = "http://your-proxy:port"
-   .\.venv\Scripts\python.exe scripts/download_attack_data.py
-   ```
-
----
-
-### SHA-256 Checksum Mismatch
-
-```
-ValueError: Checksum verification failed
-```
-
-**Fix:** The pinned checksums may be outdated if MITRE updated their bundles. Check the script for the expected hashes and compare with the latest release.
-
----
-
-### Tests Fail with "Data not found"
-
-**Fix:** Run the download script first (Step 4):
-```powershell
-.\.venv\Scripts\python.exe scripts/download_attack_data.py
-```
-
----
-
-### Tests Pass Locally but Fail in CI
-
-- CI runs on Linux — check for Windows-specific path issues
-- Ensure `scripts/download_attack_data.py` runs in CI before tests
-- Run `make lint` before pushing
-
----
-
-## Things to Check Before Pushing
-
-- [ ] Tests pass locally (`make test`)
-- [ ] Linter is clean (`make lint`)
-- [ ] Wheel builds without errors (`make build`)
-- [ ] CI will run on Linux — avoid Windows-only path assumptions
-
----
-
-## Known Limitations
-
-- Local dashboard scores are informational, not certifications
-- Not production-ready without current CI passing + dependency audit
-- Data files are pinned to ATT&CK v19.1 — won't auto-update to newer versions
+The library emits Python exceptions and mapping warnings. The consuming service must route those logs, define alert thresholds, and own its SLOs. This repository makes no availability or latency claim.

@@ -1,35 +1,43 @@
-PYTHON ?= python
-PIP ?= $(PYTHON) -m pip
+UV ?= uv
 SRC := attack_core tests scripts
+LOCKED_RUNTIME_REQUIREMENTS := /tmp/attack-v19-core-runtime-requirements.txt
+LOCKED_ALL_REQUIREMENTS := /tmp/attack-v19-core-all-requirements.txt
+SBOM := /tmp/attack-v19-core-sbom.json
 
-.PHONY: install data lint format test build security dashboard verify
+.PHONY: install data lint format typecheck test build security sbom verify
 
 install:
-	$(PIP) install --upgrade pip
-	$(PIP) install -r requirements.txt
-	$(PIP) install -e .
-	$(PIP) install build ruff bandit pip-audit
+	$(UV) sync --locked --extra dev --extra security
 
 data:
-	$(PYTHON) scripts/download_attack_data.py
+	$(UV) run python scripts/download_attack_data.py
 
 lint:
-	$(PYTHON) -m ruff check $(SRC)
+	$(UV) run ruff check $(SRC)
+	$(UV) run ruff format --check $(SRC)
 
 format:
-	$(PYTHON) -m ruff format $(SRC)
+	$(UV) run ruff format $(SRC)
+
+typecheck:
+	$(UV) run pyright attack_core scripts/download_attack_data.py
 
 test: data
-	$(PYTHON) -m pytest tests -q
+	PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 $(UV) run pytest tests -q
 
 build:
-	$(PYTHON) -m build
+	$(UV) build
+	$(UV) run check-wheel-contents --toplevel attack_core,attack_v19_core dist/*.whl
 
 security:
-	$(PYTHON) -m bandit -r attack_core scripts -ll
-	$(PYTHON) -m pip_audit -r requirements.txt
+	$(UV) run bandit -r attack_core scripts -ll
+	$(UV) export --locked --no-dev --no-emit-project --format requirements-txt --output-file $(LOCKED_RUNTIME_REQUIREMENTS)
+	$(UV) export --locked --all-extras --no-emit-project --format requirements-txt --output-file $(LOCKED_ALL_REQUIREMENTS)
+	$(UV) run pip-audit --requirement $(LOCKED_RUNTIME_REQUIREMENTS)
+	$(UV) run pip-audit --requirement $(LOCKED_ALL_REQUIREMENTS)
 
-dashboard:
-	$(PYTHON) -m http.server 8080 --directory dashboard
+sbom:
+	$(UV) export --locked --no-dev --no-emit-project --format requirements-txt --output-file $(LOCKED_RUNTIME_REQUIREMENTS)
+	$(UV) run pip-audit --requirement $(LOCKED_RUNTIME_REQUIREMENTS) --format cyclonedx-json --output $(SBOM)
 
-verify: lint test build security
+verify: lint typecheck test security build sbom

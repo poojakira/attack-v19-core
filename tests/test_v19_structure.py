@@ -51,19 +51,6 @@ def test_new_v19_techniques_resolvable():
     assert len(found) > 0, "No new v19 techniques found in index"
 
 
-def test_revoked_techniques_not_in_index():
-    loader = ATTACKLoader()
-    index = ATTACKIndex(loader)
-    # These were revoked in v19 — index must not return them as valid
-    # Note: depends on STIX bundle being updated to v19
-    revoked = ["T1562", "T1562.001", "T1070.001", "T1070.002"]
-    for tid in revoked:
-        result = index.get(tid)
-        # Only assert if we know the STIX is v19 - for now just log
-        if result is not None:
-            print(f"Revoked technique still in index: {tid} - {result.name}")
-
-
 def test_ics_new_subtechniques_resolvable():
     loader = ATTACKLoader()
     index = ATTACKIndex(loader)
@@ -78,17 +65,12 @@ def test_ics_new_subtechniques_resolvable():
     print(f"ICS v19 sub-techs found: {found}")
 
 
-def test_revocation_map_keys_not_in_v19_index():
+def test_compatibility_remap_is_nonempty_and_has_no_identity_entries():
     from attack_core.constants import V19_REVOCATION_MAP
 
     # Test that revocation map is properly defined
     assert len(V19_REVOCATION_MAP) > 10
-    # Count actual revocations (not identity mappings)
-    actual_revocations = {k: v for k, v in V19_REVOCATION_MAP.items() if k != v}
-    assert (
-        len(actual_revocations) > 5
-    ), f"Expected >5 actual revocations, got {len(actual_revocations)}"
-    for old_id, new_id in actual_revocations.items():
+    for old_id, new_id in V19_REVOCATION_MAP.items():
         assert old_id != new_id
 
 

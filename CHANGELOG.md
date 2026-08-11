@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [19.2.0] - 2026-08-10
+
+### Changed
+- Updated pinned ATT&CK data from v19.1 to v19.2 with verified bundle hashes.
+- Corrected the v19 release revocation set to 13 Enterprise and 9 ICS mappings.
+- Separated older compatibility aliases from official v19 release revocations.
+- Removed the unsupported PyPI installation path and static dashboard.
+- Replaced detection-coverage wording with mapping or inventory wording.
+
+### Security
+- Escaped STIX-controlled fields in HTML table output.
+- Streamed bundle downloads with a 128 MiB limit and temporary-file cleanup.
+- Removed import-time nested pytest execution.
+
 ## [1.0.0] - 2026-07-22
 
 ### Changed - ATT&CK v19 Migration (BREAKING)

@@ -15,7 +15,11 @@ import sys
 import textwrap
 from pathlib import Path
 
-from .constants import V19_REVOCATION_MAP
+from .constants import (
+    LEGACY_TECHNIQUE_REMAPS,
+    V19_RELEASE_REVOCATION_MAP,
+    V19_REVOCATION_MAP,
+)
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -29,16 +33,20 @@ def _build_parser() -> argparse.ArgumentParser:
     lookup_parser = subparsers.add_parser(
         "lookup", help="Look up a technique by ATT&CK ID (e.g. T1059)"
     )
-    lookup_parser.add_argument("technique_id", help="ATT&CK technique ID (e.g. T1059, T1059.001)")
-    lookup_parser.add_argument("--json", action="store_true", dest="as_json", help="Output as JSON")
-
-    # revoked
-    subparsers.add_parser(
-        "revoked", help="List all v19 revoked technique IDs and their replacements"
+    lookup_parser.add_argument(
+        "technique_id", help="ATT&CK technique ID (e.g. T1059, T1059.001)"
+    )
+    lookup_parser.add_argument(
+        "--json", action="store_true", dest="as_json", help="Output as JSON"
     )
 
+    # revoked
+    subparsers.add_parser("revoked", help="List supported technique ID remaps")
+
     # navigator
-    nav_parser = subparsers.add_parser("navigator", help="Generate an ATT&CK Navigator layer JSON")
+    nav_parser = subparsers.add_parser(
+        "navigator", help="Generate an ATT&CK Navigator layer JSON"
+    )
     nav_parser.add_argument(
         "--output",
         "-o",
@@ -85,14 +93,23 @@ def cmd_lookup(args: argparse.Namespace) -> int:
     technique = index.get(args.technique_id)
 
     if technique is None:
-        # Check if it's a known revoked ID even if data doesn't have replacement
+        # Check if it is a known remap even if the replacement is not loaded.
         replacement = V19_REVOCATION_MAP.get(args.technique_id)
         if replacement:
+            classification = (
+                "revoked in ATT&CK v19"
+                if args.technique_id in V19_RELEASE_REVOCATION_MAP
+                else "a legacy compatibility ID"
+            )
             print(
-                f"Technique {args.technique_id} was revoked in v19. " f"Replacement: {replacement}",
+                f"Technique {args.technique_id} is {classification}. "
+                f"Replacement: {replacement}",
                 file=sys.stderr,
             )
-            print(f"Could not find replacement {replacement} in loaded data.", file=sys.stderr)
+            print(
+                f"Could not find replacement {replacement} in loaded data.",
+                file=sys.stderr,
+            )
         else:
             print(f"Technique {args.technique_id} not found.", file=sys.stderr)
         return 1
@@ -103,12 +120,18 @@ def cmd_lookup(args: argparse.Namespace) -> int:
 
     # Pretty-print
     resolved_id = index.resolve_attack_id(args.technique_id)
-    was_revoked = resolved_id != args.technique_id.strip().replace("/", ".")
+    normalized_id = args.technique_id.strip().replace("/", ".")
+    was_remapped = resolved_id != normalized_id
 
     lines = []
     lines.append("-" * 60)
-    if was_revoked:
-        lines.append(f"  [!] {args.technique_id} was REVOKED -> resolved to {resolved_id}")
+    if was_remapped:
+        classification = (
+            "V19 REVOCATION"
+            if normalized_id in V19_RELEASE_REVOCATION_MAP
+            else "LEGACY REMAP"
+        )
+        lines.append(f"  [!] {classification}: {args.technique_id} -> {resolved_id}")
     lines.append(f"  {technique.attack_id}: {technique.name}")
     lines.append("-" * 60)
     lines.append(f"  Domain:      {technique.domain.value}")
@@ -121,7 +144,9 @@ def cmd_lookup(args: argparse.Namespace) -> int:
     if technique.data_sources:
         lines.append(f"  Data Src:    {', '.join(technique.data_sources[:5])}")
         if len(technique.data_sources) > 5:
-            lines.append(f"               ... and {len(technique.data_sources) - 5} more")
+            lines.append(
+                f"               ... and {len(technique.data_sources) - 5} more"
+            )
     if technique.url:
         lines.append(f"  URL:         {technique.url}")
     lines.append("")
@@ -152,19 +177,21 @@ def cmd_lookup(args: argparse.Namespace) -> int:
 
 
 def cmd_revoked(_args: argparse.Namespace) -> int:
-    """List all revoked technique IDs and their replacements."""
-    print(f"ATT&CK v19 Revocation Map ({len(V19_REVOCATION_MAP)} entries)")
+    """List official v19 revocations and older compatibility aliases."""
+    print(
+        "Official ATT&CK v19 technique revocations "
+        f"({len(V19_RELEASE_REVOCATION_MAP)} entries)"
+    )
     print("-" * 50)
     print(f"  {'Revoked ID':<16} {'Replacement':<16}")
     print(f"  {'-' * 14}   {'-' * 14}")
-    for old_id, new_id in sorted(V19_REVOCATION_MAP.items()):
-        marker = " (self)" if old_id == new_id else ""
-        print(f"  {old_id:<16} -> {new_id:<16}{marker}")
+    for old_id, new_id in sorted(V19_RELEASE_REVOCATION_MAP.items()):
+        print(f"  {old_id:<16} -> {new_id:<16}")
     print("-" * 50)
-    print(
-        "\nNote: Entries marked '(self)' indicate IDs that remain valid\n"
-        "but had sub-techniques added in v19."
-    )
+    print(f"\nOlder compatibility aliases ({len(LEGACY_TECHNIQUE_REMAPS)} entries)")
+    print("-" * 50)
+    for old_id, new_id in sorted(LEGACY_TECHNIQUE_REMAPS.items()):
+        print(f"  {old_id:<16} -> {new_id:<16}")
     return 0
 
 
@@ -206,12 +233,11 @@ def cmd_navigator(args: argparse.Namespace) -> int:
         )
 
     layer = {
-        "name": f"{args.name} ATT&CK v19 Coverage",
+        "name": f"{args.name} ATT&CK v19 Technique Inventory",
         "versions": {"attack": "19", "navigator": "4.9", "layer": "4.5"},
         "domain": f"{args.domain}-attack",
         "description": (
-            "Navigator layer generated by attack-v19-core CLI. "
-            "v19: TA0005=Stealth, TA0112=Defense Impairment."
+            "Unscored technique inventory generated by attack-v19-core CLI. ATT&CK v19."
         ),
         "filters": {
             "platforms": (
@@ -248,7 +274,7 @@ def cmd_navigator(args: argparse.Namespace) -> int:
             "maxValue": 100,
         },
         "legendItems": [
-            {"label": "Detection coverage", "color": "#ff6666"},
+            {"label": "Inventory entry", "color": "#ff6666"},
         ],
         "tacticRowBackground": "#dddddd",
         "selectTechniquesAcrossTactics": True,
