@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Dict, List
+from typing import Any, Dict, List, cast
 
 from mitreattack.stix20 import MitreAttackData
 
@@ -18,6 +18,11 @@ from .models import (
 )
 
 _RAW_CACHE: Dict[Path, Dict[str, MitreAttackData]] = {}
+
+
+def _stix_object(value: object) -> Any:
+    """Confine the untyped mitreattack-python STIX interface to this boundary."""
+    return cast(Any, value)
 
 
 def _default_stix_dir() -> Path:
@@ -53,7 +58,8 @@ class ATTACKLoader:
     def get_tactics(self, domain: Domain) -> List[Tactic]:
         src = self._raw[domain.value]
         results = []
-        for t in src.get_tactics(remove_revoked_deprecated=True):
+        for raw_tactic in src.get_tactics(remove_revoked_deprecated=True):
+            t = _stix_object(raw_tactic)
             ext = t.get("external_references", [{}])[0]
             results.append(
                 Tactic(
@@ -70,7 +76,8 @@ class ATTACKLoader:
     def get_techniques(self, domain: Domain) -> List[Technique]:
         src = self._raw[domain.value]
         results = []
-        for t in src.get_techniques(remove_revoked_deprecated=True):
+        for raw_technique in src.get_techniques(remove_revoked_deprecated=True):
+            t = _stix_object(raw_technique)
             if t.get("x_mitre_is_subtechnique"):
                 continue
             ext = t.get("external_references", [{}])[0]
@@ -80,7 +87,9 @@ class ATTACKLoader:
                     attack_id=ext.get("external_id", ""),
                     name=t["name"],
                     description=t.get("description", ""),
-                    tactic_ids=[kc["phase_name"] for kc in t.get("kill_chain_phases", [])],
+                    tactic_ids=[
+                        kc["phase_name"] for kc in t.get("kill_chain_phases", [])
+                    ],
                     platforms=t.get("x_mitre_platforms", []),
                     data_sources=t.get("x_mitre_data_sources", []),
                     mitigations=[],
@@ -94,7 +103,8 @@ class ATTACKLoader:
     def get_subtechniques(self, domain: Domain) -> List[SubTechnique]:
         src = self._raw[domain.value]
         results = []
-        for t in src.get_techniques(remove_revoked_deprecated=True):
+        for raw_subtechnique in src.get_techniques(remove_revoked_deprecated=True):
+            t = _stix_object(raw_subtechnique)
             if not t.get("x_mitre_is_subtechnique"):
                 continue
             ext = t.get("external_references", [{}])[0]
@@ -107,7 +117,9 @@ class ATTACKLoader:
                     name=t["name"],
                     description=t.get("description", ""),
                     parent_id=parent_id,
-                    tactic_ids=[kc["phase_name"] for kc in t.get("kill_chain_phases", [])],
+                    tactic_ids=[
+                        kc["phase_name"] for kc in t.get("kill_chain_phases", [])
+                    ],
                     platforms=t.get("x_mitre_platforms", []),
                     data_sources=t.get("x_mitre_data_sources", []),
                     mitigations=[],
@@ -121,19 +133,20 @@ class ATTACKLoader:
     def get_groups(self, domain: Domain) -> List[Group]:
         src = self._raw[domain.value]
         results = []
-        for g in src.get_groups(remove_revoked_deprecated=True):
+        for raw_group in src.get_groups(remove_revoked_deprecated=True):
+            g = _stix_object(raw_group)
             ext = g.get("external_references", [{}])[0]
             techniques = []
             for ref in g.get("object_refs", []):
                 if ref.startswith("attack-pattern--"):
-                    tech = src.get_object_by_stix_id(ref)
+                    tech = _stix_object(src.get_object_by_stix_id(ref))
                     if tech:
                         ext_ref = tech.get("external_references", [{}])[0]
                         techniques.append(ext_ref.get("external_id", ""))
             software = []
             for ref in g.get("object_refs", []):
                 if ref.startswith("malware--") or ref.startswith("tool--"):
-                    sw = src.get_object_by_stix_id(ref)
+                    sw = _stix_object(src.get_object_by_stix_id(ref))
                     if sw:
                         ext_ref = sw.get("external_references", [{}])[0]
                         software.append(ext_ref.get("external_id", ""))
@@ -155,12 +168,13 @@ class ATTACKLoader:
     def get_software(self, domain: Domain) -> List[Software]:
         src = self._raw[domain.value]
         results = []
-        for s in src.get_software(remove_revoked_deprecated=True):
+        for raw_software in src.get_software(remove_revoked_deprecated=True):
+            s = _stix_object(raw_software)
             ext = s.get("external_references", [{}])[0]
             techniques = []
             for ref in s.get("object_refs", []):
                 if ref.startswith("attack-pattern--"):
-                    tech = src.get_object_by_stix_id(ref)
+                    tech = _stix_object(src.get_object_by_stix_id(ref))
                     if tech:
                         ext_ref = tech.get("external_references", [{}])[0]
                         techniques.append(ext_ref.get("external_id", ""))
@@ -182,12 +196,13 @@ class ATTACKLoader:
     def get_mitigations(self, domain: Domain) -> List[Mitigation]:
         src = self._raw[domain.value]
         results = []
-        for m in src.get_mitigations(remove_revoked_deprecated=True):
+        for raw_mitigation in src.get_mitigations(remove_revoked_deprecated=True):
+            m = _stix_object(raw_mitigation)
             ext = m.get("external_references", [{}])[0]
             techniques = []
             for ref in m.get("object_refs", []):
                 if ref.startswith("attack-pattern--"):
-                    tech = src.get_object_by_stix_id(ref)
+                    tech = _stix_object(src.get_object_by_stix_id(ref))
                     if tech:
                         ext_ref = tech.get("external_references", [{}])[0]
                         techniques.append(ext_ref.get("external_id", ""))
@@ -207,7 +222,8 @@ class ATTACKLoader:
     def get_data_sources(self, domain: Domain) -> List[DataSource]:
         src = self._raw[domain.value]
         results = []
-        for component in src.get_objects_by_type("x-mitre-data-component"):
+        for raw_component in src.get_objects_by_type("x-mitre-data-component"):
+            component = _stix_object(raw_component)
             if component.get("revoked") or component.get("x_mitre_deprecated"):
                 continue
             domains = component.get("x_mitre_domains", [])
@@ -215,7 +231,9 @@ class ATTACKLoader:
                 continue
             ext = component.get("external_references", [{}])[0]
             log_sources = component.get("x_mitre_log_sources", [])
-            components = [source.get("name", "") for source in log_sources if source.get("name")]
+            components = [
+                source.get("name", "") for source in log_sources if source.get("name")
+            ]
             results.append(
                 DataSource(
                     stix_id=component["id"],

@@ -31,7 +31,7 @@ from .models import (
     Technique,
 )
 
-__version__ = "19.1.0"
+__version__ = "19.2.0"
 __all__ = [
     "Domain",
     "Tactic",

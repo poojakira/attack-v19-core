@@ -1,2 +1,0 @@
-[console_scripts]
-attack-v19 = attack_core.cli:main

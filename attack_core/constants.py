@@ -33,26 +33,47 @@ ICS_TACTIC_COUNT = 12
 TACTIC_STEALTH = "TA0005"  # renamed from Defense Evasion
 TACTIC_DEFENSE_IMPAIRMENT = "TA0112"  # new
 
-# Revoked technique IDs — map old → new for migration
-V19_REVOCATION_MAP = {
-    # Old Defense Evasion techniques revoked and replaced
+# Technique revocations listed in MITRE's April 2026 ATT&CK v19 release notes.
+V19_RELEASE_REVOCATION_MAP = {
     "T1562": "T1685",  # Impair Defenses → Disable or Modify Tools
     "T1562.001": "T1685",  # Disable or Modify Tools (sub collapsed to parent)
-    "T1562.002": "T1685.001",  # Disable Windows Event Logging → T1685.001
-    "T1562.006": "T1685.002",  # Indicator Blocking → T1685 (Modify or Spoof Tool UI)
-    "T1089": "T1685",  # Disable Security Tools (legacy) → T1685
-    "T1070.001": "T1685.005",  # Clear Windows Event Logs → T1685.005
-    "T1070.002": "T1685.006",  # Clear Linux/Mac Logs → T1685.006
-    "T1054": "T1685",  # Indicator Blocking (legacy) → T1685
-    # ICS revocations — sub-techniques now exist
-    "T0843": "T0843",  # Program Download — still valid, sub-techs added below
-    "T0873": "T0873",  # Project File Infection — still valid, sub-tech added
-    "T0846": "T0846",  # Remote System Discovery — still valid, sub-techs added
-    # Social Engineering sub-techs replaced standalone techniques
-    "T1534": "T1684.001",  # Internal Spearphishing → Social Engineering: Impersonation
-    # Email Spoofing standalone → sub-technique
-    "T1566.003": "T1684.002",  # (if referenced) → Social Engineering: Email Spoofing
+    "T1562.003": "T1690",  # Impair Command History Logging
+    "T1562.004": "T1686",  # Disable or Modify System Firewall
+    "T1562.006": "T1685",  # Indicator Blocking
+    "T1562.008": "T1685.002",  # Disable or Modify Cloud Logs
+    "T1562.009": "T1688",  # Safe Mode Boot
+    "T1562.010": "T1689",  # Downgrade Attack
+    "T1562.011": "T1685.003",  # Spoof Security Alerting
+    "T1562.012": "T1685.004",  # Disable or Modify Linux Audit System
+    "T1562.013": "T1686.002",  # Disable or Modify Network Device Firewall
+    "T1656": "T1684.001",  # Impersonation
+    "T1672": "T1684.002",  # Email Spoofing
+    # ICS revocations introduced by the v19 sub-technique migration.
+    "T0803": "T1691.001",  # Block Command Message
+    "T0804": "T1691.002",  # Block Reporting Message
+    "T0805": "T1695.001",  # Block Serial COM
+    "T0812": "T1694.001",  # Default Credentials
+    "T0839": "T1693.002",  # Module Firmware
+    "T0855": "T1692.001",  # Unauthorized Command Message
+    "T0856": "T1692.002",  # Spoof Reporting Message
+    "T0857": "T1693.001",  # System Firmware
+    "T0891": "T1694.002",  # Hardcoded Credentials
 }
+
+# Older IDs retained for downstream compatibility. These aliases are not
+# represented as v19 release revocations.
+LEGACY_TECHNIQUE_REMAPS = {
+    "T1562.002": "T1685.001",
+    "T1089": "T1685",
+    "T1070.001": "T1685.005",
+    "T1070.002": "T1685.006",
+    "T1054": "T1685",
+    "T1534": "T1684.001",
+    "T1566.003": "T1684.002",
+}
+
+# Backward-compatible public name used by ATTACKIndex and mapping consumers.
+V19_REVOCATION_MAP = {**LEGACY_TECHNIQUE_REMAPS, **V19_RELEASE_REVOCATION_MAP}
 
 # New v19 technique IDs — add to any lookup that needs them
 V19_NEW_TECHNIQUES = {
@@ -108,23 +129,6 @@ V19_NEW_TECHNIQUES = {
     "T0846.002": "Remote System Discovery: Broadcast Discovery",
     "T0846.003": "Remote System Discovery: Multicast Discovery",
 }
-
-# New v19 CTI additions worth tracking
-V19_NEW_SOFTWARE = [
-    "S9035",  # LAMEHUG — first malware to query an LLM in live ops (APT28)
-    "S9010",  # GlassWorm — 2025 npm ecosystem compromise
-    "S9008",  # Shai-Hulud — npm compromise, developer credential harvesting
-    "S9038",  # DynoWiper — Poland NATO energy infrastructure
-    "S9039",  # LazyWiper — Poland NATO energy infrastructure
-    "S9030",  # SameCoin — cross-domain Enterprise + Mobile wiper
-]
-
-V19_NEW_CAMPAIGNS = [
-    "C0062",  # Anthropic AI-orchestrated Campaign — PRC cluster using Claude Code autonomously
-    "C0063",  # 2025 Poland Wiper Attacks — first destructive wiper vs NATO energy infra
-    "C0060",  # Operation AkaiRyū — MirrorFace/menuPass subgroup
-    "C0061",  # Operation Digital Eye
-]
 
 DOMAINS = {
     "enterprise": "enterprise-attack",

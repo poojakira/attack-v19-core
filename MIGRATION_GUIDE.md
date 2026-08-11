@@ -1,248 +1,87 @@
-# Migration Guide: ATT&CK v18 -> v19
+# Migration Guide: ATT&CK v18 to v19.2
 
-This guide helps downstream consumers migrate from ATT&CK v18 to v19.
+This guide covers taxonomy and data changes used by this library. It does not prescribe detections or claim coverage.
 
-## Breaking Changes Summary
+Primary sources, retrieved 2026-08-10:
 
-| Category | v18 | v19 | Action Required |
-|----------|-----|-----|-----------------|
-| Tactic TA0005 | "Defense Evasion" | "Stealth" | Update display names, dashboards |
-| New Tactic | N/A | TA0112 "Defense Impairment" | Add to tactic lists, Navigator layers |
-| 13 Techniques | Active | Revoked | Remap rule tables (see table below) |
-| 46 Techniques | N/A | New | Add to rule tables, detection coverage |
+- https://attack.mitre.org/resources/updates/updates-april-2026/
+- https://attack.mitre.org/resources/updates/updates-august-2026/
 
-## Step 1: Update Tactic References
+## 1. Pin the data release
 
-### Code Changes
-```python
-# OLD (v18)
-TACTICS = ["TA0001", "TA0002", ..., "TA0005", ...]  # TA0005 = "Defense Evasion"
+Install this repository from a reviewed commit and run the verified downloader:
 
-# NEW (v19)
-TACTICS = ["TA0001", "TA0002", ..., "TA0005", "TA0112", ...]  # TA0005 = "Stealth", TA0112 = "Defense Impairment"
+```bash
+uv sync --locked --extra dev
+uv run python scripts/download_attack_data.py
 ```
 
-### Display Name Updates
-- Any UI showing "Defense Evasion" -> Change to "Stealth"
-- Add "Defense Impairment" to tactic dropdowns, filters, legends
+`attack-v19-core` is not published on PyPI. Do not add a package-index dependency until a signed, verifiable release channel exists.
 
-### Navigator Layers
-```json
-// OLD layer (v4.5)
-{
-  "versions": {"attack": "18", "navigator": "4.8", "layer": "4.4"},
-  "techniques": [{"techniqueID": "T1059", "tactic": "TA0002", ...}]
-}
+## 2. Update tactic names
 
-// NEW layer (v4.9) - REQUIRES tactic field per technique
-{
-  "versions": {"attack": "19", "navigator": "4.9", "layer": "4.5"},
-  "techniques": [{"techniqueID": "T1059", "tactic": "TA0002", "score": 80, ...}]
-}
+- Display TA0005 as `Stealth`.
+- Add TA0112 as `Defense Impairment`.
+- Do not treat a tactic name change as evidence that a detection rule covers the tactic.
+
+## 3. Resolve revoked technique IDs
+
+Use the exact release map when migrating v18 data:
+
+```python
+from attack_core.constants import V19_RELEASE_REVOCATION_MAP
+
+resolved = V19_RELEASE_REVOCATION_MAP.get(source_id, source_id)
 ```
 
-Use the new `NavigatorLayerReporter` in `attack_core.matrix`:
+Use `V19_REVOCATION_MAP` only when selected older aliases must also be accepted. The broader compatibility map is finite and not a complete history of every ATT&CK revocation.
+
+Representative v19 changes:
+
+| Previous ID | v19 replacement |
+|---|---|
+| `T1562` | `T1685` |
+| `T1562.003` | `T1690` |
+| `T1562.004` | `T1686` |
+| `T1562.009` | `T1688` |
+| `T1656` | `T1684.001` |
+| `T1672` | `T1684.002` |
+| `T0803` | `T1691.001` |
+| `T0855` | `T1692.001` |
+
+The complete reviewed set is `V19_RELEASE_REVOCATION_MAP` and is checked by `tests/test_official_validation.py`.
+
+## 4. Normalize sub-technique syntax
+
+ATT&CK external IDs use dot notation, for example `T1683.001`. The library accepts slash notation at its lookup boundary and normalizes it:
+
 ```python
+assert index.resolve_attack_id("T1683/001") == "T1683.001"
+```
+
+Store and emit canonical dot notation in new data.
+
+## 5. Rebuild Navigator exports
+
+```python
+from attack_core.mapping import ATTACKMappingBuilder
 from attack_core.matrix import NavigatorLayerReporter
-from attack_core.models import ATTACKMapping, Domain
 
-reporter = NavigatorLayerReporter()
-layer_json = reporter.generate("my_repo", mappings_list)
+builder = ATTACKMappingBuilder(index)
+mappings = builder.build_many(source_ids, confidence=caller_supplied_confidence)
+layer_json = NavigatorLayerReporter().generate("consumer-name", mappings)
 ```
 
-## Step 2: Remap Revoked Technique IDs
+Review every mapping. The library carries caller-supplied confidence into the export; it does not measure detection quality.
 
-The `V19_REVOCATION_MAP` in `attack_core.constants` provides automatic remapping:
+## 6. Validate the consumer
 
-```python
-from attack_core.constants import V19_REVOCATION_MAP
+1. Run this library's suite against the pinned v19.2 bundles.
+2. Run the consumer's unit and integration suites.
+3. Compare pre-migration and post-migration mapping outputs.
+4. Investigate dropped, duplicated, or tactic-changed mappings.
+5. Retain the old commit, lock file, and bundle hashes for rollback.
 
-# Auto-remap any technique ID
-def remap_technique_id(old_id: str) -> str:
-    return V19_REVOCATION_MAP.get(old_id, old_id)
+## Rollback
 
-# Example mappings
-assert remap_technique_id("T1562") == "T1685"
-assert remap_technique_id("T1562.001") == "T1685"
-assert remap_technique_id("T1070.001") == "T1685.005"
-assert remap_technique_id("T1534") == "T1684.001"
-```
-
-### Rule Table Migration (Required)
-
-| Old Rule Entry | New Rule Entry |
-|----------------|----------------|
-| `"T1562"`, `"T1562.001"` | `"T1685"` |
-| `"T1562.002"` | `"T1685.001"` |
-| `"T1562.006"` | `"T1685.003"` |
-| `"T1089"` | `"T1685"` |
-| `"T1070.001"` | `"T1685.005"` |
-| `"T1070.002"` | `"T1685.006"` |
-| `"T1054"` | `"T1685"` |
-| `"T1534"` | `"T1684.001"` |
-| `"T1566.003"` | `"T1684.002"` |
-
-**In enricher rule tables:**
-```python
-# BEFORE (v18)
-"defender_tampering": ["T1562", "T1562.001", "T1089"],
-"log_clearing": ["T1070.001", "T1070.002"],
-
-# AFTER (v19)
-"defender_tampering": ["T1685", "T1685.001", "T1685.003", "T1687"],
-"log_clearing": ["T1685.005", "T1685.006"],
-```
-
-## Step 3: Add New Technique Coverage
-
-### Priority New Techniques (AI/ML Security)
-
-| ID | Name | Relevance |
-|----|------|-----------|
-| T1682 | Query Public AI Services | CRITICAL - LAMEHUG malware uses this |
-| T1683/001 | Generate Content: Written | HIGH - Phishing content generation |
-| T1683/002 | Generate Content: Audio-Visual | HIGH - Deepfake generation |
-| T1684/001 | Social Engineering: Impersonation | HIGH - BEC, spearphishing |
-| T1684/002 | Social Engineering: Email Spoofing | HIGH - DMARC failures |
-| T1685 | Disable or Modify Tools | CRITICAL - Replaces T1562 |
-| T1687 | Exploitation for Defense Impairment | HIGH - New tactic technique |
-| T1689 | Downgrade Attack | MEDIUM - TLS/SSL downgrades |
-| T1027/018 | Invisible Unicode | MEDIUM - Code obfuscation |
-
-### ICS-Specific New Sub-techniques
-
-| Parent | New Sub-techniques |
-|--------|-------------------|
-| T1691 | /001 Command Message, /002 Reporting Message |
-| T1692 | /001 Command Message, /002 Reporting Message |
-| T1693 | /001 System Firmware, /002 Module Firmware |
-| T1694 | /001 Default Credentials, /002 Hardcoded Credentials |
-| T1695 | /001 Serial COM, /002 Ethernet, /003 Wi-Fi |
-| T0843 | /001 Download All, /002 Online Edit, /003 Program Append |
-| T0873 | /001 Siemens Project File Format |
-| T0846 | /001 Port Scan, /002 Broadcast Discovery, /003 Multicast Discovery |
-
-### Example: Adding T1682 Detection
-
-```python
-# In your enricher rule table
-"llm_api_calls": ["T1682", "T1059.006"],
-
-# In detection patterns (attack-detection-engine style)
-{
-    "rule_id": "ATK-V19-T1682-001",
-    "technique_ids": ["T1682"],
-    "conditions": [
-        {"type": "message_contains", "keywords": ["api.openai.com", "api.anthropic.com"]},
-        {"type": "field_regex", "field": "process_name", "pattern": r"(python|node|curl|wget)"}
-    ]
-}
-```
-
-## Step 4: Update Dependency
-
-### Released dependency
-
-Use the v19 package version in project metadata when your package index provides it:
-
-```toml
-[project]
-dependencies = [
-    "attack-v19-core>=19.1.0",
-]
-```
-
-For a fully pinned release, use the same version as this repository's
-`pyproject.toml`:
-
-```toml
-dependencies = [
-    "attack-v19-core==19.1.0",
-]
-```
-
-### Local sibling checkout
-
-For development, install the local core checkout instead of relying on a
-network download. These commands assume the consumer repository and
-`attack-v19-core` are sibling directories.
-
-```powershell
-# Run from the consumer repository root.
-py -m pip install -e ..\attack-v19-core
-```
-
-```bash
-# Run from the consumer repository root.
-python -m pip install -e ../attack-v19-core
-```
-
-## Step 5: Run Migration Tests
-
-### 1. Validate the core package
-
-Run this from the `attack-v19-core` repository root:
-
-```powershell
-py -m pip install -e ".[dev]"
-py -m pytest -c pyproject.toml tests/test_v19_structure.py -v
-```
-
-```bash
-python -m pip install -e ".[dev]"
-python -m pytest -c pyproject.toml tests/test_v19_structure.py -v
-```
-
-### 2. Validate a consumer repository
-
-Not every consumer repository has the same test layout. If the repository
-contains `tests/test_attack_mapping.py`, run it from that repository root:
-
-```powershell
-py -m pytest -c pyproject.toml tests/test_attack_mapping.py -v
-```
-
-```bash
-python -m pytest -c pyproject.toml tests/test_attack_mapping.py -v
-```
-
-If that file is absent, run the test command documented by that repository's
-README or runbook instead of copying this command blindly.
-
-### 3. Confirm the revocation map is available
-
-```powershell
-py -c "from attack_core.constants import V19_REVOCATION_MAP; print(f'Revocation mappings: {len(V19_REVOCATION_MAP)}')"
-```
-
-This confirms the shared mapping is installed. Checking whether a consumer's
-rule table still contains revoked IDs is consumer-specific; use that
-repository's mapping test or rule-table test for the final check.
-
-## Step 6: Verify Dashboard/Alert Updates
-
-- [ ] Tactic "Defense Evasion" renamed to "Stealth" in all dashboards
-- [ ] New tactic "Defense Impairment" (TA0112) appears in tactic filters
-- [ ] Alerts referencing T1562/T1562.001/T1070.001 now show T1685/T1685.005
-- [ ] Navigator layers regenerated with v19 format (attack: "19", navigator: "4.9")
-- [ ] New technique IDs (T1682, T1683, T1684, T1685, T1689) have coverage indicators
-
-## Step 7: Update Documentation
-
-- [ ] README.md: Update technique ID examples
-- [ ] Architecture docs: Update tactic diagrams
-- [ ] Runbook: Update technique references in response procedures
-
-## Rollback Plan
-
-If issues arise:
-1. Restore the last known compatible `attack-v19-core` version recorded in your lockfile or release manifest.
-2. Revert rule table changes.
-3. Regenerate Navigator layers with the prior ATT&CK format.
-4. Report issues to upstream.
-
-## Support
-
-- Check `CHANGELOG.md` for full change list
-- Run `pytest tests/test_v19_structure.py` to validate v19 compliance
-- See `attack_core.constants.V19_REVOCATION_MAP` for complete remapping
+Restore the prior library commit, dependency lock, and matching ATT&CK bundles as one unit. Do not mix an older mapping implementation with newer unreviewed bundle data.

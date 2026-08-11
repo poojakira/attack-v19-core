@@ -38,7 +38,8 @@ class ATTACKMappingBuilder:
         resolution = self.resolve(attack_id)
         if resolution.was_revoked:
             logger.warning(
-                "[ATT&CK v19] Technique %s was revoked. Auto-remapped to %s.",
+                "[ATT&CK] Technique %s is a known revoked or legacy ID. "
+                "Auto-remapped to %s.",
                 resolution.normalized_id,
                 resolution.resolved_id,
             )
@@ -79,7 +80,9 @@ class ATTACKMappingBuilder:
             was_revoked=resolution.was_revoked,
         )
 
-    def build_many(self, attack_ids: list[str], confidence: float) -> list[ATTACKMapping]:
+    def build_many(
+        self, attack_ids: list[str], confidence: float
+    ) -> list[ATTACKMapping]:
         mappings = []
         for attack_id in attack_ids:
             mapping = self.build(attack_id, confidence)

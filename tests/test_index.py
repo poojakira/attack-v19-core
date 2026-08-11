@@ -75,7 +75,8 @@ def test_search():
     results = index.search("credential")
     assert len(results) > 0
     assert any(
-        "credential" in r.name.lower() or "credential" in r.description.lower() for r in results
+        "credential" in r.name.lower() or "credential" in r.description.lower()
+        for r in results
     )
 
 

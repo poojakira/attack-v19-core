@@ -5,14 +5,6 @@ Tests that the enricher pipeline works end-to-end with v19 technique IDs,
 revoked ID remapping, and new tactic structure.
 """
 
-import os
-import sys
-
-import pytest
-
-# Add attack-v19-core to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "attack-v19-core"))
-
 from attack_core.constants import (
     ENTERPRISE_TACTICS,
     TACTIC_DEFENSE_IMPAIRMENT,
@@ -55,20 +47,14 @@ class TestV19EnricherChain:
         assert stealth.domain == Domain.ENTERPRISE
         assert defense_impair.domain == Domain.ENTERPRISE
 
-    def test_revoked_ids_auto_remap(self):
-        """V19_REVOCATION_MAP keys should remap to valid techniques."""
-        actual_revocations = {k: v for k, v in V19_REVOCATION_MAP.items() if k != v}
-
-        for old_id, new_id in actual_revocations.items():
-            # Old ID should NOT be in index (revoked)
-            self.index.get(old_id)
-
-            # New ID SHOULD be in index (or at least be a valid format)
+    def test_known_ids_remap_to_resolvable_techniques(self):
+        """Every supported compatibility ID should resolve to a loaded technique."""
+        for old_id, new_id in V19_REVOCATION_MAP.items():
             new_result = self.index.get(new_id)
-
-            # If STIX bundle is v19, new_id should resolve
-            if new_result is not None:
-                assert new_result.attack_id == new_id
+            assert (
+                new_result is not None
+            ), f"Replacement {new_id} for {old_id} is missing"
+            assert new_result.attack_id == new_id
 
     def test_new_v19_techniques_resolvable(self):
         """Core new v19 techniques should be resolvable."""
@@ -194,111 +180,3 @@ class TestV19EnricherChain:
         tech = self.index.get(resolved)
         assert tech is not None
         assert tech.attack_id == "T1685"
-
-
-class TestRuleTableV19Compliance:
-    """Test that rule tables across repos use v19 IDs."""
-
-    def test_no_revoked_ids_in_any_rule_table(self):
-        """Scan all enricher repos for revoked technique IDs."""
-        repos = [
-            "hf-model-provenance-scanner",
-            "mcp-security-gateway-monitor",
-            "llm-redteam-framework",
-            "dataset-poisoning-detector",
-            "model-privacy-attacks",
-            "adversarial-ml-lab",
-            "PulseNet-RUL-Forecasting",
-            "unified-ml-security-platform",
-        ]
-
-        actual_revocations = {k: v for k, v in V19_REVOCATION_MAP.items() if k != v}
-        revoked_ids = set(actual_revocations.keys())
-
-        for repo in repos:
-            enricher_path = os.path.join(
-                os.path.dirname(__file__),
-                "..",
-                "..",
-                repo,
-                "attack_mapping",
-                "enricher.py",
-            )
-            if os.path.exists(enricher_path):
-                with open(enricher_path, "r") as f:
-                    content = f.read()
-
-                # Check for revoked IDs (excluding comments)
-                for revoked in revoked_ids:
-                    # Skip if it's in a comment or string that's clearly documentation
-                    if f'"{revoked}"' in content or f"'{revoked}'" in content:
-                        # This would be a violation
-                        raise AssertionError(
-                            f"REVOKED ID {revoked} found in {repo}/enricher.py - should be remapped"
-                        )
-
-    def test_new_technique_coverage_indicators(self):
-        """Verify key new techniques appear in relevant rule tables."""
-        # T1685 (replaces T1562) should be in defense impairment related repos
-        defense_impairment_repos = [
-            "llm-redteam-framework",
-            "dataset-poisoning-detector",
-            "model-privacy-attacks",
-            "adversarial-ml-lab",
-            "PulseNet-RUL-Forecasting",
-            "mcp-security-gateway-monitor",
-            "unified-ml-security-platform",
-        ]
-
-        existing_defense_paths = []
-        for repo in defense_impairment_repos:
-            enricher_path = os.path.join(
-                os.path.dirname(__file__),
-                "..",
-                "..",
-                repo,
-                "attack_mapping",
-                "enricher.py",
-            )
-            if os.path.exists(enricher_path):
-                existing_defense_paths.append(enricher_path)
-
-        if len(existing_defense_paths) < len(defense_impairment_repos):
-            pytest.skip("cross-repo ATT&CK coverage check requires sibling repositories")
-
-        repos_with_t1685 = 0
-        for enricher_path in existing_defense_paths:
-            with open(enricher_path, "r") as f:
-                if "T1685" in f.read():
-                    repos_with_t1685 += 1
-
-        # Should be in most defense impairment related repos
-        assert repos_with_t1685 >= 5, f"T1685 only in {repos_with_t1685}/7 defense impairment repos"
-
-        # T1682 (Query Public AI) should be in AI-focused repos
-        ai_repos = [
-            "llm-redteam-framework",
-            "mcp-security-gateway-monitor",
-            "unified-ml-security-platform",
-            "hf-model-provenance-scanner",
-            "adversarial-ml-lab",
-        ]
-        repos_with_t1682 = 0
-        for repo in ai_repos:
-            enricher_path = os.path.join(
-                os.path.dirname(__file__),
-                "..",
-                "..",
-                repo,
-                "attack_mapping",
-                "enricher.py",
-            )
-            if os.path.exists(enricher_path):
-                with open(enricher_path, "r") as f:
-                    if "T1682" in f.read():
-                        repos_with_t1682 += 1
-        assert repos_with_t1682 >= 3, f"T1682 only in {repos_with_t1682}/5 AI repos"
-
-    import pytest
-
-    pytest.main([__file__, "-v", "--tb=short"])

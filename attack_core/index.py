@@ -42,9 +42,13 @@ class ATTACKIndex:
                 self._by_id.setdefault(technique.attack_id, technique)
                 for phase_name in technique.tactic_ids:
                     tactic_id = self.tactic_id_for_phase(phase_name, domain)
-                    self._by_tactic.setdefault(tactic_id, []).append(technique.attack_id)
+                    self._by_tactic.setdefault(tactic_id, []).append(
+                        technique.attack_id
+                    )
                 for platform in technique.platforms:
-                    self._by_platform.setdefault(platform.lower(), []).append(technique.attack_id)
+                    self._by_platform.setdefault(platform.lower(), []).append(
+                        technique.attack_id
+                    )
 
             for subtechnique in loader.get_subtechniques(domain):
                 self._by_domain_id[(domain, subtechnique.attack_id)] = subtechnique
@@ -54,7 +58,9 @@ class ATTACKIndex:
                 ).append(subtechnique.attack_id)
                 for phase_name in subtechnique.tactic_ids:
                     tactic_id = self.tactic_id_for_phase(phase_name, domain)
-                    self._by_tactic.setdefault(tactic_id, []).append(subtechnique.attack_id)
+                    self._by_tactic.setdefault(tactic_id, []).append(
+                        subtechnique.attack_id
+                    )
                 for platform in subtechnique.platforms:
                     self._by_platform.setdefault(platform.lower(), []).append(
                         subtechnique.attack_id
@@ -64,13 +70,17 @@ class ATTACKIndex:
         normalized_id = normalize_attack_id(attack_id)
         return V19_REVOCATION_MAP.get(normalized_id, normalized_id)
 
-    def get(self, attack_id: str, domain: Domain | None = None) -> Optional[TechniqueOrSub]:
+    def get(
+        self, attack_id: str, domain: Domain | None = None
+    ) -> Optional[TechniqueOrSub]:
         resolved_id = self.resolve_attack_id(attack_id)
         if domain is not None:
             return self._by_domain_id.get((domain, resolved_id))
         return self._by_id.get(resolved_id)
 
-    def get_exact(self, attack_id: str, domain: Domain | None = None) -> Optional[TechniqueOrSub]:
+    def get_exact(
+        self, attack_id: str, domain: Domain | None = None
+    ) -> Optional[TechniqueOrSub]:
         normalized_id = normalize_attack_id(attack_id)
         if domain is not None:
             return self._by_domain_id.get((domain, normalized_id))
@@ -91,9 +101,12 @@ class ATTACKIndex:
         )
 
     def parent_for(self, technique: TechniqueOrSub) -> Optional[TechniqueOrSub]:
-        if not technique.is_subtechnique:
+        if not isinstance(technique, SubTechnique):
             return technique
-        return self.get_exact(technique.parent_id, technique.domain)
+        parent_id = technique.parent_id
+        if not parent_id:
+            return None
+        return self.get_exact(parent_id, technique.domain)
 
     def by_tactic(self, tactic_id: str) -> List[TechniqueOrSub]:
         resolved_tactic_id = self.tactic_id_for_phase(tactic_id)
@@ -115,22 +128,15 @@ class ATTACKIndex:
     ) -> List[SubTechnique]:
         resolved_id = self.resolve_attack_id(technique_id)
         domains = [domain] if domain is not None else list(Domain)
-        subtechnique_ids = []
+        results: List[SubTechnique] = []
         for candidate_domain in domains:
-            subtechnique_ids.extend(
-                self._subtechniques_by_parent.get((candidate_domain, resolved_id), [])
-            )
-        return [
-            self._by_domain_id[(candidate_domain, subtechnique_id)]
-            for candidate_domain in domains
             for subtechnique_id in self._subtechniques_by_parent.get(
                 (candidate_domain, resolved_id), []
-            )
-            if isinstance(
-                self._by_domain_id.get((candidate_domain, subtechnique_id)),
-                SubTechnique,
-            )
-        ]
+            ):
+                candidate = self._by_domain_id.get((candidate_domain, subtechnique_id))
+                if isinstance(candidate, SubTechnique):
+                    results.append(candidate)
+        return results
 
     def search(self, keyword: str) -> List[TechniqueOrSub]:
         keyword_lower = keyword.lower()
@@ -145,12 +151,14 @@ class ATTACKIndex:
         return sum(
             1
             for technique in self._by_domain_id.values()
-            if not technique.is_subtechnique and (domain is None or technique.domain == domain)
+            if not technique.is_subtechnique
+            and (domain is None or technique.domain == domain)
         )
 
     def count_subtechniques(self, domain: Optional[Domain] = None) -> int:
         return sum(
             1
             for technique in self._by_domain_id.values()
-            if technique.is_subtechnique and (domain is None or technique.domain == domain)
+            if technique.is_subtechnique
+            and (domain is None or technique.domain == domain)
         )

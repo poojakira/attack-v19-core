@@ -2,6 +2,10 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
+.venv/
+*.egg-info/
+build/
+dist/
 .coverage
 htmlcov/
 bandit-report.json
@@ -9,4 +13,3 @@ pip-audit.json
 sbom.json
 attack_data/
 *.tmp
-
