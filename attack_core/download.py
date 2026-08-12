@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 from pathlib import Path
 from urllib.parse import urlsplit
-from urllib.request import urlopen
+from urllib.request import HTTPRedirectHandler, build_opener, urlopen  # noqa: F401 – urlopen kept for monkeypatching in tests
 
 ATTACK_STIX_TAG = "v19.2"
 MAX_BUNDLE_BYTES = 128 * 1024 * 1024
@@ -29,6 +30,59 @@ BUNDLES = {
 }
 
 
+class StrictRedirectHandler(HTTPRedirectHandler):
+    """Intercept every HTTP redirect and reject any that leave the allowed host list.
+
+    urllib's default redirect handler follows 301/302 without re-validating the
+    target URL.  This handler validates that every redirect target:
+      - uses the ``https`` scheme (no downgrade to plain HTTP), and
+      - has a hostname present in ``ALLOWED_DOWNLOAD_HOSTS``.
+
+    Raises ``ValueError`` immediately if either condition is not met, aborting
+    the request before the redirect is followed.
+    """
+
+    def _validate_redirect_url(self, newurl: str) -> None:
+        parsed = urlsplit(newurl)
+        if parsed.scheme != "https":
+            raise ValueError(
+                f"Redirect target uses scheme {parsed.scheme!r}; only 'https' is allowed"
+            )
+        if parsed.hostname not in ALLOWED_DOWNLOAD_HOSTS:
+            raise ValueError(
+                f"Redirect target hostname {parsed.hostname!r} is not in the approved host list"
+            )
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # type: ignore[override]
+        self._validate_redirect_url(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+    def http_error_301(self, req, fp, code, msg, headers):  # type: ignore[override]
+        newurl = headers.get("Location", "")
+        self._validate_redirect_url(newurl)
+        return super().http_error_301(req, fp, code, msg, headers)
+
+    def http_error_302(self, req, fp, code, msg, headers):  # type: ignore[override]
+        newurl = headers.get("Location", "")
+        self._validate_redirect_url(newurl)
+        return super().http_error_302(req, fp, code, msg, headers)
+
+    def http_error_303(self, req, fp, code, msg, headers):  # type: ignore[override]
+        newurl = headers.get("Location", "")
+        self._validate_redirect_url(newurl)
+        return super().http_error_303(req, fp, code, msg, headers)
+
+    def http_error_307(self, req, fp, code, msg, headers):  # type: ignore[override]
+        newurl = headers.get("Location", "")
+        self._validate_redirect_url(newurl)
+        return super().http_error_307(req, fp, code, msg, headers)
+
+    def http_error_308(self, req, fp, code, msg, headers):  # type: ignore[override]
+        newurl = headers.get("Location", "")
+        self._validate_redirect_url(newurl)
+        return super().http_error_308(req, fp, code, msg, headers)
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -37,15 +91,68 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _validate_stix_bundle(path: Path) -> None:
+    """Validate a downloaded file is a well-formed STIX 2.x ATT&CK bundle.
+
+    Called AFTER SHA-256 verification passes. A hash-matching file that is not
+    a valid STIX bundle (e.g. an attacker-substituted JSON with a matching hash
+    via a prefix-collision or supply-chain attack) is rejected here.
+
+    Checks:
+    1. File is valid UTF-8 JSON (raises ValueError on parse failure).
+    2. Top-level ``type`` field equals ``"bundle"`` (STIX 2.x bundle type).
+    3. ``spec_version`` starts with ``"2."`` (STIX 2.x; not STIX 1.x).
+    4. ``objects`` is a non-empty list (an empty bundle has no ATT&CK content).
+
+    On failure the file is unlinked and ValueError is raised so the caller
+    can treat it as a failed download.
+    """
+    try:
+        with path.open("r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        path.unlink(missing_ok=True)
+        raise ValueError(f"Downloaded bundle is not valid UTF-8 JSON: {exc}") from exc
+    except OSError as exc:
+        raise ValueError(f"Cannot read downloaded bundle for validation: {exc}") from exc
+
+    if not isinstance(data, dict):
+        path.unlink(missing_ok=True)
+        raise ValueError(
+            f"STIX bundle root must be a JSON object; got {type(data).__name__}"
+        )
+    bundle_type = data.get("type")
+    if bundle_type != "bundle":
+        path.unlink(missing_ok=True)
+        raise ValueError(
+            f"Expected STIX bundle type 'bundle'; got {bundle_type!r}. "
+            "This file does not appear to be an ATT&CK STIX bundle."
+        )
+    spec_version = str(data.get("spec_version", ""))
+    if not spec_version.startswith("2."):
+        path.unlink(missing_ok=True)
+        raise ValueError(
+            f"Expected STIX 2.x spec_version (e.g. '2.0' or '2.1'); got {spec_version!r}."
+        )
+    objects = data.get("objects")
+    if not isinstance(objects, list) or len(objects) == 0:
+        path.unlink(missing_ok=True)
+        raise ValueError(
+            "STIX bundle 'objects' is empty or missing — bundle has no ATT&CK content."
+        )
+
+
 def _download(url: str, target: Path, *, max_bytes: int = MAX_BUNDLE_BYTES) -> None:
     parsed = urlsplit(url)
     if parsed.scheme != "https" or parsed.hostname not in ALLOWED_DOWNLOAD_HOSTS:
         raise ValueError("Bundle URL must use HTTPS on an approved download host")
     tmp = target.with_suffix(target.suffix + ".tmp")
     tmp.unlink(missing_ok=True)
+    opener = build_opener(StrictRedirectHandler())
     try:
         # The scheme and host are allowlisted immediately above.
-        with urlopen(url, timeout=60) as response, tmp.open("wb") as handle:  # nosec B310
+        # StrictRedirectHandler validates every redirect target before following.
+        with opener.open(url, timeout=60) as response, tmp.open("wb") as handle:  # nosec B310
             total = 0
             while chunk := response.read(1024 * 1024):
                 total += len(chunk)
@@ -76,6 +183,9 @@ def ensure_attack_data(data_dir: Path, *, force: bool = False) -> None:
             raise RuntimeError(
                 f"SHA-256 mismatch for {filename}: expected {expected_hash}, got {actual_hash}"
             )
+        # Content validation: verify the file is a well-formed STIX 2.x ATT&CK bundle
+        # before it takes the place of any previously trusted data.
+        _validate_stix_bundle(target)
         print(f"OK {filename}: sha256={actual_hash}")
 
 
