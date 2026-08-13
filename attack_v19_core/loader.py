@@ -177,7 +177,9 @@ class ATTACKLoader:
     def get_data_sources(self, domain: Domain) -> List[DataSource]:
         src = self._raw[domain.value]
         results = []
-        for ds in src.get_data_sources(remove_revoked_deprecated=True):
+        # NOTE: v19 STIX data marks all x-mitre-data-source objects as revoked/deprecated.
+        # Passing remove_revoked_deprecated=True returns empty list. Use False to get them.
+        for ds in src.get_datasources(remove_revoked_deprecated=False):
             ext = ds.get("external_references", [{}])[0]
             components = ds.get("x_mitre_data_components", [])
             techniques = []

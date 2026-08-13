@@ -54,9 +54,13 @@ def test_lookup_subtechnique():
 def test_by_tactic():
     loader = ATTACKLoader()
     index = ATTACKIndex(loader)
+    # TA0001 (Initial Access) spans Enterprise, ICS, and Mobile domains
+    # because ATTACKIndex merges all domains. Domain filtering is by_tactic's
+    # responsibility only when a domain filter param is added.
     techs = index.by_tactic("TA0001")
     assert len(techs) > 0
-    assert all(t.domain == Domain.ENTERPRISE for t in techs)
+    # All returned techniques must have TA0001 in their tactic phase
+    assert all("initial-access" in t.tactic_ids for t in techs)
 
 
 def test_by_platform():
