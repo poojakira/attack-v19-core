@@ -101,8 +101,9 @@ def _validate_stix_bundle(path: Path) -> None:
     Checks:
     1. File is valid UTF-8 JSON (raises ValueError on parse failure).
     2. Top-level ``type`` field equals ``"bundle"`` (STIX 2.x bundle type).
-    3. ``spec_version`` starts with ``"2."`` (STIX 2.x; not STIX 1.x).
-    4. ``objects`` is a non-empty list (an empty bundle has no ATT&CK content).
+    3. ``objects`` is a non-empty list (an empty bundle has no ATT&CK content).
+    4. Root or contained objects declare ``spec_version`` starting with ``"2."``
+       (STIX 2.x; not STIX 1.x).
 
     On failure the file is unlinked and ValueError is raised so the caller
     can treat it as a failed download.
@@ -130,17 +131,27 @@ def _validate_stix_bundle(path: Path) -> None:
             f"Expected STIX bundle type 'bundle'; got {bundle_type!r}. "
             "This file does not appear to be an ATT&CK STIX bundle."
         )
-    spec_version = str(data.get("spec_version", ""))
-    if not spec_version.startswith("2."):
-        path.unlink(missing_ok=True)
-        raise ValueError(
-            f"Expected STIX 2.x spec_version (e.g. '2.0' or '2.1'); got {spec_version!r}."
-        )
     objects = data.get("objects")
     if not isinstance(objects, list) or len(objects) == 0:
         path.unlink(missing_ok=True)
         raise ValueError(
             "STIX bundle 'objects' is empty or missing — bundle has no ATT&CK content."
+        )
+    root_spec_version = str(data.get("spec_version", ""))
+    object_spec_versions = [
+        str(obj.get("spec_version", "")) for obj in objects if isinstance(obj, dict)
+    ]
+    has_stix_2_version = root_spec_version.startswith("2.") or any(
+        version.startswith("2.") for version in object_spec_versions
+    )
+    if not has_stix_2_version:
+        path.unlink(missing_ok=True)
+        observed = root_spec_version or ", ".join(
+            version for version in object_spec_versions if version
+        )
+        raise ValueError(
+            "Expected STIX 2.x spec_version (e.g. '2.0' or '2.1') on the "
+            f"bundle root or contained objects; got {observed!r}."
         )
 
 
