@@ -2,15 +2,26 @@
 Loads all three ATT&CK STIX bundles from local disk or TAXII server.
 Returns fully-typed model instances.
 """
+
 import json
 from pathlib import Path
 from typing import Dict, List, Tuple
-from mitreattack.stix20 import MitreAttackData
-from .models import (
-    Domain, Tactic, Technique, SubTechnique,
-    Group, Software, Mitigation, DataSource
+from ._distutils_compat import ensure_distutils_version
+
+ensure_distutils_version()
+
+from mitreattack.stix20 import MitreAttackData  # noqa: E402
+from .models import (  # noqa: E402
+    Domain,
+    Tactic,
+    Technique,
+    SubTechnique,
+    Group,
+    Software,
+    Mitigation,
+    DataSource,
 )
-from .constants import DOMAINS
+from .constants import DOMAINS  # noqa: E402
 
 _DEFAULT_STIX_DIR = Path.home() / "attack_data"
 
@@ -24,8 +35,8 @@ class ATTACKLoader:
     def _load_all(self):
         for domain_key, filename in [
             ("enterprise", "enterprise-attack.json"),
-            ("mobile",     "mobile-attack.json"),
-            ("ics",        "ics-attack.json"),
+            ("mobile", "mobile-attack.json"),
+            ("ics", "ics-attack.json"),
         ]:
             path = self.stix_dir / filename
             if not path.exists():
@@ -37,14 +48,16 @@ class ATTACKLoader:
         results = []
         for t in src.get_tactics(remove_revoked_deprecated=True):
             ext = t.get("external_references", [{}])[0]
-            results.append(Tactic(
-                stix_id=t["id"],
-                attack_id=ext.get("external_id", ""),
-                name=t["name"],
-                description=t.get("description", ""),
-                domain=domain,
-                url=ext.get("url"),
-            ))
+            results.append(
+                Tactic(
+                    stix_id=t["id"],
+                    attack_id=ext.get("external_id", ""),
+                    name=t["name"],
+                    description=t.get("description", ""),
+                    domain=domain,
+                    url=ext.get("url"),
+                )
+            )
         return results
 
     def get_techniques(self, domain: Domain) -> List[Technique]:
@@ -54,19 +67,23 @@ class ATTACKLoader:
             if t.get("x_mitre_is_subtechnique"):
                 continue
             ext = t.get("external_references", [{}])[0]
-            results.append(Technique(
-                stix_id=t["id"],
-                attack_id=ext.get("external_id", ""),
-                name=t["name"],
-                description=t.get("description", ""),
-                tactic_ids=[kc["phase_name"] for kc in t.get("kill_chain_phases", [])],
-                platforms=t.get("x_mitre_platforms", []),
-                data_sources=t.get("x_mitre_data_sources", []),
-                mitigations=[],
-                kill_chain=t.get("kill_chain_phases", []),
-                domain=domain,
-                url=ext.get("url"),
-            ))
+            results.append(
+                Technique(
+                    stix_id=t["id"],
+                    attack_id=ext.get("external_id", ""),
+                    name=t["name"],
+                    description=t.get("description", ""),
+                    tactic_ids=[
+                        kc["phase_name"] for kc in t.get("kill_chain_phases", [])
+                    ],
+                    platforms=t.get("x_mitre_platforms", []),
+                    data_sources=t.get("x_mitre_data_sources", []),
+                    mitigations=[],
+                    kill_chain=t.get("kill_chain_phases", []),
+                    domain=domain,
+                    url=ext.get("url"),
+                )
+            )
         return results
 
     def get_subtechniques(self, domain: Domain) -> List[SubTechnique]:
@@ -78,20 +95,24 @@ class ATTACKLoader:
             ext = t.get("external_references", [{}])[0]
             attack_id = ext.get("external_id", "")
             parent_id = attack_id.split(".")[0] if "." in attack_id else ""
-            results.append(SubTechnique(
-                stix_id=t["id"],
-                attack_id=attack_id,
-                name=t["name"],
-                description=t.get("description", ""),
-                parent_id=parent_id,
-                tactic_ids=[kc["phase_name"] for kc in t.get("kill_chain_phases", [])],
-                platforms=t.get("x_mitre_platforms", []),
-                data_sources=t.get("x_mitre_data_sources", []),
-                mitigations=[],
-                kill_chain=t.get("kill_chain_phases", []),
-                domain=domain,
-                url=ext.get("url"),
-            ))
+            results.append(
+                SubTechnique(
+                    stix_id=t["id"],
+                    attack_id=attack_id,
+                    name=t["name"],
+                    description=t.get("description", ""),
+                    parent_id=parent_id,
+                    tactic_ids=[
+                        kc["phase_name"] for kc in t.get("kill_chain_phases", [])
+                    ],
+                    platforms=t.get("x_mitre_platforms", []),
+                    data_sources=t.get("x_mitre_data_sources", []),
+                    mitigations=[],
+                    kill_chain=t.get("kill_chain_phases", []),
+                    domain=domain,
+                    url=ext.get("url"),
+                )
+            )
         return results
 
     def get_groups(self, domain: Domain) -> List[Group]:
@@ -113,17 +134,19 @@ class ATTACKLoader:
                     if sw:
                         ext_ref = sw.get("external_references", [{}])[0]
                         software.append(ext_ref.get("external_id", ""))
-            results.append(Group(
-                stix_id=g["id"],
-                attack_id=ext.get("external_id", ""),
-                name=g["name"],
-                aliases=g.get("aliases", []),
-                description=g.get("description", ""),
-                techniques=techniques,
-                software=software,
-                domain=domain,
-                url=ext.get("url"),
-            ))
+            results.append(
+                Group(
+                    stix_id=g["id"],
+                    attack_id=ext.get("external_id", ""),
+                    name=g["name"],
+                    aliases=g.get("aliases", []),
+                    description=g.get("description", ""),
+                    techniques=techniques,
+                    software=software,
+                    domain=domain,
+                    url=ext.get("url"),
+                )
+            )
         return results
 
     def get_software(self, domain: Domain) -> List[Software]:
@@ -138,17 +161,19 @@ class ATTACKLoader:
                     if tech:
                         ext_ref = tech.get("external_references", [{}])[0]
                         techniques.append(ext_ref.get("external_id", ""))
-            results.append(Software(
-                stix_id=s["id"],
-                attack_id=ext.get("external_id", ""),
-                name=s["name"],
-                software_type=s.get("x_mitre_type", "malware"),
-                platforms=s.get("x_mitre_platforms", []),
-                techniques=techniques,
-                description=s.get("description", ""),
-                domain=domain,
-                url=ext.get("url"),
-            ))
+            results.append(
+                Software(
+                    stix_id=s["id"],
+                    attack_id=ext.get("external_id", ""),
+                    name=s["name"],
+                    software_type=s.get("x_mitre_type", "malware"),
+                    platforms=s.get("x_mitre_platforms", []),
+                    techniques=techniques,
+                    description=s.get("description", ""),
+                    domain=domain,
+                    url=ext.get("url"),
+                )
+            )
         return results
 
     def get_mitigations(self, domain: Domain) -> List[Mitigation]:
@@ -163,15 +188,17 @@ class ATTACKLoader:
                     if tech:
                         ext_ref = tech.get("external_references", [{}])[0]
                         techniques.append(ext_ref.get("external_id", ""))
-            results.append(Mitigation(
-                stix_id=m["id"],
-                attack_id=ext.get("external_id", ""),
-                name=m["name"],
-                description=m.get("description", ""),
-                techniques=techniques,
-                domain=domain,
-                url=ext.get("url"),
-            ))
+            results.append(
+                Mitigation(
+                    stix_id=m["id"],
+                    attack_id=ext.get("external_id", ""),
+                    name=m["name"],
+                    description=m.get("description", ""),
+                    techniques=techniques,
+                    domain=domain,
+                    url=ext.get("url"),
+                )
+            )
         return results
 
     def get_data_sources(self, domain: Domain) -> List[DataSource]:
@@ -189,14 +216,16 @@ class ATTACKLoader:
                     if tech:
                         ext_ref = tech.get("external_references", [{}])[0]
                         techniques.append(ext_ref.get("external_id", ""))
-            results.append(DataSource(
-                stix_id=ds["id"],
-                attack_id=ext.get("external_id", ""),
-                name=ds["name"],
-                description=ds.get("description", ""),
-                components=components,
-                techniques=techniques,
-                domain=domain,
-                url=ext.get("url"),
-            ))
+            results.append(
+                DataSource(
+                    stix_id=ds["id"],
+                    attack_id=ext.get("external_id", ""),
+                    name=ds["name"],
+                    description=ds.get("description", ""),
+                    components=components,
+                    techniques=techniques,
+                    domain=domain,
+                    url=ext.get("url"),
+                )
+            )
         return results
