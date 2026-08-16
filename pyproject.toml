@@ -24,4 +24,4 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["attack_v19_core**"]
+include = ["attack_core**", "attack_v19_core**"]
