@@ -19,6 +19,7 @@ from attack_core.download import StrictRedirectHandler, _validate_stix_bundle
 # Test helpers
 # ---------------------------------------------------------------------------
 
+
 class _Response(BytesIO):
     """Minimal urllib response stand-in."""
 
@@ -42,6 +43,7 @@ class _FakeOpener:
 # ---------------------------------------------------------------------------
 # Existing download behaviour
 # ---------------------------------------------------------------------------
+
 
 def test_download_streams_to_target(monkeypatch, tmp_path):
     monkeypatch.setattr(
@@ -107,6 +109,7 @@ def test_v19_2_bundle_hashes_are_pinned():
 # StrictRedirectHandler — redirect security unit tests
 # ---------------------------------------------------------------------------
 
+
 class TestStrictRedirectHandler:
     """Unit tests for StrictRedirectHandler._validate_redirect_url.
 
@@ -143,13 +146,16 @@ class TestStrictRedirectHandler:
         with pytest.raises(ValueError, match="only 'https' is allowed"):
             handler._validate_redirect_url("file:///etc/passwd")
 
-    @pytest.mark.parametrize("bad_host", [
-        "evil.com",
-        "github.com",                              # close but wrong subdomain
-        "raw.githubusercontent.com.evil.com",      # subdomain spoofing
-        "evil.raw.githubusercontent.com",          # prefix spoofing
-        "raw.githubusercontent.com@evil.com",      # userinfo confusion
-    ])
+    @pytest.mark.parametrize(
+        "bad_host",
+        [
+            "evil.com",
+            "github.com",  # close but wrong subdomain
+            "raw.githubusercontent.com.evil.com",  # subdomain spoofing
+            "evil.raw.githubusercontent.com",  # prefix spoofing
+            "raw.githubusercontent.com@evil.com",  # userinfo confusion
+        ],
+    )
     def test_various_attacker_domains_rejected(self, bad_host):
         handler = StrictRedirectHandler()
         with pytest.raises(ValueError, match="not in the approved host list"):
@@ -159,6 +165,7 @@ class TestStrictRedirectHandler:
 # ---------------------------------------------------------------------------
 # _validate_stix_bundle — content validation unit tests
 # ---------------------------------------------------------------------------
+
 
 def _write(tmp_path: Path, data, filename="bundle.json") -> Path:
     p = tmp_path / filename
@@ -184,8 +191,8 @@ class TestValidateStixBundle:
             "objects": [{"type": "attack-pattern", "id": "attack-pattern--1234"}],
         }
         p = _write(tmp_path, bundle)
-        _validate_stix_bundle(p)           # must not raise
-        assert p.exists()                  # file must NOT be deleted on success
+        _validate_stix_bundle(p)  # must not raise
+        assert p.exists()  # file must NOT be deleted on success
 
     def test_valid_stix_20_bundle_accepted(self, tmp_path):
         bundle = {

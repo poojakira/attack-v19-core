@@ -4,6 +4,7 @@ Integration tests for cross-repo enricher chain with ATT&CK v19.
 Tests that the enricher pipeline works end-to-end with v19 technique IDs,
 revoked ID remapping, and new tactic structure.
 """
+
 import sys
 import os
 
@@ -11,8 +12,10 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "attack-v19-core"))
 
 from attack_v19_core.constants import (
-    ENTERPRISE_TACTICS, V19_REVOCATION_MAP, V19_NEW_TECHNIQUES,
-    TACTIC_STEALTH, TACTIC_DEFENSE_IMPAIRMENT
+    ENTERPRISE_TACTICS,
+    V19_REVOCATION_MAP,
+    TACTIC_STEALTH,
+    TACTIC_DEFENSE_IMPAIRMENT,
 )
 from attack_v19_core.loader import ATTACKLoader
 from attack_v19_core.index import ATTACKIndex
@@ -56,7 +59,7 @@ class TestV19EnricherChain:
 
         for old_id, new_id in actual_revocations.items():
             # Old ID should NOT be in index (revoked)
-            old_result = self.index.get(old_id)
+            _ = self.index.get(old_id)
 
             # New ID SHOULD be in index (or at least be a valid format)
             new_result = self.index.get(new_id)
@@ -69,8 +72,16 @@ class TestV19EnricherChain:
         """Core new v19 techniques should be resolvable."""
         # At least the parent techniques should exist
         core_new = [
-            "T1682", "T1683", "T1684", "T1685", "T1686",
-            "T1687", "T1688", "T1689", "T1690", "T1027/018"
+            "T1682",
+            "T1683",
+            "T1684",
+            "T1685",
+            "T1686",
+            "T1687",
+            "T1688",
+            "T1689",
+            "T1690",
+            "T1027/018",
         ]
 
         found = 0
@@ -86,8 +97,13 @@ class TestV19EnricherChain:
     def test_ics_subtechniques_resolvable(self):
         """ICS v19 sub-techniques should be resolvable."""
         ics_new = [
-            "T1691", "T1692", "T1693", "T1694", "T1695",
-            "T0843/001", "T0846/001"
+            "T1691",
+            "T1692",
+            "T1693",
+            "T1694",
+            "T1695",
+            "T0843/001",
+            "T0846/001",
         ]
 
         found = 0
@@ -118,6 +134,7 @@ class TestV19EnricherChain:
         reporter = NavigatorLayerReporter()
         layer_json = reporter.generate("integration_test", [mapping])
         import json
+
         layer = json.loads(layer_json)
 
         # Validate v19 layer structure
@@ -155,6 +172,7 @@ class TestV19EnricherChain:
         reporter = NavigatorLayerReporter()
         layer_json = reporter.generate("multi_tactic_test", [mapping])
         import json
+
         layer = json.loads(layer_json)
 
         tech = layer["techniques"][0]
@@ -196,9 +214,16 @@ class TestRuleTableV19Compliance:
         revoked_ids = set(actual_revocations.keys())
 
         for repo in repos:
-            enricher_path = os.path.join(os.path.dirname(__file__), "..", "..", repo, "attack_mapping", "enricher.py")
+            enricher_path = os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "..",
+                repo,
+                "attack_mapping",
+                "enricher.py",
+            )
             if os.path.exists(enricher_path):
-                with open(enricher_path, 'r') as f:
+                with open(enricher_path, "r") as f:
                     content = f.read()
 
                 # Check for revoked IDs (excluding comments)
@@ -206,7 +231,9 @@ class TestRuleTableV19Compliance:
                     # Skip if it's in a comment or string that's clearly documentation
                     if f'"{revoked}"' in content or f"'{revoked}'" in content:
                         # This would be a violation
-                        raise AssertionError(f"REVOKED ID {revoked} found in {repo}/enricher.py - should be remapped")
+                        raise AssertionError(
+                            f"REVOKED ID {revoked} found in {repo}/enricher.py - should be remapped"
+                        )
 
     def test_new_technique_coverage_indicators(self):
         """Verify key new techniques appear in relevant rule tables."""
@@ -223,9 +250,16 @@ class TestRuleTableV19Compliance:
 
         repos_with_t1685 = 0
         for repo in defense_impairment_repos:
-            enricher_path = os.path.join(os.path.dirname(__file__), "..", "..", repo, "attack_mapping", "enricher.py")
+            enricher_path = os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "..",
+                repo,
+                "attack_mapping",
+                "enricher.py",
+            )
             if os.path.exists(enricher_path):
-                with open(enricher_path, 'r') as f:
+                with open(enricher_path, "r") as f:
                     if "T1685" in f.read():
                         repos_with_t1685 += 1
 
@@ -235,16 +269,30 @@ class TestRuleTableV19Compliance:
         assert repos_with_t1685 >= 0, f"Coverage check failed: {repos_with_t1685}"
 
         # T1682 (Query Public AI) should be in AI-focused repos
-        ai_repos = ["llm-redteam-framework", "mcp-security-gateway-monitor", "unified-ml-security-platform",
-                    "hf-model-provenance-scanner", "adversarial-ml-lab"]
+        ai_repos = [
+            "llm-redteam-framework",
+            "mcp-security-gateway-monitor",
+            "unified-ml-security-platform",
+            "hf-model-provenance-scanner",
+            "adversarial-ml-lab",
+        ]
         repos_with_t1682 = 0
         for repo in ai_repos:
-            enricher_path = os.path.join(os.path.dirname(__file__), "..", "..", repo, "attack_mapping", "enricher.py")
+            enricher_path = os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "..",
+                repo,
+                "attack_mapping",
+                "enricher.py",
+            )
             if os.path.exists(enricher_path):
-                with open(enricher_path, 'r') as f:
+                with open(enricher_path, "r") as f:
                     if "T1682" in f.read():
                         repos_with_t1682 += 1
         # T1682 coverage is aspirational (only 1/5 confirmed as of 2026-08)
         assert repos_with_t1682 >= 0, f"T1682 coverage: {repos_with_t1682}/5 AI repos"
+
     import pytest
+
     pytest.main([__file__, "-v", "--tb=short"])

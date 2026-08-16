@@ -114,7 +114,9 @@ def _validate_stix_bundle(path: Path) -> None:
         path.unlink(missing_ok=True)
         raise ValueError(f"Downloaded bundle is not valid UTF-8 JSON: {exc}") from exc
     except OSError as exc:
-        raise ValueError(f"Cannot read downloaded bundle for validation: {exc}") from exc
+        raise ValueError(
+            f"Cannot read downloaded bundle for validation: {exc}"
+        ) from exc
 
     if not isinstance(data, dict):
         path.unlink(missing_ok=True)
