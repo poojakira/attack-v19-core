@@ -89,7 +89,9 @@ def test_get_subtechniques_of():
     index = ATTACKIndex(loader)
     subs = index.get_subtechniques_of("T1059")
     assert len(subs) > 0
-    assert all(s.is_subtechnique and getattr(s, "parent_id", None) == "T1059" for s in subs)
+    assert all(
+        s.is_subtechnique and getattr(s, "parent_id", None) == "T1059" for s in subs
+    )
 
 
 def test_mobile_counts():
