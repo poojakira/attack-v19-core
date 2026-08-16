@@ -50,7 +50,7 @@ def test_lookup_subtechnique():
     sub = index.get("T1059.001")
     assert sub is not None
     assert sub.is_subtechnique
-    assert sub.parent_id == "T1059"
+    assert getattr(sub, "parent_id", None) == "T1059"
 
 
 def test_by_tactic():
