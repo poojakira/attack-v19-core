@@ -203,6 +203,22 @@ class TestValidateStixBundle:
         p = _write(tmp_path, bundle)
         _validate_stix_bundle(p)
 
+    def test_valid_bundle_with_object_spec_version_accepted(self, tmp_path):
+        bundle = {
+            "type": "bundle",
+            "id": "bundle--1234",
+            "objects": [
+                {
+                    "type": "attack-pattern",
+                    "id": "attack-pattern--1234",
+                    "spec_version": "2.1",
+                }
+            ],
+        }
+        p = _write(tmp_path, bundle)
+        _validate_stix_bundle(p)
+        assert p.exists()
+
     def test_invalid_json_rejected_and_deleted(self, tmp_path):
         p = _write(tmp_path, b"this is not json at all {{{{")
         with pytest.raises(ValueError, match="not valid UTF-8 JSON"):
