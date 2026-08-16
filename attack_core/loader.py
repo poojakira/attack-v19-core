@@ -4,9 +4,13 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, cast
 
-from mitreattack.stix20 import MitreAttackData
+from ._distutils_compat import ensure_distutils_version
 
-from .models import (
+ensure_distutils_version()
+
+from mitreattack.stix20 import MitreAttackData  # noqa: E402
+
+from .models import (  # noqa: E402
     DataSource,
     Domain,
     Group,
