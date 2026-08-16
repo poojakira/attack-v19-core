@@ -21,7 +21,7 @@ concurrency:
 env:
   PYTHON_VERSION: "3.12"
   RUFF_VERSION: "0.8.4"
-  PYRIGHT_VERSION: "1.1.40"
+  PYRIGHT_VERSION: "1.1.388"
   BANDIT_VERSION: "1.8.3"
   PIP_AUDIT_VERSION: "2.10.1"
   CYCLONEDX_VERSION: "5.1.1"
@@ -134,7 +134,8 @@ jobs:
                   data = json.load(f)
           except Exception:
               data = []
-          vulns = [v for v in data if v.get("vulns")]
+          records = data.get("dependencies", data) if isinstance(data, dict) else data
+          vulns = [v for v in records if isinstance(v, dict) and v.get("vulns")]
           if vulns:
               print(f"FAIL: {len(vulns)} packages with known vulnerabilities")
               for v in vulns:
@@ -155,12 +156,13 @@ jobs:
           path: sbom.json
           retention-days: 90
 
-      - name: Upload Bandit SARIF
+      - name: Upload Bandit report artifact
         if: always()
-        uses: github/codeql-action/upload-sarif@192325c86100d080feab897ff886c34abd4c83a3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          sarif_file: bandit-report.json
-          category: bandit
+          name: bandit-report
+          path: bandit-report.json
+          retention-days: 30
 
   test:
     name: Unit Tests
