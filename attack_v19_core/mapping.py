@@ -4,10 +4,10 @@ Provides utilities for building ATT&CK mappings from detection findings.
 """
 
 from __future__ import annotations
-from typing import List, Optional
+from typing import List
 from dataclasses import dataclass
 
-from .models import Domain, ATTACKMapping, Technique, SubTechnique, Tactic
+from .models import Domain, ATTACKMapping
 from .index import ATTACKIndex
 
 

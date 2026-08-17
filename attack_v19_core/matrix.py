@@ -5,9 +5,9 @@ Renders ATT&CK matrix as dict/JSON/CSV/HTML for Enterprise, Mobile, ICS.
 import json
 import csv
 from io import StringIO
-from typing import Dict, List
+from typing import Dict
 from .index import ATTACKIndex
-from .models import Domain, Technique, SubTechnique, Tactic, ATTACKMapping
+from .models import Domain
 
 
 class ATTACKMatrix:

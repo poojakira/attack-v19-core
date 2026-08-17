@@ -3,9 +3,8 @@ Loads all three ATT&CK STIX bundles from local disk or TAXII server.
 Returns fully-typed model instances.
 """
 
-import json
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List
 from ._distutils_compat import ensure_distutils_version
 
 ensure_distutils_version()
@@ -21,7 +20,6 @@ from .models import (  # noqa: E402
     Mitigation,
     DataSource,
 )
-from .constants import DOMAINS  # noqa: E402
 
 _DEFAULT_STIX_DIR = Path.home() / "attack_data"
 
