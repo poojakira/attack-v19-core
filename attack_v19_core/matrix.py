@@ -1,6 +1,7 @@
 """
 Renders ATT&CK matrix as dict/JSON/CSV/HTML for Enterprise, Mobile, ICS.
 """
+
 import json
 import csv
 from io import StringIO
@@ -24,19 +25,29 @@ class ATTACKMatrix:
             tactic_data = {
                 "tactic_id": tac.attack_id,
                 "tactic_name": tac.name,
-                "techniques": []
+                "techniques": [],
             }
             for tech in techs_sorted:
-                subs = [s for s in self.index._by_id.values()
-                        if s.is_subtechnique and s.parent_id == tech.attack_id and s.domain == domain]
-                tactic_data["techniques"].append({
-                    "technique_id": tech.attack_id,
-                    "technique_name": tech.name,
-                    "subtechniques": [
-                        {"subtechnique_id": s.attack_id, "subtechnique_name": s.name}
-                        for s in subs
-                    ]
-                })
+                subs = [
+                    s
+                    for s in self.index._by_id.values()
+                    if s.is_subtechnique
+                    and s.parent_id == tech.attack_id
+                    and s.domain == domain
+                ]
+                tactic_data["techniques"].append(
+                    {
+                        "technique_id": tech.attack_id,
+                        "technique_name": tech.name,
+                        "subtechniques": [
+                            {
+                                "subtechnique_id": s.attack_id,
+                                "subtechnique_name": s.name,
+                            }
+                            for s in subs
+                        ],
+                    }
+                )
             matrix["tactics"].append(tactic_data)
         return matrix
 
@@ -46,36 +57,73 @@ class ATTACKMatrix:
     def to_csv(self, domain: Domain = Domain.ENTERPRISE) -> str:
         output = StringIO()
         writer = csv.writer(output)
-        writer.writerow(["Tactic ID", "Tactic Name", "Technique ID", "Technique Name", "Sub-technique ID", "Sub-technique Name"])
+        writer.writerow(
+            [
+                "Tactic ID",
+                "Tactic Name",
+                "Technique ID",
+                "Technique Name",
+                "Sub-technique ID",
+                "Sub-technique Name",
+            ]
+        )
         matrix = self.to_dict(domain)
         for tac in matrix["tactics"]:
             for tech in tac["techniques"]:
                 if tech["subtechniques"]:
                     for sub in tech["subtechniques"]:
-                        writer.writerow([tac["tactic_id"], tac["tactic_name"], tech["technique_id"], tech["technique_name"], sub["subtechnique_id"], sub["subtechnique_name"]])
+                        writer.writerow(
+                            [
+                                tac["tactic_id"],
+                                tac["tactic_name"],
+                                tech["technique_id"],
+                                tech["technique_name"],
+                                sub["subtechnique_id"],
+                                sub["subtechnique_name"],
+                            ]
+                        )
                 else:
-                    writer.writerow([tac["tactic_id"], tac["tactic_name"], tech["technique_id"], tech["technique_name"], "", ""])
+                    writer.writerow(
+                        [
+                            tac["tactic_id"],
+                            tac["tactic_name"],
+                            tech["technique_id"],
+                            tech["technique_name"],
+                            "",
+                            "",
+                        ]
+                    )
         return output.getvalue()
 
     def to_html(self, domain: Domain = Domain.ENTERPRISE) -> str:
         matrix = self.to_dict(domain)
-        html = ['<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;">']
-        html.append('<tr><th>Tactic</th><th>Techniques / Sub-techniques</th></tr>')
+        html = [
+            '<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;">'
+        ]
+        html.append("<tr><th>Tactic</th><th>Techniques / Sub-techniques</th></tr>")
         for tac in matrix["tactics"]:
             tech_html = []
             for tech in tac["techniques"]:
-                tech_html.append(f'<strong>{tech["technique_id"]}: {tech["technique_name"]}</strong>')
+                tech_html.append(
+                    f"<strong>{tech['technique_id']}: {tech['technique_name']}</strong>"
+                )
                 if tech["subtechniques"]:
-                    subs = ", ".join(f'{s["subtechnique_id"]}: {s["subtechnique_name"]}' for s in tech["subtechniques"])
+                    subs = ", ".join(
+                        f"{s['subtechnique_id']}: {s['subtechnique_name']}"
+                        for s in tech["subtechniques"]
+                    )
                     tech_html.append(f'<small style="color:#666;">{subs}</small>')
-            html.append(f'<tr><td><strong>{tac["tactic_id"]}: {tac["tactic_name"]}</strong></td><td>{"<br>".join(tech_html)}</td></tr>')
-        html.append('</table>')
+            html.append(
+                f"<tr><td><strong>{tac['tactic_id']}: {tac['tactic_name']}</strong></td><td>{'<br>'.join(tech_html)}</td></tr>"
+            )
+        html.append("</table>")
         return "\n".join(html)
 
 
 class NavigatorLayerReporter:
     def generate(self, repo_name: str, mappings) -> str:
         import json
+
         techniques = []
         seen = set()
         for m in mappings:
@@ -85,41 +133,67 @@ class NavigatorLayerReporter:
             if tid in seen:
                 continue
             seen.add(tid)
-            techniques.append({
-                "techniqueID": tid,
-                "tactic":      m.tactic_id,
-                "score":       int(m.confidence * 100),
-                "comment":     f"{repo_name} detection — ATT&CK v19",
-                "enabled":     True,
-                "color":       "",
-                "metadata":    [{"name": "repo", "value": repo_name}],
-            })
+            techniques.append(
+                {
+                    "techniqueID": tid,
+                    "tactic": m.tactic_id,
+                    "score": int(m.confidence * 100),
+                    "comment": f"{repo_name} detection — ATT&CK v19",
+                    "enabled": True,
+                    "color": "",
+                    "metadata": [{"name": "repo", "value": repo_name}],
+                }
+            )
 
         # v19 tactic order — include BOTH TA0005 (Stealth) and TA0112 (Defense Impairment)
         layer = {
-            "name":        f"{repo_name} ATT&CK v19 Coverage",
-            "versions":    {"attack": "19", "navigator": "4.9", "layer": "4.5"},
-            "domain":      "enterprise-attack",
+            "name": f"{repo_name} ATT&CK v19 Coverage",
+            "versions": {"attack": "19", "navigator": "4.9", "layer": "4.5"},
+            "domain": "enterprise-attack",
             "description": f"Generated by {repo_name} ATT&CK enricher. v19: TA0005=Stealth, TA0112=Defense Impairment.",
-            "filters":     {"platforms": ["Windows", "macOS", "Linux", "AWS", "Azure", "GCP",
-                                          "Containers", "Network", "SaaS", "IaaS", "Office 365",
-                                          "Google Workspace"]},
-            "sorting":     3,
-            "layout":      {"layout": "side", "showAggregateScores": True,
-                            "countUnscored": False, "aggregateFunction": "max"},
+            "filters": {
+                "platforms": [
+                    "Windows",
+                    "macOS",
+                    "Linux",
+                    "AWS",
+                    "Azure",
+                    "GCP",
+                    "Containers",
+                    "Network",
+                    "SaaS",
+                    "IaaS",
+                    "Office 365",
+                    "Google Workspace",
+                ]
+            },
+            "sorting": 3,
+            "layout": {
+                "layout": "side",
+                "showAggregateScores": True,
+                "countUnscored": False,
+                "aggregateFunction": "max",
+            },
             "hideDisabled": False,
-            "techniques":  techniques,
-            "gradient":    {"colors": ["#ffffff", "#ff6666"], "minValue": 0, "maxValue": 100},
+            "techniques": techniques,
+            "gradient": {
+                "colors": ["#ffffff", "#ff6666"],
+                "minValue": 0,
+                "maxValue": 100,
+            },
             "legendItems": [
                 {"label": "Detection coverage", "color": "#ff6666"},
             ],
             "tacticRowBackground": "#dddddd",
             "selectTechniquesAcrossTactics": True,
-            "selectSubtechniquesWithParent":  False,
+            "selectSubtechniquesWithParent": False,
             "metadata": [
-                {"name": "attack_version",  "value": "19"},
-                {"name": "generated_by",    "value": repo_name},
-                {"name": "tactic_note",     "value": "TA0005=Stealth (renamed from Defense Evasion); TA0112=Defense Impairment (new)"},
+                {"name": "attack_version", "value": "19"},
+                {"name": "generated_by", "value": repo_name},
+                {
+                    "name": "tactic_note",
+                    "value": "TA0005=Stealth (renamed from Defense Evasion); TA0112=Defense Impairment (new)",
+                },
             ],
         }
         return json.dumps(layer, indent=2)

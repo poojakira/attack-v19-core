@@ -12,18 +12,18 @@ def test_enterprise_technique_count():
     loader = ATTACKLoader()
     index = ATTACKIndex(loader)
     count = index.count_techniques(Domain.ENTERPRISE)
-    assert (
-        count == ENTERPRISE_TECHNIQUE_COUNT
-    ), f"Expected {ENTERPRISE_TECHNIQUE_COUNT} techniques, got {count}"
+    assert count == ENTERPRISE_TECHNIQUE_COUNT, (
+        f"Expected {ENTERPRISE_TECHNIQUE_COUNT} techniques, got {count}"
+    )
 
 
 def test_enterprise_subtechnique_count():
     loader = ATTACKLoader()
     index = ATTACKIndex(loader)
     count = index.count_subtechniques(Domain.ENTERPRISE)
-    assert (
-        count == ENTERPRISE_SUBTECHNIQUE_COUNT
-    ), f"Expected {ENTERPRISE_SUBTECHNIQUE_COUNT} sub-techniques, got {count}"
+    assert count == ENTERPRISE_SUBTECHNIQUE_COUNT, (
+        f"Expected {ENTERPRISE_SUBTECHNIQUE_COUNT} sub-techniques, got {count}"
+    )
 
 
 def test_enterprise_tactic_count():
@@ -31,9 +31,9 @@ def test_enterprise_tactic_count():
     index = ATTACKIndex(loader)
     tactics = [t for t in index._tactics.values() if t.domain == Domain.ENTERPRISE]
     count = len(tactics)
-    assert (
-        count == ENTERPRISE_TACTIC_COUNT
-    ), f"Expected {ENTERPRISE_TACTIC_COUNT} tactics, got {count}"
+    assert count == ENTERPRISE_TACTIC_COUNT, (
+        f"Expected {ENTERPRISE_TACTIC_COUNT} tactics, got {count}"
+    )
 
 
 def test_lookup_by_id():

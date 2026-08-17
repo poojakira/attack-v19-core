@@ -8,31 +8,64 @@ Supported runtime: Python 3.11 or 3.12 with dependencies resolved from `uv.lock`
 
 ## Provision
 
+**Linux / macOS (bash):**
+
 ```bash
 git clone https://github.com/poojakira/attack-v19-core.git
 cd attack-v19-core
-uv sync --locked --extra dev
-uv run python scripts/download_attack_data.py
+pip install -e ".[dev]"
+python scripts/download_attack_data.py
 ```
 
-The download succeeds only when all official v19.2 bundle hashes match. The default data directory is `~/attack_data`; override it with `ATTACK_DATA_DIR` for runtime use and `--data-dir` for download.
+**Windows (PowerShell):**
+
+```powershell
+git clone https://github.com/poojakira/attack-v19-core.git
+cd attack-v19-core
+pip install -e ".[dev]"
+python scripts/download_attack_data.py
+```
+
+> **Note:** The previous recommendation of `uv sync --locked --extra dev` may fail if `uv` cannot locate your Python installation. If you prefer `uv`, pass `--python 3.12` explicitly: `uv sync --locked --python 3.12 --extra dev`. The simplest cross-platform method is `pip install -e ".[dev]"` shown above.
+
+The download succeeds only when all official v19.2 bundle hashes match. The default data directory is `~/attack_data` (Linux/macOS) or `$env:USERPROFILE\attack_data` (Windows); override it with `ATTACK_DATA_DIR` for runtime use and `--data-dir` for download.
 
 ## Pre-deployment verification
 
+**Linux / macOS (bash):**
+
 ```bash
-ATTACK_DATA_DIR="$HOME/attack_data" uv run pytest tests -q
-uv run ruff check attack_core tests scripts
-uv run ruff format --check attack_core tests scripts
-uv build
+ATTACK_DATA_DIR="$HOME/attack_data" pytest tests -q
+ruff check attack_core tests scripts
+ruff format --check attack_core tests scripts
+python -m build
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$env:ATTACK_DATA_DIR="$env:USERPROFILE\attack_data"; pytest tests -q
+ruff check attack_core tests scripts
+ruff format --check attack_core tests scripts
+python -m build
 ```
 
 Record the Git commit, Python version, `uv.lock` hash, bundle hashes, and complete command output. Do not convert a source-file count into a passing-test claim.
 
 ## Runtime smoke test
 
+**Linux / macOS (bash):**
+
 ```bash
-ATTACK_DATA_DIR="$HOME/attack_data" uv run attack-v19 lookup T1059
-ATTACK_DATA_DIR="$HOME/attack_data" uv run attack-v19 lookup T1562.009
+ATTACK_DATA_DIR="$HOME/attack_data" attack-v19 lookup T1059
+ATTACK_DATA_DIR="$HOME/attack_data" attack-v19 lookup T1562.009
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$env:ATTACK_DATA_DIR="$env:USERPROFILE\attack_data"; attack-v19 lookup T1059
+$env:ATTACK_DATA_DIR="$env:USERPROFILE\attack_data"; attack-v19 lookup T1562.009
 ```
 
 Expected behavior:

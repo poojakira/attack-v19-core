@@ -108,22 +108,22 @@ class ATTACKMatrix:
             for tech in tac["techniques"]:
                 tech_html.append(
                     "<strong>"
-                    f'{escape(str(tech["technique_id"]))}: '
-                    f'{escape(str(tech["technique_name"]))}'
+                    f"{escape(str(tech['technique_id']))}: "
+                    f"{escape(str(tech['technique_name']))}"
                     "</strong>"
                 )
                 if tech["subtechniques"]:
                     subs = ", ".join(
-                        f'{escape(str(s["subtechnique_id"]))}: '
-                        f'{escape(str(s["subtechnique_name"]))}'
+                        f"{escape(str(s['subtechnique_id']))}: "
+                        f"{escape(str(s['subtechnique_name']))}"
                         for s in tech["subtechniques"]
                     )
                     tech_html.append(f'<small style="color:#666;">{subs}</small>')
             html.append(
                 "<tr><td><strong>"
-                f'{escape(str(tac["tactic_id"]))}: '
-                f'{escape(str(tac["tactic_name"]))}'
-                f'</strong></td><td>{"<br>".join(tech_html)}</td></tr>'
+                f"{escape(str(tac['tactic_id']))}: "
+                f"{escape(str(tac['tactic_name']))}"
+                f"</strong></td><td>{'<br>'.join(tech_html)}</td></tr>"
             )
         html.append("</table>")
         return "\n".join(html)

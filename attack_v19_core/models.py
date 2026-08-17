@@ -102,6 +102,7 @@ class ATTACKMapping(BaseModel):
     """
     Reusable mapping block - attach to any detection finding, alert, or artifact.
     """
+
     tactic_id: str
     tactic_name: str
     technique_id: str
