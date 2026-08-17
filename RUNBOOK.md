@@ -1,5 +1,12 @@
 # Operator Runbook
 
+## Prerequisites
+
+- Python 3.10+ (`py --version` on Windows, `python3 --version` on Linux/macOS)
+- pip (bundled with Python)
+- Git
+- ~500MB disk space (for ATT&CK STIX data bundles)
+
 ## Supported operating model
 
 `attack-v19-core` is an in-process utility. The operator owns the Python environment, read-only ATT&CK data directory, application logging, and rollback of dependent applications. There is no hosted service or autonomous action path.
