@@ -293,6 +293,3 @@ class TestRuleTableV19Compliance:
         # T1682 coverage is aspirational (only 1/5 confirmed as of 2026-08)
         assert repos_with_t1682 >= 0, f"T1682 coverage: {repos_with_t1682}/5 AI repos"
 
-    import pytest
-
-    pytest.main([__file__, "-v", "--tb=short"])
