@@ -85,9 +85,9 @@ def test_revocation_map_keys_not_in_v19_index():
     assert len(V19_REVOCATION_MAP) > 10
     # Count actual revocations (not identity mappings)
     actual_revocations = {k: v for k, v in V19_REVOCATION_MAP.items() if k != v}
-    assert len(actual_revocations) > 5, (
-        f"Expected >5 actual revocations, got {len(actual_revocations)}"
-    )
+    assert (
+        len(actual_revocations) > 5
+    ), f"Expected >5 actual revocations, got {len(actual_revocations)}"
     for old_id, new_id in actual_revocations.items():
         assert old_id != new_id
 
@@ -112,6 +112,6 @@ def test_navigator_layer_includes_defense_impairment():
     layer = json.loads(layer_json)
     assert layer["versions"]["attack"] == "19"
     # Check that the technique has the correct tactic field
-    assert any(t.get("tactic") == "TA0112" for t in layer["techniques"]), (
-        "TA0112 Defense Impairment missing from Navigator layer"
-    )
+    assert any(
+        t.get("tactic") == "TA0112" for t in layer["techniques"]
+    ), "TA0112 Defense Impairment missing from Navigator layer"
