@@ -1,127 +1,34 @@
-# MITRE ATT&CK v19 Core
+# attack-v19-core
+
+Python package for MITRE ATT&CK v19 data models. Enterprise (15 tactics, 222 techniques, 475 sub-techniques), Mobile, ICS. Handles v19 breaking changes so downstream repos don't have to.
 
 [![CI](https://github.com/poojakira/attack-v19-core/actions/workflows/ci.yml/badge.svg)](https://github.com/poojakira/attack-v19-core/actions/workflows/ci.yml)
-[![Python >=3.10](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
+![MIT](https://img.shields.io/badge/license-MIT-green)
 
-Standalone importable Python package for MITRE ATT&CK v19 data models across Enterprise, Mobile, and ICS domains.
+## Why It Exists
 
-## Installation
+ATT&CK v19 (July 2026) renamed TA0005 ("Defense Evasion" → "Stealth"), added TA0112 ("Defense Impairment"), revoked 12 techniques, and added 48 new ones. Any tool hardcoding v18 IDs silently produces wrong mappings. This package ingests STIX bundles and provides a typed lookup API with auto-remapping through `V19_REVOCATION_MAP`.
+
+Other repos in this portfolio (`import attack_v19_core`) use it as their ATT&CK backend.
+
+## Install
 
 ```bash
 pip install -r requirements.txt
+# Requires STIX bundles in ~/attack_data/
 ```
-
-Requires ATT&CK STIX bundles in `~/attack_data/`:
-- `enterprise-attack.json`
-- `mobile-attack.json`
-- `ics-attack.json`
-
-## v19 Migration (Breaking Changes)
-
-**ATT&CK v19 introduced breaking structural changes. See [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) and [CHANGELOG.md](CHANGELOG.md).**
-
-Key changes:
-- **TA0005 renamed**: "Defense Evasion" → "Stealth"
-- **TA0112 added**: "Defense Impairment" (new tactic from TA0005 split)
-- **12 techniques revoked**: T1562*, T1070.001/002, T1089, T1054, T1534, T1566.003
-- **48 new techniques**: T1682-T1695, T1691-T1695, T1693-T1695 sub-techniques, T1027/018
-- **First ICS sub-techniques**: T1691/001-002, T1692/001-002, T1693/001-002, T1694/001-002, T1695/001-003
-- **New AI/ML techniques**: T1682 (Query Public AI), T1683 (Generate Content), T1684 (Social Engineering)
-
-Built-in automatic remapping via `V19_REVOCATION_MAP` - revoked IDs resolve to replacements with warning logs.
 
 ## Usage
 
 ```python
-from attack_core import ATTACKLoader, ATTACKIndex, Domain
-from attack_core.constants import V19_REVOCATION_MAP
-from attack_core.matrix import NavigatorLayerReporter
-from attack_core.models import ATTACKMapping, Domain
-
-loader = ATTACKLoader()
-index = ATTACKIndex(loader)
-
-# Look up technique by ID (auto-remaps revoked IDs)
-technique = index.get("T1562")  # Returns T1685 "Disable or Modify Tools"
-print(technique.name)
-
-# Check revocation map manually
-resolved = V19_REVOCATION_MAP.get("T1562.001", "T1562.001")  # Returns "T1685"
-
-# Search by keyword
-results = index.search("credential dumping")
-for r in results:
-    print(f"{r.attack_id}: {r.name}")
-
-# Get all techniques in a tactic
-stealth = index.by_tactic("TA0005")  # NEW: Stealth tactic
-defense_impairment = index.by_tactic("TA0112")  # NEW: Defense Impairment tactic
-
-# Generate ATT&CK Navigator v4.9 layer
-reporter = NavigatorLayerReporter()
-mappings = [ATTACKMapping(...)]  # Your detection mappings
-layer_json = reporter.generate("my_detector", mappings)
-# layer_json includes TA0112, versions.attack="19"
-
-# Get all techniques for a platform
-windows_techs = index.by_platform("Windows")
-
-# Count assertions (v19 canonical counts)
-assert index.count_techniques(Domain.ENTERPRISE) == 222
-assert index.count_subtechniques(Domain.ENTERPRISE) == 475
+from attack_v19_core import AttackDatabase
+db = AttackDatabase()
+t = db.get_technique("T1059.006")  # Python scripting interpreter
 ```
 
-## Data Model
-
-All models are Pydantic v2 dataclasses:
-
-- `Tactic` - ATT&CK tactics (TA0001-TA0112)
-- `Technique` - Base techniques (Txxxx)
-- `SubTechnique` - Sub-techniques (Txxxx.xxx)
-- `Group` - Threat groups (Gxxxx)
-- `Software` - Malware/Tools (Sxxxx)
-- `Mitigation` - Mitigations (Mxxxx)
-- `DataSource` - Data sources (DSxxxx)
-- `ATTACKMapping` - Reusable mapping block for detections
-
-## Domains
-
-| Domain | Tactics | Techniques | Sub-techniques |
-|--------|---------|------------|----------------|
-| Enterprise | 15 | 222 | 475 |
-| Mobile | 12 | ~100 | ~200 |
-| ICS | 12 | ~100 | ~150 |
-
-### Enterprise Tactics (v19 Order)
-1. TA0001 Initial Access
-2. TA0002 Execution
-3. TA0003 Persistence
-4. TA0004 Privilege Escalation
-5. **TA0005 Stealth** (renamed from Defense Evasion)
-6. TA0006 Credential Access
-7. TA0007 Discovery
-8. TA0008 Lateral Movement
-9. TA0009 Collection
-10. TA0010 Exfiltration
-11. TA0011 Command and Control
-12. TA0040 Impact
-13. TA0042 Resource Development
-14. TA0043 Reconnaissance
-15. **TA0112 Defense Impairment** (NEW)
-
-## Testing
-
-```bash
-pytest tests/ -v
-```
-
-Key test: `tests/test_v19_structure.py` validates v19 structure compliance.
-
-## Migration
-
-See [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for step-by-step migration from v18.
+See `MIGRATION_GUIDE.md` for v18 → v19 migration.
 
 ## License
 
-MIT
+MIT.
