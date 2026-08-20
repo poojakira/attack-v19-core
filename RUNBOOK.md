@@ -12,20 +12,25 @@ pip install -r requirements.txt
 
 ## Import Techniques
 ```python
-from attack_v19_core import techniques
+from attack_v19_core import ATTACKLoader
+from attack_v19_core.models import Domain
 
-all_techniques = techniques.get_all()
-print(f"Loaded {len(all_techniques)} techniques")
+loader = ATTACKLoader()
+techniques = loader.get_techniques(Domain.ENTERPRISE)
+print(f"Loaded {len(techniques)} techniques")
 ```
 
 ## Query by ID
 ```python
-from attack_v19_core import techniques
+from attack_v19_core import ATTACKLoader, ATTACKIndex
+from attack_v19_core.models import Domain
 
-t1059 = techniques.get_by_id("T1059")
+loader = ATTACKLoader()
+index = ATTACKIndex(loader)
+
+t1059 = index.get("T1059")
 print(t1059.name)        # "Command and Scripting Interpreter"
-print(t1059.tactics)     # associated tactics
-print(t1059.platforms)   # target platforms
+print(t1059.tactics)   # associated tactic IDs
 ```
 
 ## Update Data
