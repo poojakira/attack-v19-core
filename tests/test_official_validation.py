@@ -129,7 +129,7 @@ class TestRevocationMapIntegrity:
     """Verify V19_REVOCATION_MAP is internally consistent."""
 
     def test_revoked_ids_not_in_new_techniques(self):
-        """Old (revoked) IDs should NOT appear in V19_NEW_TECHNIQUES  -- 
+        """Old (revoked) IDs should NOT appear in V19_NEW_TECHNIQUES  --
         they are being replaced, not added."""
         for old_id in V19_REVOCATION_MAP:
             # Identity mappings (ICS techniques that got sub-techs added) are exceptions
