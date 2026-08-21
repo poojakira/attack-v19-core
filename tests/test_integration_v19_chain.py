@@ -263,7 +263,7 @@ class TestRuleTableV19Compliance:
                     if "T1685" in f.read():
                         repos_with_t1685 += 1
 
-        # NOTE: T1685 coverage is aspirational — enricher.py files exist in only some repos.
+        # NOTE: T1685 coverage is aspirational  --  enricher.py files exist in only some repos.
         # Test verifies the coverage measurement mechanism works, not a specific count.
         # As of 2026-08, 2 repos have enricher.py with T1685 (confirmed).
         assert repos_with_t1685 >= 0, f"Coverage check failed: {repos_with_t1685}"

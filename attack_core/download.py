@@ -135,7 +135,7 @@ def _validate_stix_bundle(path: Path) -> None:
     if not isinstance(objects, list) or len(objects) == 0:
         path.unlink(missing_ok=True)
         raise ValueError(
-            "STIX bundle 'objects' is empty or missing — bundle has no ATT&CK content."
+            "STIX bundle 'objects' is empty or missing  --  bundle has no ATT&CK content."
         )
     root_spec_version = str(data.get("spec_version", ""))
     object_spec_versions = [

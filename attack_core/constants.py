@@ -1,6 +1,6 @@
 """
 MITRE ATT&CK v19 canonical constants.
-Counts are assertions — tests will fail if loaded data diverges.
+Counts are assertions  --  tests will fail if loaded data diverges.
 """
 
 ENTERPRISE_TACTICS = [
@@ -8,7 +8,7 @@ ENTERPRISE_TACTICS = [
     ("TA0002", "Execution"),
     ("TA0003", "Persistence"),
     ("TA0004", "Privilege Escalation"),
-    ("TA0005", "Stealth"),  # WAS "Defense Evasion" — RENAMED v19
+    ("TA0005", "Stealth"),  # WAS "Defense Evasion"  --  RENAMED v19
     ("TA0006", "Credential Access"),
     ("TA0007", "Discovery"),
     ("TA0008", "Lateral Movement"),
@@ -18,10 +18,10 @@ ENTERPRISE_TACTICS = [
     ("TA0040", "Impact"),
     ("TA0042", "Resource Development"),
     ("TA0043", "Reconnaissance"),
-    ("TA0112", "Defense Impairment"),  # NEW in v19 — replaces old TA0005 split
+    ("TA0112", "Defense Impairment"),  # NEW in v19  --  replaces old TA0005 split
 ]
 
-# Counts remain the same — tactic count is still 15
+# Counts remain the same  --  tactic count is still 15
 ENTERPRISE_TACTIC_COUNT = 15
 ENTERPRISE_TECHNIQUE_COUNT = 222
 ENTERPRISE_SUBTECHNIQUE_COUNT = 475
@@ -75,9 +75,9 @@ LEGACY_TECHNIQUE_REMAPS = {
 # Backward-compatible public name used by ATTACKIndex and mapping consumers.
 V19_REVOCATION_MAP = {**LEGACY_TECHNIQUE_REMAPS, **V19_RELEASE_REVOCATION_MAP}
 
-# New v19 technique IDs — add to any lookup that needs them
+# New v19 technique IDs  --  add to any lookup that needs them
 V19_NEW_TECHNIQUES = {
-    # Enterprise — new in v19
+    # Enterprise  --  new in v19
     "T1682": "Query Public AI Services",
     "T1683": "Generate Content",
     "T1683.001": "Generate Content: Written Content",
@@ -101,7 +101,7 @@ V19_NEW_TECHNIQUES = {
     "T1689": "Downgrade Attack",
     "T1690": "Prevent Command History Logging",
     "T1027.018": "Obfuscated Files or Information: Invisible Unicode",
-    # ICS — new sub-techniques in v19
+    # ICS  --  new sub-techniques in v19
     "T1691": "Block Operational Technology Message",
     "T1691.001": "Block Operational Technology Message: Command Message",
     "T1691.002": "Block Operational Technology Message: Reporting Message",
@@ -118,13 +118,13 @@ V19_NEW_TECHNIQUES = {
     "T1695.001": "Block Communications: Serial COM",
     "T1695.002": "Block Communications: Ethernet",
     "T1695.003": "Block Communications: Wi-Fi",
-    # ICS — new Program Download sub-techniques
+    # ICS  --  new Program Download sub-techniques
     "T0843.001": "Program Download: Download All",
     "T0843.002": "Program Download: Online Edit",
     "T0843.003": "Program Download: Program Append",
-    # ICS — new Project File Infection sub-technique
+    # ICS  --  new Project File Infection sub-technique
     "T0873.001": "Project File Infection: Siemens Project File Format",
-    # ICS — new Remote System Discovery sub-techniques
+    # ICS  --  new Remote System Discovery sub-techniques
     "T0846.001": "Remote System Discovery: Port Scan",
     "T0846.002": "Remote System Discovery: Broadcast Discovery",
     "T0846.003": "Remote System Discovery: Multicast Discovery",

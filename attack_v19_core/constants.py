@@ -1,6 +1,6 @@
 """
 MITRE ATT&CK v19 canonical constants.
-Counts are assertions — tests will fail if loaded data diverges.
+Counts are assertions  --  tests will fail if loaded data diverges.
 """
 
 ENTERPRISE_TACTICS = [
@@ -8,7 +8,7 @@ ENTERPRISE_TACTICS = [
     ("TA0002", "Execution"),
     ("TA0003", "Persistence"),
     ("TA0004", "Privilege Escalation"),
-    ("TA0005", "Stealth"),  # WAS "Defense Evasion" — RENAMED v19
+    ("TA0005", "Stealth"),  # WAS "Defense Evasion"  --  RENAMED v19
     ("TA0006", "Credential Access"),
     ("TA0007", "Discovery"),
     ("TA0008", "Lateral Movement"),
@@ -18,10 +18,10 @@ ENTERPRISE_TACTICS = [
     ("TA0040", "Impact"),
     ("TA0042", "Resource Development"),
     ("TA0043", "Reconnaissance"),
-    ("TA0112", "Defense Impairment"),  # NEW in v19 — replaces old TA0005 split
+    ("TA0112", "Defense Impairment"),  # NEW in v19  --  replaces old TA0005 split
 ]
 
-# Counts remain the same — tactic count is still 15
+# Counts remain the same  --  tactic count is still 15
 ENTERPRISE_TACTIC_COUNT = 15
 ENTERPRISE_TECHNIQUE_COUNT = 222
 ENTERPRISE_SUBTECHNIQUE_COUNT = 475
@@ -33,7 +33,7 @@ ICS_TACTIC_COUNT = 12
 TACTIC_STEALTH = "TA0005"  # renamed from Defense Evasion
 TACTIC_DEFENSE_IMPAIRMENT = "TA0112"  # new
 
-# Revoked technique IDs — map old → new for migration
+# Revoked technique IDs  --  map old → new for migration
 V19_REVOCATION_MAP = {
     # Old Defense Evasion techniques revoked and replaced
     "T1562": "T1685",  # Impair Defenses → Disable or Modify Tools
@@ -44,19 +44,19 @@ V19_REVOCATION_MAP = {
     "T1070.001": "T1685.005",  # Clear Windows Event Logs → T1685/005
     "T1070.002": "T1685.006",  # Clear Linux/Mac Logs → T1685/006
     "T1054": "T1685",  # Indicator Blocking (legacy) → T1685
-    # ICS revocations — sub-techniques now exist
-    "T0843": "T0843",  # Program Download — still valid, sub-techs added below
-    "T0873": "T0873",  # Project File Infection — still valid, sub-tech added
-    "T0846": "T0846",  # Remote System Discovery — still valid, sub-techs added
+    # ICS revocations  --  sub-techniques now exist
+    "T0843": "T0843",  # Program Download  --  still valid, sub-techs added below
+    "T0873": "T0873",  # Project File Infection  --  still valid, sub-tech added
+    "T0846": "T0846",  # Remote System Discovery  --  still valid, sub-techs added
     # Social Engineering sub-techs replaced standalone techniques
     "T1534": "T1684.001",  # Internal Spearphishing → Social Engineering: Impersonation
     # Email Spoofing standalone → sub-technique
     "T1566.003": "T1684.002",  # (if referenced) → Social Engineering: Email Spoofing
 }
 
-# New v19 technique IDs — add to any lookup that needs them
+# New v19 technique IDs  --  add to any lookup that needs them
 V19_NEW_TECHNIQUES = {
-    # Enterprise — new in v19
+    # Enterprise  --  new in v19
     "T1682": "Query Public AI Services",
     "T1683": "Generate Content",
     "T1683/001": "Generate Content: Written Content",
@@ -80,7 +80,7 @@ V19_NEW_TECHNIQUES = {
     "T1689": "Downgrade Attack",
     "T1690": "Prevent Command History Logging",
     "T1027/018": "Obfuscated Files or Information: Invisible Unicode",
-    # ICS — new sub-techniques in v19
+    # ICS  --  new sub-techniques in v19
     "T1691": "Block Operational Technology Message",
     "T1691/001": "Block Operational Technology Message: Command Message",
     "T1691/002": "Block Operational Technology Message: Reporting Message",
@@ -97,13 +97,13 @@ V19_NEW_TECHNIQUES = {
     "T1695/001": "Block Communications: Serial COM",
     "T1695/002": "Block Communications: Ethernet",
     "T1695/003": "Block Communications: Wi-Fi",
-    # ICS — new Program Download sub-techniques
+    # ICS  --  new Program Download sub-techniques
     "T0843/001": "Program Download: Download All",
     "T0843/002": "Program Download: Online Edit",
     "T0843/003": "Program Download: Program Append",
-    # ICS — new Project File Infection sub-technique
+    # ICS  --  new Project File Infection sub-technique
     "T0873/001": "Project File Infection: Siemens Project File Format",
-    # ICS — new Remote System Discovery sub-techniques
+    # ICS  --  new Remote System Discovery sub-techniques
     "T0846/001": "Remote System Discovery: Port Scan",
     "T0846/002": "Remote System Discovery: Broadcast Discovery",
     "T0846/003": "Remote System Discovery: Multicast Discovery",
@@ -111,18 +111,18 @@ V19_NEW_TECHNIQUES = {
 
 # New v19 CTI additions worth tracking
 V19_NEW_SOFTWARE = [
-    "S9035",  # LAMEHUG — first malware to query an LLM in live ops (APT28)
-    "S9010",  # GlassWorm — 2025 npm ecosystem compromise
-    "S9008",  # Shai-Hulud — npm compromise, developer credential harvesting
-    "S9038",  # DynoWiper — Poland NATO energy infrastructure
-    "S9039",  # LazyWiper — Poland NATO energy infrastructure
-    "S9030",  # SameCoin — cross-domain Enterprise + Mobile wiper
+    "S9035",  # LAMEHUG  --  first malware to query an LLM in live ops (APT28)
+    "S9010",  # GlassWorm  --  2025 npm ecosystem compromise
+    "S9008",  # Shai-Hulud  --  npm compromise, developer credential harvesting
+    "S9038",  # DynoWiper  --  Poland NATO energy infrastructure
+    "S9039",  # LazyWiper  --  Poland NATO energy infrastructure
+    "S9030",  # SameCoin  --  cross-domain Enterprise + Mobile wiper
 ]
 
 V19_NEW_CAMPAIGNS = [
-    "C0062",  # Anthropic AI-orchestrated Campaign — PRC cluster using Claude Code autonomously
-    "C0063",  # 2025 Poland Wiper Attacks — first destructive wiper vs NATO energy infra
-    "C0060",  # Operation AkaiRyū — MirrorFace/menuPass subgroup
+    "C0062",  # Anthropic AI-orchestrated Campaign  --  PRC cluster using Claude Code autonomously
+    "C0063",  # 2025 Poland Wiper Attacks  --  first destructive wiper vs NATO energy infra
+    "C0060",  # Operation AkaiRyū  --  MirrorFace/menuPass subgroup
     "C0061",  # Operation Digital Eye
 ]
 

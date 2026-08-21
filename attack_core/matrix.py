@@ -147,14 +147,14 @@ class NavigatorLayerReporter:
                     "techniqueID": tid,
                     "tactic": m.tactic_id,
                     "score": int(m.confidence * 100),
-                    "comment": f"{repo_name} mapping — ATT&CK v19",
+                    "comment": f"{repo_name} mapping  --  ATT&CK v19",
                     "enabled": True,
                     "color": "",
                     "metadata": [{"name": "repo", "value": repo_name}],
                 }
             )
 
-        # v19 tactic order — include BOTH TA0005 (Stealth) and TA0112 (Defense Impairment)
+        # v19 tactic order  --  include BOTH TA0005 (Stealth) and TA0112 (Defense Impairment)
         layer = {
             "name": f"{repo_name} ATT&CK v19 Mappings",
             "versions": {"attack": "19", "navigator": "4.9", "layer": "4.5"},

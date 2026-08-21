@@ -54,7 +54,7 @@ def test_new_v19_techniques_resolvable():
 def test_revoked_techniques_not_in_index():
     loader = ATTACKLoader()
     index = ATTACKIndex(loader)
-    # These were revoked in v19 — index must not return them as valid
+    # These were revoked in v19  --  index must not return them as valid
     # Note: depends on STIX bundle being updated to v19
     revoked = ["T1562", "T1562.001", "T1070.001", "T1070.002"]
     for tid in revoked:

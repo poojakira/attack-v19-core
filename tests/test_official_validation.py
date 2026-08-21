@@ -129,7 +129,7 @@ class TestRevocationMapIntegrity:
     """Verify V19_REVOCATION_MAP is internally consistent."""
 
     def test_revoked_ids_not_in_new_techniques(self):
-        """Old (revoked) IDs should NOT appear in V19_NEW_TECHNIQUES —
+        """Old (revoked) IDs should NOT appear in V19_NEW_TECHNIQUES  -- 
         they are being replaced, not added."""
         for old_id in V19_REVOCATION_MAP:
             # Identity mappings (ICS techniques that got sub-techs added) are exceptions
@@ -145,7 +145,7 @@ class TestRevocationMapIntegrity:
         Exception: identity mappings where old == new (technique kept, sub-techs added)."""
         for old_id, new_id in V19_REVOCATION_MAP.items():
             if old_id == new_id:
-                # Identity mapping — the technique still exists, sub-techs were added
+                # Identity mapping  --  the technique still exists, sub-techs were added
                 continue
             assert new_id in V19_NEW_TECHNIQUES, (
                 f"Replacement ID '{new_id}' (for revoked '{old_id}') "
@@ -283,7 +283,7 @@ class TestTacticRename:
         ), f"TA0005 should be 'Stealth' in v19, got '{tactic_map.get('TA0005')}'"
 
     def test_defense_evasion_not_present(self):
-        """'Defense Evasion' was retired in v19 — should not appear as a tactic name."""
+        """'Defense Evasion' was retired in v19  --  should not appear as a tactic name."""
         tactic_names = [name for _, name in ENTERPRISE_TACTICS]
         assert (
             "Defense Evasion" not in tactic_names
@@ -386,7 +386,7 @@ class TestOfficialNewTechniques:
 
 
 # ---------------------------------------------------------------------------
-# Section 8: Data integrity — no duplicates, no empty values
+# Section 8: Data integrity  --  no duplicates, no empty values
 # ---------------------------------------------------------------------------
 
 

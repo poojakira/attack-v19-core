@@ -1,4 +1,4 @@
-"""Tests for attack_core.download — redirect security and STIX content validation.
+"""Tests for attack_core.download  --  redirect security and STIX content validation.
 
 All tests are network-free (monkeypatched or unit-testing internal helpers directly).
 """
@@ -106,7 +106,7 @@ def test_v19_2_bundle_hashes_are_pinned():
 
 
 # ---------------------------------------------------------------------------
-# StrictRedirectHandler — redirect security unit tests
+# StrictRedirectHandler  --  redirect security unit tests
 # ---------------------------------------------------------------------------
 
 
@@ -163,7 +163,7 @@ class TestStrictRedirectHandler:
 
 
 # ---------------------------------------------------------------------------
-# _validate_stix_bundle — content validation unit tests
+# _validate_stix_bundle  --  content validation unit tests
 # ---------------------------------------------------------------------------
 
 
