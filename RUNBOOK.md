@@ -1,4 +1,4 @@
-# RUNBOOK — attack-v19-core
+# RUNBOOK  --  attack-v19-core
 
 ## Overview
 Python package providing MITRE ATT&CK v19 data models (techniques, tactics, mitigations).
