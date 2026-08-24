@@ -1,56 +1,31 @@
 # attack-v19-core
 
-Typed Python data models and O(1) lookup API for MITRE ATT&CK v19, so security tools never hardcode stale technique IDs again.
+Typed Python data models and O(1) lookup for MITRE ATT&CK v19. Handles ID revocations between versions so your detection rules don't silently break.
 
 ---
 
-## The Problem in 30 Seconds
+## Why This Exists
 
-ATT&CK v19 renamed "Defense Evasion" (TA0005) to "Stealth," introduced a brand-new tactic "Defense Impairment" (TA0112), revoked 12 techniques, and added 48 new ones. If your detection pipeline references `T1562` (Impair Defenses), that ID no longer exists in v19. It was revoked and replaced by `T1685` (Disable or Modify Tools).
+ATT&CK v19 revoked 12 technique IDs, renamed a tactic, added a new one (TA0112, "Defense Impairment"), and introduced 48 new techniques. If your SIEM rules reference `T1562` (Impair Defenses), that ID no longer exists. It was replaced by `T1685`. Your coverage dashboard shows green but you're missing a whole tactic.
 
-Imagine your SIEM correlation rules map alerts to ATT&CK IDs. After the v19 update, those mappings silently produce broken references. Your coverage dashboard shows green, but you are actually missing an entire tactic. This library absorbs that version churn so your downstream tools stay correct across ATT&CK releases.
-
----
-
-## Executive Summary
-
-**Who is this for:** Security engineers building detection platforms, threat intelligence pipelines, SOC tooling, or any system that references ATT&CK technique IDs programmatically.
-
-**What problem it solves:** ATT&CK version upgrades break hardcoded IDs. This library provides:
-- Pydantic-validated data models for every ATT&CK object type (Technique, Tactic, SubTechnique, Group, Software, Mitigation, DataSource)
-- A revocation map that transparently resolves deprecated v18 IDs to their v19 replacements
-- O(1) in-memory indexes for lookups by ID, tactic, platform, or keyword search
-- ATT&CK Navigator layer generation (v4.5 format) for visualization
-- CLI for quick queries and data management
+I got tired of this breaking our detection pipeline every release cycle, so I built a library that absorbs the version churn. It gives you Pydantic models for every ATT&CK object type, a revocation map that resolves deprecated IDs to their replacements, and in-memory indexes for fast lookup by ID, tactic, platform, or keyword.
 
 ---
 
-## Why This Repository Exists
+## What's In the Box
 
-Security tools that consume ATT&CK data face recurring breakage every time MITRE publishes a new version. The raw STIX bundles are large, their schema is verbose, and there is no built-in way to handle ID revocations across versions.
+- Pydantic-validated models for Technique, Tactic, SubTechnique, Group, Software, Mitigation, DataSource
+- Transparent revocation resolution (v18 ID in, v19 replacement out)
+- In-memory indexes with O(1) lookup
+- ATT&CK Navigator layer generation (v4.5 format)
+- CLI for quick queries
 
-**Questions this repo answers:**
+**Note:** This repo contains two packages. `attack_core` is the current one. `attack_v19_core` is a deprecated duplicate kept for backward compatibility. Use `attack_core` for new code:
 
-- "Technique T1562 was in my detection rules. What replaced it in v19?"
-- "How many techniques exist in Enterprise ATT&CK v19, and which tactics do they map to?"
-- "I need to generate a Navigator layer from my detection coverage. How?"
-- "How do I build typed, validated ATT&CK objects I can pass through a Python pipeline without parsing raw STIX every time?"
-- "What new techniques and campaigns appeared in v19 that I need to add coverage for?"
-
----
-
-## Package Structure
-
-> **⚠️ Important:** This repository contains two Python packages: `attack_core` and `attack_v19_core`.
->
-> - **`attack_core`** is the **current, actively maintained** package. It contains the CLI, download logic, loader, index, matrix, mapping, and all domain models. Use this for all new code.
-> - **`attack_v19_core`** is a **deprecated legacy** package. It is a weaker duplicate of `attack_core` that lacks the CLI, the download module, and some newer features (e.g., `MappingResolution`). It is retained because external code may still import from it, but it should not be used for new development.
->
-> **For new integrations, always import from `attack_core`:**
-> ```python
-> from attack_core import ATTACKLoader, ATTACKIndex
-> from attack_core.models import Domain
-> ```
+```python
+from attack_core import ATTACKLoader, ATTACKIndex
+from attack_core.models import Domain
+```
 
 ---
 
