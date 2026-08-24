@@ -2,6 +2,7 @@
 Renders ATT&CK matrix as dict/JSON/CSV/HTML for Enterprise, Mobile, ICS.
 """
 
+import html
 import json
 import csv
 from io import StringIO
@@ -97,27 +98,31 @@ class ATTACKMatrix:
 
     def to_html(self, domain: Domain = Domain.ENTERPRISE) -> str:
         matrix = self.to_dict(domain)
-        html = [
+        html_lines = [
             '<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;">'
         ]
-        html.append("<tr><th>Tactic</th><th>Techniques / Sub-techniques</th></tr>")
+        html_lines.append("<tr><th>Tactic</th><th>Techniques / Sub-techniques</th></tr>")
         for tac in matrix["tactics"]:
             tech_html = []
             for tech in tac["techniques"]:
+                escaped_tid = html.escape(tech['technique_id'])
+                escaped_tname = html.escape(tech['technique_name'])
                 tech_html.append(
-                    f"<strong>{tech['technique_id']}: {tech['technique_name']}</strong>"
+                    f"<strong>{escaped_tid}: {escaped_tname}</strong>"
                 )
                 if tech["subtechniques"]:
                     subs = ", ".join(
-                        f"{s['subtechnique_id']}: {s['subtechnique_name']}"
+                        f"{html.escape(s['subtechnique_id'])}: {html.escape(s['subtechnique_name'])}"
                         for s in tech["subtechniques"]
                     )
                     tech_html.append(f'<small style="color:#666;">{subs}</small>')
-            html.append(
-                f"<tr><td><strong>{tac['tactic_id']}: {tac['tactic_name']}</strong></td><td>{'<br>'.join(tech_html)}</td></tr>"
+            escaped_tac_id = html.escape(tac['tactic_id'])
+            escaped_tac_name = html.escape(tac['tactic_name'])
+            html_lines.append(
+                f"<tr><td><strong>{escaped_tac_id}: {escaped_tac_name}</strong></td><td>{'<br>'.join(tech_html)}</td></tr>"
             )
-        html.append("</table>")
-        return "\n".join(html)
+        html_lines.append("</table>")
+        return "\n".join(html_lines)
 
 
 class NavigatorLayerReporter:

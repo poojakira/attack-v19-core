@@ -39,12 +39,27 @@ Security tools that consume ATT&CK data face recurring breakage every time MITRE
 
 ---
 
+## Package Structure
+
+> **⚠️ Important:** This repository contains two Python packages: `attack_core` and `attack_v19_core`.
+>
+> - **`attack_core`** is the **current, actively maintained** package. It contains the CLI, download logic, loader, index, matrix, mapping, and all domain models. Use this for all new code.
+> - **`attack_v19_core`** is a **deprecated legacy** package. It is a weaker duplicate of `attack_core` that lacks the CLI, the download module, and some newer features (e.g., `MappingResolution`). It is retained because external code may still import from it, but it should not be used for new development.
+>
+> **For new integrations, always import from `attack_core`:**
+> ```python
+> from attack_core import ATTACKLoader, ATTACKIndex
+> from attack_core.models import Domain
+> ```
+
+---
+
 ## Architecture Overview
 
 ```
 +-------------------+       +-------------------+       +-------------------+
 |  MITRE STIX Data  |       |   attack_core     |       | attack_v19_core   |
-|  (GitHub / TAXII) |       |   (Infrastructure)|       |   (Domain Logic)  |
+|  (GitHub / TAXII) |       |   (Current)       |       |   (DEPRECATED)    |
 +--------+----------+       +--------+----------+       +--------+----------+
          |                           |                           |
          | HTTPS download            |                           |
@@ -121,7 +136,7 @@ Here is how data moves from MITRE's published STIX bundles to a usable lookup in
 
 **Pinned STIX bundles with SHA-256 verification.** The library downloads from a specific Git tag (`v19.2`) rather than pulling "latest" from the TAXII server. This makes builds reproducible and prevents silent data changes. The trade-off is that updating to a new ATT&CK version requires a code change to bump the tag and hashes.
 
-**Two packages: `attack_core` and `attack_v19_core`.** The `attack_core` package holds infrastructure (CLI, download logic). The `attack_v19_core` package holds the version-specific domain logic. This separation makes it possible to add `attack_v20_core` later without refactoring the CLI layer. The trade-off is slightly more complex imports.
+**Two packages: `attack_core` and `attack_v19_core`.** The `attack_core` package is the current, canonical package containing all functionality (CLI, download, loader, models, index, matrix, mapping). The `attack_v19_core` package is a deprecated legacy duplicate retained for backward compatibility with existing dependents. New code should always import from `attack_core`. See the "Package Structure" section above for details.
 
 **Pydantic models over raw dicts.** Every ATT&CK object is a validated Pydantic `BaseModel`. This catches schema violations at load time rather than at query time, and gives downstream code IDE autocomplete and type safety. The trade-off is a dependency on Pydantic and slightly higher memory usage.
 
