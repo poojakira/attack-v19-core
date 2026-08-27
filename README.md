@@ -344,6 +344,14 @@ This is a security data library. It does not process untrusted user input at run
 
 ---
 
+
+## Additional Documentation
+
+- [INCIDENT_RUNBOOK.md](INCIDENT_RUNBOOK.md) - incident response for version breaks and hash mismatches
+- [docs/PERFORMANCE_BASELINE.md](docs/PERFORMANCE_BASELINE.md) - O(1) lookup performance baselines
+- [enchmarks/lookup_perf.py](benchmarks/lookup_perf.py) - performance regression gate
+- [	ests/test_verify_cli.py](tests/test_verify_cli.py) - verify command tests
+
 ## License and Author
 
 **License:** MIT
