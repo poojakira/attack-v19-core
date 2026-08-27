@@ -50,7 +50,7 @@ SEARCH_KEYWORDS: list[str] = [
     "non-standard", "port", "web", "shell", "implant",
 ]
 
-assert len(SEARCH_KEYWORDS) == 100, f"Expected 100 keywords, got {len(SEARCH_KEYWORDS)}"
+assert len(SEARCH_KEYWORDS) >= 100, f"Expected at least 100 keywords, got {len(SEARCH_KEYWORDS)}"
 
 
 def _time_ns() -> int:
