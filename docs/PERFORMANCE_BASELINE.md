@@ -10,7 +10,7 @@ This document establishes the performance baseline for `attack-core` index opera
 |-----------|--------|-----------|---------|------------|
 | `index.get(technique_id)` | Mean latency | < 0.01 ms | ~0.002 ms | O(1) dict lookup |
 | `index.search(keyword)` | p95 latency | < 5 ms | ~1.2 ms | O(n) substring scan |
-| `AttackIndex.load()` | Cold start | < 2000 ms | ~800 ms | One-time parse |
+| `ATTACKIndex(ATTACKLoader())` | Cold start | < 2000 ms | ~800 ms | One-time parse |
 | Memory (loaded index) | RSS delta | < 150 MB | ~95 MB | Full ATT&CK corpus |
 
 ---
@@ -19,7 +19,7 @@ This document establishes the performance baseline for `attack-core` index opera
 
 ### O(1) Lookups via `get()`
 
-The `AttackIndex` stores all techniques in a Python `dict` keyed by technique ID (e.g., `"T1059"`). Dictionary lookup in CPython is amortized O(1) via hash table, giving sub-microsecond access regardless of corpus size.
+The `ATTACKIndex` stores all techniques in a Python `dict` keyed by technique ID (e.g., `"T1059"`). Dictionary lookup in CPython is amortized O(1) via hash table, giving sub-microsecond access regardless of corpus size.
 
 **Why this matters:** Security tools performing real-time detection need to resolve technique IDs in hot paths. A 10μs budget per lookup allows thousands of enrichments per second on a single core.
 
@@ -46,7 +46,7 @@ The p95 threshold of 5ms accommodates the full ATT&CK Enterprise corpus (~800 te
 
 ### Procedure
 
-1. Load the full ATT&CK Enterprise STIX bundle via `AttackIndex.load()`.
+1. Load the full ATT&CK Enterprise STIX bundle via `ATTACKIndex(ATTACKLoader())`.
 2. **get() benchmark**: Call `index.get(tid)` for every technique ID, repeated 100 iterations. Measure wall-clock time per call using `time.perf_counter_ns()`.
 3. **search() benchmark**: Call `index.search(kw)` for 100 representative keywords, repeated 100 iterations. Measure wall-clock time per call.
 4. Compute mean, median, p95, p99, and max for each operation.
@@ -100,7 +100,7 @@ Threshold:        < 5 ms (p95)
 Status:           ✓ PASS
 ```
 
-### `AttackIndex.load()` — Cold Start
+### `ATTACKIndex(ATTACKLoader())` — Cold Start
 
 ```
 Iterations:       10

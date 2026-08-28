@@ -243,7 +243,7 @@ field (e.g. `"Process: Process Creation"`).
 
 ## Revocation and ID Resolution
 
-ATT&CK v19 revoked 12 techniques and remapped them to new IDs. The library
+ATT&CK v19 revoked 22 techniques (29 total remaps) and remapped them to new IDs. The library
 handles this transparently via `V19_REVOCATION_MAP`:
 
 ```python

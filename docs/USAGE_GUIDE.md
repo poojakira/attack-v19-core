@@ -284,14 +284,14 @@ The library includes a CLI for common operations:
 # Download STIX bundles from MITRE
 python -m attack_core download
 
-# Validate loaded data against expected v19 counts
-python -m attack_core validate
+# Look up a technique
+python -m attack_core lookup T1059
 
-# Query a technique
-python -m attack_core query T1059
+# List all v19 technique ID remaps (revocations)
+python -m attack_core revoked
 
-# Export matrix
-python -m attack_core matrix --format json --domain enterprise
+# Generate an ATT&CK Navigator layer
+python -m attack_core navigator --output layer.json --domain enterprise
 ```
 
 ---

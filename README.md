@@ -6,7 +6,7 @@ Typed Python data models and O(1) lookup for MITRE ATT&CK v19. Handles ID revoca
 
 ## Why This Exists
 
-ATT&CK v19 revoked 12 technique IDs, renamed a tactic, added a new one (TA0112, "Defense Impairment"), and introduced 48 new techniques. If your SIEM rules reference `T1562` (Impair Defenses), that ID no longer exists. It was replaced by `T1685`. Your coverage dashboard shows green but you're missing a whole tactic.
+ATT&CK v19 revoked 22 technique IDs (29 total remaps including legacy), renamed a tactic, added a new one (TA0112, "Defense Impairment"), and introduced 48 new techniques. If your SIEM rules reference `T1562` (Impair Defenses), that ID no longer exists. It was replaced by `T1685`. Your coverage dashboard shows green but you're missing a whole tactic.
 
 I got tired of this breaking our detection pipeline every release cycle, so I built a library that absorbs the version churn. It gives you Pydantic models for every ATT&CK object type, a revocation map that resolves deprecated IDs to their replacements, and in-memory indexes for fast lookup by ID, tactic, platform, or keyword.
 

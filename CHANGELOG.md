@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TA0112 added**: "Defense Impairment" (new tactic, split from old TA0005)
 - Enterprise tactic count remains 15, but composition changed
 
-#### Technique Revocations (17 mappings in V19_REVOCATION_MAP)
+#### Technique Revocations (29 mappings in V19_REVOCATION_MAP)
 | Old ID | New ID | Notes |
 |--------|--------|-------|
 | T1562 | T1685 | Impair Defenses -> Disable or Modify Tools |

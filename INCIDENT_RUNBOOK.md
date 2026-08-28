@@ -25,18 +25,21 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 
 ### Resolution Steps
 
-1. **Diff the STIX bundle**:
+1. **Compare technique IDs across versions** using the CLI:
    ```bash
-   python -m attack_core diff --old v15.1 --new v16.0
+   # Look up specific techniques to confirm current definitions
+   python -m attack_core lookup T1059
+   # List all supported technique ID remaps (revocations)
+   python -m attack_core revoked
    ```
 2. **Update Pydantic models** to handle new/changed fields:
    - Add `Optional` fields for new attributes.
    - Add model validators for renamed fields.
-3. **Update the revocation map** if techniques were revoked or deprecated upstream.
-4. **Regenerate SHA-256 hashes** for the new bundle:
+3. **Update the revocation map** (`V19_REVOCATION_MAP` in `attack_core/constants.py`) if techniques were revoked or deprecated upstream.
+4. **Re-download the new bundle** and confirm it loads cleanly:
    ```bash
-   python -m attack_core fetch --version v16.0
-   python -m attack_core verify
+   python -m attack_core download
+   python -m attack_core lookup T1059
    ```
 5. **Run the full test suite** including integration tests:
    ```bash
@@ -56,7 +59,7 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 ## Incident 2: SHA-256 Hash Mismatch on Download
 
 ### Symptoms
-- `attack_core.fetch()` or `attack_core verify` raises `IntegrityError`.
+- `python -m attack_core download` raises an integrity error.
 - Error message: `SHA-256 mismatch: expected <hash_a>, got <hash_b>`.
 
 ### Severity
@@ -71,7 +74,7 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 3. **Compare hashes independently**:
    ```bash
    curl -sL <stix_url> | sha256sum
-   # Compare against the pinned hash in attack_core/hashes.json
+   # Compare against the pinned hash in attack_core/download.py
    ```
 4. **Check for upstream legitimate update**:
    - If MITRE pushed a silent update to the same tag (rare but possible), the hash will differ.
@@ -81,7 +84,7 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 
 **If legitimate upstream change:**
 1. Verify the new bundle content manually (spot-check techniques, validate STIX schema).
-2. Update `hashes.json` with the new SHA-256.
+2. Update the pinned SHA-256 hashes in `attack_core/download.py` with the new values.
 3. Run full test suite.
 4. Cut a patch release.
 
@@ -98,7 +101,7 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 
 ### Prevention
 - Always verify downloads with SHA-256 before loading into memory.
-- Use `--verify` CLI command after any cache refresh.
+- Re-run `python -m attack_core download` after any cache refresh; it re-verifies the SHA-256 before use.
 - Pin to specific STIX data release tags, not `main`.
 
 ---
@@ -108,7 +111,7 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 ### Symptoms
 - Consumer calls `index.get("T1234")` and receives a valid technique object, but MITRE has revoked T1234.
 - Detection rules reference revoked techniques without being redirected to replacements.
-- `index.revocations()` does not list a known revocation.
+- `V19_REVOCATION_MAP` does not list a known revocation.
 
 ### Severity
 **Medium** — Detection coverage may be stale but no integrity issue.
@@ -118,39 +121,35 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 1. **Confirm the revocation** on https://attack.mitre.org/techniques/T1234 (or via STIX bundle `x-mitre-deprecated` / revoked-by relationship).
 2. **Check the STIX bundle** for the revocation relationship:
    ```python
-   from attack_core import AttackIndex
-   idx = AttackIndex.load()
+   from attack_core import ATTACKLoader, ATTACKIndex
+   idx = ATTACKIndex(ATTACKLoader())
    # Look for relationship where source_ref is T1234 and relationship_type == "revoked-by"
    ```
 3. **Determine scope**: How many revocations are missing? Cross-reference the full STIX revocation list.
 
 ### Resolution Steps
 
-1. **Update the revocation map** in `attack_core/data/revocations.json`:
-   ```json
-   {
-     "T1234": {
-       "revoked_by": "T1234.001",
-       "revoked_date": "2025-04-01",
-       "reason": "Merged into sub-technique"
-     }
+1. **Update the revocation map** `V19_REVOCATION_MAP` in `attack_core/constants.py`:
+   ```python
+   V19_REVOCATION_MAP = {
+       # ...
+       "T1234": "T1234.001",  # Merged into sub-technique
    }
    ```
 2. **Add a test** for the specific revocation:
    ```python
    def test_t1234_revoked():
-       assert index.is_revoked("T1234")
-       assert index.revoked_by("T1234") == "T1234.001"
+       assert index.resolve_attack_id("T1234") == "T1234.001"
    ```
 3. **Run the revocation completeness check**:
    ```bash
-   python -m attack_core audit-revocations
+   python -m attack_core revoked
    ```
 4. **Patch release** with the updated map.
 5. **Notify affected consumers** if they rely on the revoked technique.
 
 ### Prevention
-- Nightly CI job: compare `revocations.json` against STIX bundle relationships.
+- Nightly CI job: compare `V19_REVOCATION_MAP` (in `attack_core/constants.py`) against STIX bundle relationships.
 - Add a `test_revocation_completeness` that fails when the map falls behind.
 - Include revocation diff in release notes.
 
@@ -204,8 +203,8 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 ### Migration Guide for Consumers
 
 ```diff
-- from attack_v19_core import AttackIndex
-+ from attack_core import AttackIndex
+- from attack_v19_core import ATTACKIndex
++ from attack_core import ATTACKIndex
 
 - pip install attack-v19-core
 + pip install attack-core
