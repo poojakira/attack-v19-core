@@ -157,6 +157,9 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[dev]"
 
+      - name: Download ATT&CK data
+        run: python scripts/download_attack_data.py
+
       - name: Run performance benchmark
         run: |
           python benchmarks/lookup_perf.py \

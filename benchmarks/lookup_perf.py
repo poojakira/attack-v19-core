@@ -150,7 +150,11 @@ def _time_ns() -> int:
 
 def benchmark_get(index, iterations: int) -> dict:
     """Benchmark index.get() over all technique IDs."""
-    technique_ids: list[str] = list(index.technique_ids())
+    # ATTACKIndex does not expose a public "all IDs" accessor; derive the list
+    # of technique/sub-technique IDs from the internal id map.
+    technique_ids: list[str] = [
+        obj.attack_id for obj in index._by_id.values() if hasattr(obj, "attack_id")
+    ]
 
     if not technique_ids:
         raise RuntimeError("No technique IDs found in index — cannot benchmark get()")
@@ -247,7 +251,7 @@ def main() -> int:
 
     # Import the library under test
     try:
-        from attack_core import AttackIndex
+        from attack_core import ATTACKIndex, ATTACKLoader
     except ImportError:
         print(
             "ERROR: attack_core is not installed. "
@@ -257,7 +261,7 @@ def main() -> int:
         return 1
 
     print("Loading ATT&CK index...", file=sys.stderr)
-    index = AttackIndex.load()
+    index = ATTACKIndex(ATTACKLoader())
     print(
         f"Index loaded. Running benchmarks (iterations={args.iterations})...",
         file=sys.stderr,
