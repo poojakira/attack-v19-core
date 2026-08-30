@@ -18,7 +18,7 @@ from .constants import (
 from .index import ATTACKIndex
 from .loader import ATTACKLoader
 from .mapping import ATTACKMappingBuilder, MappingResolution
-from .matrix import ATTACKMatrix
+from .matrix import ATTACKMatrix, NavigatorLayerReporter
 from .models import (
     ATTACKMapping,
     DataSource,
@@ -47,6 +47,7 @@ __all__ = [
     "ATTACKLoader",
     "ATTACKIndex",
     "ATTACKMatrix",
+    "NavigatorLayerReporter",
     "ENTERPRISE_TACTICS",
     "ENTERPRISE_TACTIC_COUNT",
     "ENTERPRISE_TECHNIQUE_COUNT",

@@ -160,8 +160,8 @@ pip install -e ".[dev]"
 ## Quick Start
 
 ```python
-from attack_v19_core import ATTACKLoader, ATTACKIndex
-from attack_v19_core.models import Domain
+from attack_core import ATTACKLoader, ATTACKIndex
+from attack_core.models import Domain
 
 # Load all three matrices from local STIX data
 loader = ATTACKLoader()
@@ -192,7 +192,7 @@ print(technique.tactic_ids) # ["execution"]
 
 **Resolve a revoked v18 ID to its v19 replacement:**
 ```python
-from attack_v19_core.constants import V19_REVOCATION_MAP
+from attack_core.constants import V19_REVOCATION_MAP
 
 old_id = "T1562"
 new_id = V19_REVOCATION_MAP.get(old_id)
@@ -207,7 +207,7 @@ print(f"{len(windows_techniques)} techniques target Windows")
 
 **Generate an ATT&CK Navigator layer:**
 ```python
-from attack_v19_core.mapping import ATTACKMappingBuilder, NavigatorLayerReporter
+from attack_core import ATTACKMappingBuilder, NavigatorLayerReporter
 
 builder = ATTACKMappingBuilder(index=index)
 mappings = builder.build_many(["T1059", "T1059.001", "T1053"], confidence=0.8)
@@ -219,7 +219,7 @@ layer_json = reporter.generate("my-detection-tool", mappings)
 
 **Export the full matrix as CSV:**
 ```python
-from attack_v19_core.matrix import ATTACKMatrix
+from attack_core.matrix import ATTACKMatrix
 
 matrix = ATTACKMatrix(index)
 csv_data = matrix.to_csv(Domain.ENTERPRISE)
