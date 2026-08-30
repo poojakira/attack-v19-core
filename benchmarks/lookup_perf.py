@@ -38,7 +38,9 @@ GET_MEAN_THRESHOLD_MS: float = float(os.environ.get("ATTACK_CORE_GET_MEAN_MS", "
 # latency is highly sensitive to CPU speed and shared-runner noise, so the p95
 # threshold carries generous headroom (~3x the fast-runner baseline of ~5ms) to
 # avoid false CI failures while still catching order-of-magnitude regressions.
-SEARCH_P95_THRESHOLD_MS: float = float(os.environ.get("ATTACK_CORE_SEARCH_P95_MS", "15.0"))
+SEARCH_P95_THRESHOLD_MS: float = float(
+    os.environ.get("ATTACK_CORE_SEARCH_P95_MS", "15.0")
+)
 
 # ---------------------------------------------------------------------------
 # Keyword corpus for search benchmarks
