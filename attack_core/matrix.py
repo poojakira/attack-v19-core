@@ -6,7 +6,7 @@ import csv
 import json
 from html import escape
 from io import StringIO
-from typing import Dict
+from typing import Any, Dict
 
 from .index import ATTACKIndex
 from .models import Domain
@@ -19,12 +19,12 @@ class ATTACKMatrix:
     def to_dict(self, domain: Domain = Domain.ENTERPRISE) -> Dict:
         tactics = [t for t in self.index._tactics.values() if t.domain == domain]
         tactics_sorted = sorted(tactics, key=lambda t: t.attack_id)
-        matrix = {"domain": domain.value, "tactics": []}
+        matrix: dict[str, Any] = {"domain": domain.value, "tactics": []}
         for tac in tactics_sorted:
             techs = self.index.by_tactic(tac.attack_id)
             techs = [t for t in techs if t.domain == domain and not t.is_subtechnique]
             techs_sorted = sorted(techs, key=lambda t: t.attack_id)
-            tactic_data = {
+            tactic_data: dict[str, Any] = {
                 "tactic_id": tac.attack_id,
                 "tactic_name": tac.name,
                 "techniques": [],

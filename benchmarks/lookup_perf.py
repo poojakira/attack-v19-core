@@ -26,31 +26,121 @@ from pathlib import Path
 # Keyword corpus for search benchmarks
 # ---------------------------------------------------------------------------
 SEARCH_KEYWORDS: list[str] = [
-    "phishing", "credential", "lateral", "persistence", "exfiltration",
-    "discovery", "privilege", "escalation", "defense", "evasion",
-    "initial", "access", "execution", "impact", "collection",
-    "command", "control", "resource", "development", "reconnaissance",
-    "spearphishing", "attachment", "link", "service", "exploit",
-    "public", "application", "remote", "desktop", "protocol",
-    "brute", "force", "password", "spraying", "kerberoasting",
-    "token", "manipulation", "process", "injection", "dll",
-    "side-loading", "registry", "run", "keys", "scheduled",
-    "task", "boot", "logon", "autostart", "browser",
-    "extensions", "clipboard", "data", "encrypted", "channel",
-    "proxy", "multi-hop", "domain", "fronting", "fallback",
-    "channels", "ingress", "tool", "transfer", "archive",
-    "collected", "audio", "capture", "video", "screen",
-    "keylogging", "input", "credentials", "file", "directory",
-    "network", "share", "email", "local", "cloud",
-    "storage", "object", "automated", "man-in-the-middle", "adversary",
-    "firmware", "corruption", "wiper", "defacement", "endpoint",
-    "denial", "account", "manipulation", "trusted", "relationship",
-    "supply", "chain", "compromise", "hardware", "additions",
-    "traffic", "signaling", "steganography", "protocol", "tunneling",
-    "non-standard", "port", "web", "shell", "implant",
+    "phishing",
+    "credential",
+    "lateral",
+    "persistence",
+    "exfiltration",
+    "discovery",
+    "privilege",
+    "escalation",
+    "defense",
+    "evasion",
+    "initial",
+    "access",
+    "execution",
+    "impact",
+    "collection",
+    "command",
+    "control",
+    "resource",
+    "development",
+    "reconnaissance",
+    "spearphishing",
+    "attachment",
+    "link",
+    "service",
+    "exploit",
+    "public",
+    "application",
+    "remote",
+    "desktop",
+    "protocol",
+    "brute",
+    "force",
+    "password",
+    "spraying",
+    "kerberoasting",
+    "token",
+    "manipulation",
+    "process",
+    "injection",
+    "dll",
+    "side-loading",
+    "registry",
+    "run",
+    "keys",
+    "scheduled",
+    "task",
+    "boot",
+    "logon",
+    "autostart",
+    "browser",
+    "extensions",
+    "clipboard",
+    "data",
+    "encrypted",
+    "channel",
+    "proxy",
+    "multi-hop",
+    "domain",
+    "fronting",
+    "fallback",
+    "channels",
+    "ingress",
+    "tool",
+    "transfer",
+    "archive",
+    "collected",
+    "audio",
+    "capture",
+    "video",
+    "screen",
+    "keylogging",
+    "input",
+    "credentials",
+    "file",
+    "directory",
+    "network",
+    "share",
+    "email",
+    "local",
+    "cloud",
+    "storage",
+    "object",
+    "automated",
+    "man-in-the-middle",
+    "adversary",
+    "firmware",
+    "corruption",
+    "wiper",
+    "defacement",
+    "endpoint",
+    "denial",
+    "account",
+    "manipulation",
+    "trusted",
+    "relationship",
+    "supply",
+    "chain",
+    "compromise",
+    "hardware",
+    "additions",
+    "traffic",
+    "signaling",
+    "steganography",
+    "protocol",
+    "tunneling",
+    "non-standard",
+    "port",
+    "web",
+    "shell",
+    "implant",
 ]
 
-assert len(SEARCH_KEYWORDS) >= 100, f"Expected at least 100 keywords, got {len(SEARCH_KEYWORDS)}"
+assert (
+    len(SEARCH_KEYWORDS) >= 100
+), f"Expected at least 100 keywords, got {len(SEARCH_KEYWORDS)}"
 
 
 def _time_ns() -> int:
@@ -166,9 +256,12 @@ def main() -> int:
         )
         return 1
 
-    print(f"Loading ATT&CK index...", file=sys.stderr)
+    print("Loading ATT&CK index...", file=sys.stderr)
     index = AttackIndex.load()
-    print(f"Index loaded. Running benchmarks (iterations={args.iterations})...", file=sys.stderr)
+    print(
+        f"Index loaded. Running benchmarks (iterations={args.iterations})...",
+        file=sys.stderr,
+    )
 
     get_results = benchmark_get(index, iterations=args.iterations)
     search_results = benchmark_search(index, iterations=args.iterations)
@@ -195,12 +288,18 @@ def main() -> int:
 
     # Summary to stderr
     print("\n--- Summary ---", file=sys.stderr)
-    print(f"  get()    mean: {get_results['mean_ms']:.4f} ms  "
-          f"(threshold: <{get_results['threshold_ms']} ms) "
-          f"{'✓ PASS' if get_results['pass'] else '✗ FAIL'}", file=sys.stderr)
-    print(f"  search() p95:  {search_results['p95_ms']:.4f} ms  "
-          f"(threshold: <{search_results['threshold_p95_ms']} ms) "
-          f"{'✓ PASS' if search_results['pass'] else '✗ FAIL'}", file=sys.stderr)
+    print(
+        f"  get()    mean: {get_results['mean_ms']:.4f} ms  "
+        f"(threshold: <{get_results['threshold_ms']} ms) "
+        f"{'✓ PASS' if get_results['pass'] else '✗ FAIL'}",
+        file=sys.stderr,
+    )
+    print(
+        f"  search() p95:  {search_results['p95_ms']:.4f} ms  "
+        f"(threshold: <{search_results['threshold_p95_ms']} ms) "
+        f"{'✓ PASS' if search_results['pass'] else '✗ FAIL'}",
+        file=sys.stderr,
+    )
 
     if args.fail_on_threshold and not report["overall_pass"]:
         print("\nFAILED: One or more thresholds exceeded.", file=sys.stderr)

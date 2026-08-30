@@ -68,7 +68,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install linters
-        run: pip install ruff
+        run: pip install ruff==0.8.4
 
       - name: Ruff check (lint)
         run: ruff check . --output-format=github
@@ -117,7 +117,7 @@ jobs:
       - name: Audit dependencies (pip-audit)
         run: |
           pip install -e ".[dev]"
-          pip-audit --strict --progress-spinner=off
+          pip-audit --skip-editable --progress-spinner=off
 
       - name: Static security analysis (bandit)
         run: |

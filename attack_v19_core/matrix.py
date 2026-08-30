@@ -101,23 +101,23 @@ class ATTACKMatrix:
         html_lines = [
             '<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;">'
         ]
-        html_lines.append("<tr><th>Tactic</th><th>Techniques / Sub-techniques</th></tr>")
+        html_lines.append(
+            "<tr><th>Tactic</th><th>Techniques / Sub-techniques</th></tr>"
+        )
         for tac in matrix["tactics"]:
             tech_html = []
             for tech in tac["techniques"]:
-                escaped_tid = html.escape(tech['technique_id'])
-                escaped_tname = html.escape(tech['technique_name'])
-                tech_html.append(
-                    f"<strong>{escaped_tid}: {escaped_tname}</strong>"
-                )
+                escaped_tid = html.escape(tech["technique_id"])
+                escaped_tname = html.escape(tech["technique_name"])
+                tech_html.append(f"<strong>{escaped_tid}: {escaped_tname}</strong>")
                 if tech["subtechniques"]:
                     subs = ", ".join(
                         f"{html.escape(s['subtechnique_id'])}: {html.escape(s['subtechnique_name'])}"
                         for s in tech["subtechniques"]
                     )
                     tech_html.append(f'<small style="color:#666;">{subs}</small>')
-            escaped_tac_id = html.escape(tac['tactic_id'])
-            escaped_tac_name = html.escape(tac['tactic_name'])
+            escaped_tac_id = html.escape(tac["tactic_id"])
+            escaped_tac_name = html.escape(tac["tactic_name"])
             html_lines.append(
                 f"<tr><td><strong>{escaped_tac_id}: {escaped_tac_name}</strong></td><td>{'<br>'.join(tech_html)}</td></tr>"
             )
