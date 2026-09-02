@@ -20,12 +20,14 @@ I got tired of this breaking our detection pipeline every release cycle, so I bu
 - ATT&CK Navigator layer generation (v4.5 format)
 - CLI for quick queries
 
-**Note:** This repo contains two packages. `attack_core` is the current one. `attack_v19_core` is a deprecated duplicate kept for backward compatibility. Use `attack_core` for new code:
+**Note:** This repo contains two packages. `attack_v19_core` is the canonical package. `attack_core` is a deprecated compatibility shim kept for backward compatibility — importing it emits a `DeprecationWarning` and it will be removed in v20.0.0. Use `attack_v19_core` for new code:
 
 ```python
-from attack_core import ATTACKLoader, ATTACKIndex
-from attack_core.models import Domain
+from attack_v19_core import ATTACKLoader, ATTACKIndex
+from attack_v19_core.models import Domain
 ```
+
+> Note on the CLI/download entry points: the `lookup`/`revoked`/`navigator`/`download` command-line interface and the STIX downloader currently live in the `attack_core` shim (`python -m attack_core ...`). Running them still works but emits the deprecation warning; the source-checkout wrapper `python scripts/download_attack_data.py` provides the same download without the `-m attack_core` form.
 
 ---
 
@@ -33,8 +35,9 @@ from attack_core.models import Domain
 
 ```
 +-------------------+       +-------------------+       +-------------------+
-|  MITRE STIX Data  |       |   attack_core     |       | attack_v19_core   |
-|  (GitHub / TAXII) |       |   (Current)       |       |   (DEPRECATED)    |
+|  MITRE STIX Data  |       | attack_v19_core   |       |   attack_core     |
+|  (GitHub / TAXII) |       |   (CANONICAL)     |       |   (DEPRECATED     |
+|                   |       |                   |       |    SHIM + CLI)    |
 +--------+----------+       +--------+----------+       +--------+----------+
          |                           |                           |
          | HTTPS download            |                           |
@@ -111,7 +114,7 @@ Here is how data moves from MITRE's published STIX bundles to a usable lookup in
 
 **Pinned STIX bundles with SHA-256 verification.** The library downloads from a specific Git tag (`v19.2`) rather than pulling "latest" from the TAXII server. This makes builds reproducible and prevents silent data changes. The trade-off is that updating to a new ATT&CK version requires a code change to bump the tag and hashes.
 
-**Two packages: `attack_core` and `attack_v19_core`.** The `attack_core` package is the current, canonical package containing all functionality (CLI, download, loader, models, index, matrix, mapping). The `attack_v19_core` package is a deprecated legacy duplicate retained for backward compatibility with existing dependents. New code should always import from `attack_core`. See the "Package Structure" section above for details.
+**Two packages: `attack_v19_core` and `attack_core`.** The `attack_v19_core` package is the current, canonical package containing the data models, loader, index, matrix, and mapping. The `attack_core` package is a deprecated legacy shim retained for backward compatibility with existing dependents; importing it emits a `DeprecationWarning` and re-exports from `attack_v19_core`. The command-line interface and STIX downloader (`cli.py`, `download.py`, `__main__.py`) currently live in the `attack_core` shim, so `python -m attack_core ...` is the working CLI invocation today. New code should import from `attack_v19_core`. See the "What's In the Box" note and MIGRATION_GUIDE.md for details.
 
 **Pydantic models over raw dicts.** Every ATT&CK object is a validated Pydantic `BaseModel`. This catches schema violations at load time rather than at query time, and gives downstream code IDE autocomplete and type safety. The trade-off is a dependency on Pydantic and slightly higher memory usage.
 
@@ -160,8 +163,8 @@ pip install -e ".[dev]"
 ## Quick Start
 
 ```python
-from attack_core import ATTACKLoader, ATTACKIndex
-from attack_core.models import Domain
+from attack_v19_core import ATTACKLoader, ATTACKIndex
+from attack_v19_core.models import Domain
 
 # Load all three matrices from local STIX data
 loader = ATTACKLoader()
@@ -192,7 +195,7 @@ print(technique.tactic_ids) # ["execution"]
 
 **Resolve a revoked v18 ID to its v19 replacement:**
 ```python
-from attack_core.constants import V19_REVOCATION_MAP
+from attack_v19_core.constants import V19_REVOCATION_MAP
 
 old_id = "T1562"
 new_id = V19_REVOCATION_MAP.get(old_id)
@@ -207,7 +210,7 @@ print(f"{len(windows_techniques)} techniques target Windows")
 
 **Generate an ATT&CK Navigator layer:**
 ```python
-from attack_core import ATTACKMappingBuilder, NavigatorLayerReporter
+from attack_v19_core import ATTACKMappingBuilder, NavigatorLayerReporter
 
 builder = ATTACKMappingBuilder(index=index)
 mappings = builder.build_many(["T1059", "T1059.001", "T1053"], confidence=0.8)
@@ -219,7 +222,7 @@ layer_json = reporter.generate("my-detection-tool", mappings)
 
 **Export the full matrix as CSV:**
 ```python
-from attack_core.matrix import ATTACKMatrix
+from attack_v19_core.matrix import ATTACKMatrix
 
 matrix = ATTACKMatrix(index)
 csv_data = matrix.to_csv(Domain.ENTERPRISE)

@@ -4,7 +4,8 @@ import warnings
 def test_attack_core_shim_emits_deprecation_warning():
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter('always')
-        import importlib, sys
+        import importlib
+        import sys
         # Remove cached import to force re-import and trigger warning
         sys.modules.pop('attack_core', None)
         importlib.import_module('attack_core')
