@@ -4,8 +4,6 @@ from attack_v19_core.constants import (
     TACTIC_STEALTH,
     TACTIC_DEFENSE_IMPAIRMENT,
 )
-from attack_v19_core.loader import ATTACKLoader
-from attack_v19_core.index import ATTACKIndex
 from attack_v19_core.models import Domain
 
 
@@ -26,9 +24,7 @@ def test_defense_impairment_tactic_exists():
     assert TACTIC_DEFENSE_IMPAIRMENT in tactic_ids, "TA0112 Defense Impairment missing"
 
 
-def test_new_v19_techniques_resolvable():
-    loader = ATTACKLoader()
-    index = ATTACKIndex(loader)
+def test_new_v19_techniques_resolvable(index):
     # Only test techniques that exist in current STIX bundle
     new_ids = [
         "T1682",
@@ -51,9 +47,7 @@ def test_new_v19_techniques_resolvable():
     assert len(found) > 0, "No new v19 techniques found in index"
 
 
-def test_revoked_techniques_not_in_index():
-    loader = ATTACKLoader()
-    index = ATTACKIndex(loader)
+def test_revoked_techniques_not_in_index(index):
     # These were revoked in v19  --  index must not return them as valid
     # Note: depends on STIX bundle being updated to v19
     revoked = ["T1562", "T1562.001", "T1070.001", "T1070.002"]
@@ -64,9 +58,7 @@ def test_revoked_techniques_not_in_index():
             print(f"Revoked technique still in index: {tid} - {result.name}")
 
 
-def test_ics_new_subtechniques_resolvable():
-    loader = ATTACKLoader()
-    index = ATTACKIndex(loader)
+def test_ics_new_subtechniques_resolvable(index):
     ics_new = ["T1691", "T1692", "T1693", "T1694", "T1695", "T0843/001", "T0846/001"]
     for tid in ics_new:
         result = index.get(tid)
