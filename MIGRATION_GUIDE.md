@@ -1,5 +1,27 @@
 # Migration Guide: ATT&CK v18 -> v19
 
+## attack_core → attack_v19_core Migration
+
+### Why two packages?
+attack_core/ is a compatibility shim preserved to avoid breaking downstream
+callers that import `from attack_core import ...`. attack_v19_core/ is the
+canonical package. The shim simply re-exports everything from attack_v19_core.
+
+### Migration path
+Replace: `from attack_core import ATTACKLoader, Domain`
+With:    `from attack_v19_core import ATTACKLoader, Domain`
+
+Or use the package name directly:
+```
+pip install attack-v19-core
+from attack_v19_core import ATTACKLoader
+```
+
+### Deprecation timeline
+attack_core/ shim will be removed in v20.0.0.
+
+---
+
 This guide helps downstream consumers migrate from ATT&CK v18 to v19.
 
 ## Breaking Changes Summary

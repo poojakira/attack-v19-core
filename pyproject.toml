@@ -25,4 +25,5 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
+# attack_core/ is a deprecated compatibility shim; use attack_v19_core/ directly
 include = ["attack_core**", "attack_v19_core**"]
