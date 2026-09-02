@@ -12,7 +12,7 @@ points with other tools in the portfolio, and common query patterns.
 pip install -e .
 
 # Download STIX bundles (required before first use)
-python -m attack_core download
+python -m attack_core.download
 
 # Or set a custom data directory
 export ATTACK_DATA_DIR=/path/to/stix/bundles
@@ -282,7 +282,7 @@ The library includes a CLI for common operations:
 
 ```bash
 # Download STIX bundles from MITRE
-python -m attack_core download
+python -m attack_core.download
 
 # Look up a technique
 python -m attack_core lookup T1059
@@ -324,7 +324,7 @@ The library uses explicit error patterns:
 try:
     loader = ATTACKLoader()
 except FileNotFoundError as e:
-    print(f"Run 'python -m attack_core download' first: {e}")
+    print(f"Run 'python -m attack_core.download' first: {e}")
 
 # Returns None if technique not found (does not raise)
 technique = index.get("T9999")

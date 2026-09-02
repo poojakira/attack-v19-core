@@ -31,6 +31,18 @@ class ATTACKLoader:
         self._load_all()
 
     def _load_all(self):
+        if not self.stix_dir.exists():
+            raise FileNotFoundError(
+                f"STIX data directory not found: {self.stix_dir}\n"
+                "Download the pinned MITRE ATT&CK v19.2 bundles first:\n"
+                "    python -m attack_core.download\n"
+                f"(bundles are cached in {self.stix_dir})."
+            )
+        if not self.stix_dir.is_dir():
+            raise NotADirectoryError(
+                f"STIX data path is not a directory: {self.stix_dir}"
+            )
+        missing: list[str] = []
         for domain_key, filename in [
             ("enterprise", "enterprise-attack.json"),
             ("mobile", "mobile-attack.json"),
@@ -38,8 +50,16 @@ class ATTACKLoader:
         ]:
             path = self.stix_dir / filename
             if not path.exists():
-                raise FileNotFoundError(f"STIX bundle not found: {path}")
+                missing.append(filename)
+                continue
             self._raw[domain_key] = MitreAttackData(str(path))
+        if missing:
+            raise FileNotFoundError(
+                "Missing STIX bundle(s) in "
+                f"{self.stix_dir}: {', '.join(missing)}.\n"
+                "Fetch the pinned v19.2 bundles with:\n"
+                "    python -m attack_core.download"
+            )
 
     def get_tactics(self, domain: Domain) -> List[Tactic]:
         src = self._raw[domain.value]

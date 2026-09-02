@@ -12,11 +12,23 @@ pip install -r requirements.txt
 
 ## Download STIX Data (required before first use)
 ```bash
-python -m attack_core download
+python -m attack_core.download
 # or using the helper script:
 python scripts/download_attack_data.py
+# re-download / refresh even if cached:
+python -m attack_core.download --force
 ```
-This fetches ~80MB of STIX bundles from MITRE's pinned v19.2 tag and caches them locally in `~/attack_data/`.
+This fetches the real MITRE ATT&CK **v19.2** STIX bundles (Enterprise, Mobile,
+ICS; ~60-80 MB total) from MITRE's SHA-256-pinned `v19.2` tag on
+`raw.githubusercontent.com` and caches them in `~/attack_data/`. Each bundle's
+SHA-256 is pinned in `attack_core/download.py`; a mismatch aborts and deletes
+the file. Downloads are size-capped (128 MB), HTTPS + host-allowlisted, and
+every HTTP redirect target is re-validated before it is followed. After hash
+verification each file is checked to be a well-formed STIX 2.x bundle.
+
+> Note: `attack_core` is a deprecated compatibility shim that still hosts the
+> CLI and downloader; importing it emits a `DeprecationWarning`. Library code
+> should import from `attack_v19_core`. See `MIGRATION_GUIDE.md`.
 
 ## CLI Commands
 
@@ -60,5 +72,5 @@ python -m pytest tests/
 
 ## Troubleshooting
 - **ImportError**: Ensure package is installed in editable mode (`pip install -e .`).
-- **FileNotFoundError on load**: Run `python -m attack_core download` to fetch STIX bundles.
+- **FileNotFoundError on load**: Run `python -m attack_core.download` to fetch STIX bundles.
 - **Test failures after update**: Check for schema changes in upstream STIX bundle.

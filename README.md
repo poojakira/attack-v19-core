@@ -96,7 +96,7 @@ from attack_v19_core.models import Domain
 
 Here is how data moves from MITRE's published STIX bundles to a usable lookup in your code:
 
-1. **Download:** `python -m attack_core download` fetches three STIX bundles (Enterprise, Mobile, ICS) from MITRE's pinned v19.2 tag on GitHub. Each file is verified against a hardcoded SHA-256 hash and validated as a well-formed STIX 2.x bundle.
+1. **Download:** `python -m attack_core.download` fetches three STIX bundles (Enterprise, Mobile, ICS) from MITRE's pinned v19.2 tag on GitHub. Each file is verified against a hardcoded SHA-256 hash and validated as a well-formed STIX 2.x bundle.
 
 2. **Load:** `ATTACKLoader(stix_dir)` reads the three JSON bundles from disk, parses them through `mitreattack-python`, and instantiates Pydantic models for every ATT&CK object. Revoked and deprecated objects are filtered out (except DataSources, which are handled specially in v19).
 
@@ -152,7 +152,7 @@ cd attack-v19-core
 pip install -r requirements.txt
 
 # Download STIX bundles (fetches ~80MB, caches locally)
-python -m attack_core download
+python -m attack_core.download
 ```
 
 For development:
@@ -266,7 +266,7 @@ This is a security data library. It does not process untrusted user input at run
 - The library operates on read-only reference data; it does not modify system state
 
 **Recommendations for consumers:**
-- Run `python -m attack_core download` in a controlled environment before deploying
+- Run `python -m attack_core.download` in a controlled environment before deploying
 - Verify the SHA-256 hashes in `download.py` match MITRE's published values if you are security-conscious about your supply chain
 - Do not expose the raw STIX data directory to untrusted users
 

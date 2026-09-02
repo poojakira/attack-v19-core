@@ -1,5 +1,34 @@
 # tests/test_loader.py
+import pytest
+
+from attack_v19_core.loader import ATTACKLoader
 from attack_v19_core.models import Domain
+
+
+def test_loader_missing_directory_raises_actionable_error(tmp_path):
+    missing = tmp_path / "does_not_exist"
+    with pytest.raises(FileNotFoundError) as exc:
+        ATTACKLoader(stix_dir=missing)
+    msg = str(exc.value)
+    assert "not found" in msg
+    assert "python -m attack_core.download" in msg
+
+
+def test_loader_path_is_file_raises_not_a_directory(tmp_path):
+    not_a_dir = tmp_path / "afile"
+    not_a_dir.write_text("x", encoding="utf-8")
+    with pytest.raises(NotADirectoryError):
+        ATTACKLoader(stix_dir=not_a_dir)
+
+
+def test_loader_missing_bundle_lists_missing_files(tmp_path):
+    # Directory exists but bundles are absent.
+    (tmp_path / "placeholder.txt").write_text("x", encoding="utf-8")
+    with pytest.raises(FileNotFoundError) as exc:
+        ATTACKLoader(stix_dir=tmp_path)
+    msg = str(exc.value)
+    assert "enterprise-attack.json" in msg
+    assert "python -m attack_core.download" in msg
 
 
 def test_loader_loads_all_domains(loader):

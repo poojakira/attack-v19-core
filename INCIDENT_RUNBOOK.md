@@ -38,7 +38,7 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 3. **Update the revocation map** (`V19_REVOCATION_MAP` in `attack_core/constants.py`) if techniques were revoked or deprecated upstream.
 4. **Re-download the new bundle** and confirm it loads cleanly:
    ```bash
-   python -m attack_core download
+   python -m attack_core.download
    python -m attack_core lookup T1059
    ```
 5. **Run the full test suite** including integration tests:
@@ -59,7 +59,7 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 ## Incident 2: SHA-256 Hash Mismatch on Download
 
 ### Symptoms
-- `python -m attack_core download` raises an integrity error.
+- `python -m attack_core.download` raises an integrity error.
 - Error message: `SHA-256 mismatch: expected <hash_a>, got <hash_b>`.
 
 ### Severity
@@ -101,7 +101,7 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 
 ### Prevention
 - Always verify downloads with SHA-256 before loading into memory.
-- Re-run `python -m attack_core download` after any cache refresh; it re-verifies the SHA-256 before use.
+- Re-run `python -m attack_core.download` after any cache refresh; it re-verifies the SHA-256 before use.
 - Pin to specific STIX data release tags, not `main`.
 
 ---
