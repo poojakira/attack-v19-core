@@ -32,6 +32,7 @@ from .models import (
 )
 
 import warnings
+
 warnings.warn(
     "The 'attack_core' package is a compatibility shim for 'attack_v19_core'. "
     "It will be removed in v20.0.0. Update your imports to use 'attack_v19_core' directly. "
