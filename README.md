@@ -274,7 +274,7 @@ This is a security data library. It does not process untrusted user input at run
 
 ## Evaluation Methods and Results
 
-**Test suite:** 104 test functions across 10 test files covering:
+**Test suite:** 108 test functions across 11 test files (156 tests after parametrization, all passing) covering:
 - Unit tests for each module (models, loader, matrix, mapping, index)
 - Integration tests that validate parsed data against official STIX bundle structure
 - CLI tests for all three commands
@@ -309,7 +309,7 @@ This is a security data library. It does not process untrusted user input at run
 | Pinned dependencies | Yes | All exact versions in pyproject.toml + uv.lock |
 | Reproducible data | Yes | SHA-256 verified STIX bundles from pinned Git tag |
 | Type safety | Yes | Pydantic models with full type annotations |
-| Test coverage | Good | 104 tests, structural assertions against official data |
+| Test coverage | Good | 156 tests, structural assertions against official data |
 | Error handling | Good | Clear FileNotFoundError on missing data, hash mismatch raises RuntimeError |
 | CI/CD | Yes | GitHub Actions (`.github/` directory present) |
 | Documentation | Good | README, CHANGELOG, MIGRATION_GUIDE, RUNBOOK, THIRD_PARTY_NOTICES |
