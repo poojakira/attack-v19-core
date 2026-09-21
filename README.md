@@ -1,6 +1,6 @@
 # attack-v19-core
 
-**Repository owner & maintainer:** Pooja Kiran ([@poojakira](https://github.com/poojakira)) — I review changes, verify public claims, and maintain the repository record.
+**Repository owner & maintainer:** Pooja Kiran ([@poojakira](https://github.com/poojakira)) — I lead the design, implementation, validation, documentation, and maintenance of this repository, and I verify public claims against repository evidence.
 
 Typed Python data models and O(1) lookup for MITRE ATT&CK v19. Handles ID revocations between versions so your detection rules don't silently break.
 
