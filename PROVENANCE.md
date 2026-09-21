@@ -43,7 +43,7 @@ Evidence considered in this pass included:
 
 The reachable commit history was also reviewed for author/committer identities.
 
-One commit, [`e1042a3b5080`](https://github.com/poojakira/attack-v19-core/commit/e1042a3b508064545d347bdb2c2a258b2685c593), records **Pooja Kiran as the author** and an automated committer identity. The commit added or updated documentation and pre-commit configuration. The author attribution is Pooja Kiran; the committer metadata does not represent a separate human contributor and does not change the project's 2026 provenance.
+One historical commit, [`e1042a3b5080`](https://github.com/poojakira/attack-v19-core/commit/e1042a3b508064545d347bdb2c2a258b2685c593), records **Pooja Kiran as the author** and a legacy commit-transport identity as the committer. The repository treats Pooja Kiran / @poojakira as the accountable maintainer; the transport metadata does not represent a separate human contributor and does not change the project's 2026 provenance.
 
 
 ## Expanded proof matrix
