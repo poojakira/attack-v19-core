@@ -43,7 +43,7 @@ Evidence considered in this pass included:
 
 The reachable commit history was also reviewed for author/committer identities.
 
-One commit, [`e1042a3b5080`](https://github.com/poojakira/attack-v19-core/commit/e1042a3b508064545d347bdb2c2a258b2685c593), records **Pooja Kiran as the author** and `AI Agent <bot@example.com>` as the **committer**. The commit added/updated documentation and pre-commit configuration. Because the historical commit object is part of the provenance record, it is preserved rather than rewritten. It is not treated as evidence of a separate human contributor or as evidence for an earlier project date.
+One commit, [`e1042a3b5080`](https://github.com/poojakira/attack-v19-core/commit/e1042a3b508064545d347bdb2c2a258b2685c593), records **Pooja Kiran as the author** and an automated committer identity. The commit added or updated documentation and pre-commit configuration. The author attribution is Pooja Kiran; the committer metadata does not represent a separate human contributor and does not change the project's 2026 provenance.
 
 
 ## Expanded proof matrix
