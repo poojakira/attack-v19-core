@@ -4,7 +4,7 @@
 
 ATT&CK data loading, mapping, CLI behavior, cache/download handling, and parsing are in scope. Technique mappings are reference data, not detection efficacy claims.
 
-This is an open-source research/engineering project. Security claims are limited to behavior demonstrated by the repository and its CI/committed evidence; they are not a statement of production certification.
+This is an open-source production-oriented ATT&CK data and mapping library. Security claims remain limited to behavior demonstrated by the repository, its CI, and committed evidence; production orientation does not imply third-party certification.
 
 ## Reporting a vulnerability
 
