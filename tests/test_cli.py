@@ -1,6 +1,6 @@
 import argparse
 
-from attack_core.cli import cmd_revoked
+from attack_v19_core.cli import cmd_revoked
 
 
 def test_revoked_command_separates_release_and_legacy_maps(capsys):
