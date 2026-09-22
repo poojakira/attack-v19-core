@@ -189,16 +189,21 @@ def ensure_attack_data(data_dir: Path, *, force: bool = False) -> None:
             print(f"OK {filename}: already present")
             continue
         print(f"Downloading {filename} from {spec['url']}")
-        _download(spec["url"], target)
-        actual_hash = _sha256(target)
-        if actual_hash != expected_hash:
-            target.unlink(missing_ok=True)
-            raise RuntimeError(
-                f"SHA-256 mismatch for {filename}: expected {expected_hash}, got {actual_hash}"
-            )
-        # Content validation: verify the file is a well-formed STIX 2.x ATT&CK bundle
-        # before it takes the place of any previously trusted data.
-        _validate_stix_bundle(target)
+        candidate = target.with_suffix(target.suffix + ".candidate")
+        candidate.unlink(missing_ok=True)
+        try:
+            _download(spec["url"], candidate)
+            actual_hash = _sha256(candidate)
+            if actual_hash != expected_hash:
+                raise RuntimeError(
+                    f"SHA-256 mismatch for {filename}: expected {expected_hash}, got {actual_hash}"
+                )
+            # Validate the candidate before it replaces any previously trusted cache.
+            _validate_stix_bundle(candidate)
+            candidate.replace(target)
+        except Exception:
+            candidate.unlink(missing_ok=True)
+            raise
         print(f"OK {filename}: sha256={actual_hash}")
 
 
