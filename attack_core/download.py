@@ -21,6 +21,9 @@ __all__ = [
     "BUNDLES",
     "MAX_BUNDLE_BYTES",
     "StrictRedirectHandler",
+    "_download",
+    "_sha256",
+    "_validate_stix_bundle",
     "ensure_attack_data",
     "main",
 ]
