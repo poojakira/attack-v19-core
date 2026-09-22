@@ -118,7 +118,7 @@ jobs:
     needs: [build, sign, attest]
     environment:
       name: pypi
-      url: https://pypi.org/project/attack-core/
+      url: https://pypi.org/project/attack-v19-core/
     permissions:
       id-token: write  # Trusted Publisher OIDC
     steps:
@@ -163,7 +163,7 @@ jobs:
             sigstore verify identity \
               --cert-oidc-issuer https://token.actions.githubusercontent.com \
               --cert-identity https://github.com/${{ github.repository }}/.github/workflows/release.yml@${{ github.ref }} \
-              attack_core-*.tar.gz
+              attack_v19_core-*.tar.gz
             ```
 
             ## SBOM
