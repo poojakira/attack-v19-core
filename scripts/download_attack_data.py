@@ -1,6 +1,6 @@
-"""Source-checkout wrapper for ``python -m attack_core.download``."""
+"""Source-checkout wrapper for the canonical ATT&CK v19 downloader."""
 
-from attack_core.download import main
+from attack_v19_core.download import main
 
 
 if __name__ == "__main__":
