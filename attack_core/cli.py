@@ -9,7 +9,7 @@ from attack_v19_core.cli import (
     main,
 )
 
-__all__ = ["cmd_lookup", "cmd_navigator", "cmd_revoked", "main"]
+__all__ = ["_build_parser", "_load_index", "cmd_lookup", "cmd_navigator", "cmd_revoked", "main"]
 
 
 if __name__ == "__main__":
