@@ -17,6 +17,10 @@ dependencies = [
     "pydantic==2.7.4",
 ]
 
+[project.scripts]
+attack-v19 = "attack_v19_core.cli:main"
+attack-v19-download = "attack_v19_core.download:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
