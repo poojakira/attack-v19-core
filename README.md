@@ -319,18 +319,21 @@ This is a security data library. It does not process untrusted user input at run
 | Security hardening | Good | Download allowlisting, redirect validation, SHA-256, STIX content validation |
 | Python version | 3.10+ | Uses modern syntax (match, `|` unions) |
 
-**What would strengthen production readiness:**
-- Publishing to PyPI for easier installation
-- Adding a `--verify` CLI command that re-checks cached bundle hashes
-- Structured logging instead of print statements
-- Async download option for CI environments
+**Production release contract:**
+- Tagged releases build wheel/sdist artifacts and publish the `attack-v19-core` package through PyPI trusted publishing.
+- Release artifacts are accompanied by Sigstore signatures, a CycloneDX SBOM, and GitHub build provenance.
+- Consumers that require maximum reproducibility should pin an exact package version and run the hash-verified ATT&CK data download during image/build creation.
+
+**Further hardening opportunities:**
+- Add a `--verify` CLI command that re-checks cached bundle hashes without redownloading.
+- Complete migration of remaining CLI/downloader compatibility paths out of the deprecated `attack_core` shim.
+- Add structured logging for long-running automation consumers.
 
 ---
 
 ## Roadmap and Future Improvements
 
 - **v20 support:** When ATT&CK v20 ships, add an `attack_v20_core` package alongside v19, keeping both importable
-- **PyPI publishing:** Package as `attack-v19-core` on PyPI for `pip install attack-v19-core`
 - **Delta reporting:** Given two versions, show what was added, removed, renamed, or revoked
 - **Relationship graph:** Use networkx to expose technique-to-group and technique-to-software graphs for threat modeling
 - **Async download:** Optional async fetcher for parallelized bundle downloads in CI
