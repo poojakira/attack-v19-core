@@ -3,6 +3,7 @@ Loads all three ATT&CK STIX bundles from local disk or TAXII server.
 Returns fully-typed model instances.
 """
 
+import hashlib
 from pathlib import Path
 from typing import Dict, List
 from ._distutils_compat import ensure_distutils_version
@@ -10,6 +11,7 @@ from ._distutils_compat import ensure_distutils_version
 ensure_distutils_version()
 
 from mitreattack.stix20 import MitreAttackData  # noqa: E402
+from .download import BUNDLES  # noqa: E402
 from .models import (  # noqa: E402
     Domain,
     Tactic,
@@ -24,9 +26,23 @@ from .models import (  # noqa: E402
 _DEFAULT_STIX_DIR = Path.home() / "attack_data"
 
 
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 class ATTACKLoader:
-    def __init__(self, stix_dir: Path = _DEFAULT_STIX_DIR):
+    def __init__(
+        self,
+        stix_dir: Path = _DEFAULT_STIX_DIR,
+        *,
+        verify_integrity: bool = True,
+    ):
         self.stix_dir = stix_dir
+        self.verify_integrity = verify_integrity
         self._raw: Dict[str, MitreAttackData] = {}
         self._load_all()
 
@@ -35,7 +51,7 @@ class ATTACKLoader:
             raise FileNotFoundError(
                 f"STIX data directory not found: {self.stix_dir}\n"
                 "Download the pinned MITRE ATT&CK v19.2 bundles first:\n"
-                "    python -m attack_core.download\n"
+                "    python -m attack_v19_core.download\n"
                 f"(bundles are cached in {self.stix_dir})."
             )
         if not self.stix_dir.is_dir():
@@ -52,13 +68,22 @@ class ATTACKLoader:
             if not path.exists():
                 missing.append(filename)
                 continue
+            if self.verify_integrity:
+                expected = BUNDLES[filename]["sha256"]
+                actual = _sha256_file(path)
+                if actual != expected:
+                    raise RuntimeError(
+                        f"ATT&CK bundle integrity check failed for {filename}: "
+                        f"expected {expected}, got {actual}. Re-download with "
+                        "'python -m attack_v19_core.download --force'."
+                    )
             self._raw[domain_key] = MitreAttackData(str(path))
         if missing:
             raise FileNotFoundError(
                 "Missing STIX bundle(s) in "
                 f"{self.stix_dir}: {', '.join(missing)}.\n"
                 "Fetch the pinned v19.2 bundles with:\n"
-                "    python -m attack_core.download"
+                "    python -m attack_v19_core.download"
             )
 
     def get_tactics(self, domain: Domain) -> List[Tactic]:
