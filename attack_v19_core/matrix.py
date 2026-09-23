@@ -6,24 +6,24 @@ import html
 import json
 import csv
 from io import StringIO
-from typing import Dict
+from typing import Any
 from .index import ATTACKIndex
-from .models import Domain
+from .models import ATTACKMapping, Domain, SubTechnique, Technique
 
 
 class ATTACKMatrix:
     def __init__(self, index: ATTACKIndex):
         self.index = index
 
-    def to_dict(self, domain: Domain = Domain.ENTERPRISE) -> Dict:
+    def to_dict(self, domain: Domain = Domain.ENTERPRISE) -> dict[str, Any]:
         tactics = [t for t in self.index._tactics.values() if t.domain == domain]
         tactics_sorted = sorted(tactics, key=lambda t: t.attack_id)
-        matrix = {"domain": domain.value, "tactics": []}
+        matrix: dict[str, Any] = {"domain": domain.value, "tactics": []}
         for tac in tactics_sorted:
             techs = self.index.by_tactic(tac.attack_id)
-            techs = [t for t in techs if t.domain == domain and not t.is_subtechnique]
+            techs = [t for t in techs if t.domain == domain and isinstance(t, Technique)]
             techs_sorted = sorted(techs, key=lambda t: t.attack_id)
-            tactic_data = {
+            tactic_data: dict[str, Any] = {
                 "tactic_id": tac.attack_id,
                 "tactic_name": tac.name,
                 "techniques": [],
@@ -32,7 +32,7 @@ class ATTACKMatrix:
                 subs = [
                     s
                     for s in self.index._by_id.values()
-                    if s.is_subtechnique
+                    if isinstance(s, SubTechnique)
                     and s.parent_id == tech.attack_id
                     and s.domain == domain
                 ]
@@ -126,11 +126,11 @@ class ATTACKMatrix:
 
 
 class NavigatorLayerReporter:
-    def generate(self, repo_name: str, mappings) -> str:
+    def generate(self, repo_name: str, mappings: list[ATTACKMapping]) -> str:
         import json
 
-        techniques = []
-        seen = set()
+        techniques: list[dict[str, Any]] = []
+        seen: set[str] = set()
         for m in mappings:
             if m is None:
                 continue
