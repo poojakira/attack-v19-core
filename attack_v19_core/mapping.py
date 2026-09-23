@@ -7,7 +7,7 @@ from __future__ import annotations
 from typing import List
 from dataclasses import dataclass
 
-from .models import Domain, ATTACKMapping
+from .models import ATTACKMapping, Domain, SubTechnique
 from .index import ATTACKIndex
 
 
@@ -36,7 +36,7 @@ class ATTACKMappingBuilder:
         tactic = self.index._tactics.get(tactic_id)
         tactic_name = tactic.name if tactic else ""
 
-        if tech.is_subtechnique:
+        if isinstance(tech, SubTechnique):
             # Get parent technique name
             parent_id = (
                 tech.attack_id.split(".")[0]
