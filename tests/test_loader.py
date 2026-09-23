@@ -11,7 +11,7 @@ def test_loader_missing_directory_raises_actionable_error(tmp_path):
         ATTACKLoader(stix_dir=missing)
     msg = str(exc.value)
     assert "not found" in msg
-    assert "python -m attack_core.download" in msg
+    assert "python -m attack_v19_core.download" in msg
 
 
 def test_loader_path_is_file_raises_not_a_directory(tmp_path):
@@ -28,7 +28,7 @@ def test_loader_missing_bundle_lists_missing_files(tmp_path):
         ATTACKLoader(stix_dir=tmp_path)
     msg = str(exc.value)
     assert "enterprise-attack.json" in msg
-    assert "python -m attack_core.download" in msg
+    assert "python -m attack_v19_core.download" in msg
 
 
 def test_loader_loads_all_domains(loader):
