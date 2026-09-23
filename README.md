@@ -190,9 +190,9 @@ print(t.platforms)  # ['Windows', 'macOS', 'Linux', ...]
 ```python
 index = ATTACKIndex(ATTACKLoader())
 technique = index.get("T1059.001")
-print(technique.name)       # "PowerShell"
+print(technique.name)  # "PowerShell"
 print(technique.parent_id)  # "T1059"
-print(technique.tactic_ids) # ["execution"]
+print(technique.tactic_ids)  # ["execution"]
 ```
 
 **Resolve a revoked v18 ID to its v19 replacement:**

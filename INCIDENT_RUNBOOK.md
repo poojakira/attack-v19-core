@@ -122,6 +122,7 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 2. **Check the STIX bundle** for the revocation relationship:
    ```python
    from attack_core import ATTACKLoader, ATTACKIndex
+
    idx = ATTACKIndex(ATTACKLoader())
    # Look for relationship where source_ref is T1234 and relationship_type == "revoked-by"
    ```
@@ -183,6 +184,7 @@ Operational procedures for responding to incidents affecting `attack-core` and i
    ```python
    # attack_v19_core/__init__.py
    import warnings
+
    warnings.warn(
        "attack_v19_core is deprecated and will be removed in 2026. "
        "Migrate to 'attack-core': pip install attack-core",

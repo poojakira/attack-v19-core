@@ -61,7 +61,7 @@ print(f"Loaded {len(techniques)} techniques")
 
 index = ATTACKIndex(loader)
 t1059 = index.get("T1059")
-print(t1059.name)        # "Command and Scripting Interpreter"
+print(t1059.name)  # "Command and Scripting Interpreter"
 print(t1059.tactic_ids)  # associated tactic IDs
 ```
 

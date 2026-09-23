@@ -41,7 +41,14 @@ This guide helps downstream consumers migrate from ATT&CK v18 to v19.
 TACTICS = ["TA0001", "TA0002", ..., "TA0005", ...]  # TA0005 = "Defense Evasion"
 
 # NEW (v19)
-TACTICS = ["TA0001", "TA0002", ..., "TA0005", "TA0112", ...]  # TA0005 = "Stealth", TA0112 = "Defense Impairment"
+TACTICS = [
+    "TA0001",
+    "TA0002",
+    ...,
+    "TA0005",
+    "TA0112",
+    ...,
+]  # TA0005 = "Stealth", TA0112 = "Defense Impairment"
 ```
 
 ### Display Name Updates
@@ -79,9 +86,11 @@ The `V19_REVOCATION_MAP` in `attack_core.constants` provides automatic remapping
 ```python
 from attack_core.constants import V19_REVOCATION_MAP
 
+
 # Auto-remap any technique ID
 def remap_technique_id(old_id: str) -> str:
     return V19_REVOCATION_MAP.get(old_id, old_id)
+
 
 # Example mappings
 assert remap_technique_id("T1562") == "T1685"

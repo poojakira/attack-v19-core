@@ -37,9 +37,9 @@ index = ATTACKIndex(loader)
 
 # Look up a technique by ID
 technique = index.get("T1059")
-print(technique.name)           # "Command and Scripting Interpreter"
-print(technique.platforms)      # ["Windows", "macOS", "Linux"]
-print(technique.tactic_ids)     # ["execution"]
+print(technique.name)  # "Command and Scripting Interpreter"
+print(technique.platforms)  # ["Windows", "macOS", "Linux"]
+print(technique.tactic_ids)  # ["execution"]
 
 # Get sub-techniques
 subs = index.get_subtechniques_of("T1059")
@@ -204,6 +204,7 @@ loader = ATTACKLoader()
 index = ATTACKIndex(loader)
 builder = ATTACKMappingBuilder(index)
 
+
 def map_detection_to_attack(rule_technique_id: str, confidence: float):
     """Map a detection rule's technique ID to a full ATT&CK v19 mapping."""
     mapping = builder.build(rule_technique_id, confidence)
@@ -249,6 +250,7 @@ RISK_TO_TECHNIQUE = {
     "model_backdoor": ("T1195.003", 0.80),
     "unsafe_deserialization": ("T1059.006", 0.90),
 }
+
 
 def map_scan_finding(risk_type: str) -> dict | None:
     """Convert a scan finding to an ATT&CK-annotated risk report."""

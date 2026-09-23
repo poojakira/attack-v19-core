@@ -275,7 +275,7 @@ ATTACKMapping(
     confidence=0.85,
     data_sources=["Cloud Service: Cloud Service Modification"],
     platforms=["AWS", "Azure", "GCP"],
-    was_revoked=True,          # input was T1562.008
+    was_revoked=True,  # input was T1562.008
     source_technique_id="T1562.008",
     resolved_technique_id="T1685.002",
 )
