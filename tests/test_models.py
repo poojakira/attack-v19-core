@@ -9,16 +9,16 @@ from attack_v19_core.models import Domain
 
 def test_enterprise_technique_count(index):
     count = index.count_techniques(Domain.ENTERPRISE)
-    assert count == ENTERPRISE_TECHNIQUE_COUNT, (
-        f"Expected {ENTERPRISE_TECHNIQUE_COUNT} techniques, got {count}"
-    )
+    assert (
+        count == ENTERPRISE_TECHNIQUE_COUNT
+    ), f"Expected {ENTERPRISE_TECHNIQUE_COUNT} techniques, got {count}"
 
 
 def test_enterprise_subtechnique_count(index):
     count = index.count_subtechniques(Domain.ENTERPRISE)
-    assert count == ENTERPRISE_SUBTECHNIQUE_COUNT, (
-        f"Expected {ENTERPRISE_SUBTECHNIQUE_COUNT} sub-techniques, got {count}"
-    )
+    assert (
+        count == ENTERPRISE_SUBTECHNIQUE_COUNT
+    ), f"Expected {ENTERPRISE_SUBTECHNIQUE_COUNT} sub-techniques, got {count}"
 
 
 def test_lookup_by_id(index):
