@@ -21,7 +21,9 @@ class ATTACKMatrix:
         matrix: dict[str, Any] = {"domain": domain.value, "tactics": []}
         for tac in tactics_sorted:
             techs = self.index.by_tactic(tac.attack_id)
-            techs = [t for t in techs if t.domain == domain and isinstance(t, Technique)]
+            techs = [
+                t for t in techs if t.domain == domain and isinstance(t, Technique)
+            ]
             techs_sorted = sorted(techs, key=lambda t: t.attack_id)
             tactic_data: dict[str, Any] = {
                 "tactic_id": tac.attack_id,
