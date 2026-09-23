@@ -1,3 +1,1 @@
-Verification run after audit remediation.
-Repository: attack-v19-core
-Verification cycle: 2026-09-22-final-1
+trigger ruff formatter after typing fixes
