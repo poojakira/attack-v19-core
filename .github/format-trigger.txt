@@ -1,1 +1,1 @@
-trigger ruff formatter after typing fixes
+verify formatter and CI after remediation
