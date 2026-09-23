@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from attack_core import download as download_attack_data
-from attack_core.download import StrictRedirectHandler, _validate_stix_bundle
+from attack_v19_core import download as download_attack_data
+from attack_v19_core.download import StrictRedirectHandler, _validate_stix_bundle
 
 
 # ---------------------------------------------------------------------------
