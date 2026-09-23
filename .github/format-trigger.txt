@@ -1,0 +1,3 @@
+Run Ruff formatter after production audit fixes.
+Repository: attack-v19-core
+Audit remediation cycle: 2026-09-22
