@@ -1,7 +1,9 @@
 from __future__ import annotations
-from typing import Optional, List, Dict
-from pydantic import BaseModel, Field
+
 from enum import Enum
+from typing import Dict, List, Optional
+
+from pydantic import BaseModel, Field
 
 
 class Domain(str, Enum):
@@ -46,6 +48,7 @@ class Technique(BaseModel):
     data_sources: List[str]
     mitigations: List[str]
     subtechniques: List[str] = Field(default_factory=list)
+    parent_id: Optional[str] = None
     detection: Optional[str] = None
     domain: Domain
     is_subtechnique: bool = False
@@ -114,3 +117,9 @@ class ATTACKMapping(BaseModel):
     data_sources: List[str] = Field(default_factory=list)
     platforms: List[str] = Field(default_factory=list)
     url: Optional[str] = None
+    source_technique_id: Optional[str] = None
+    resolved_technique_id: Optional[str] = None
+    parent_technique_id: Optional[str] = None
+    parent_technique_name: Optional[str] = None
+    was_normalized: bool = False
+    was_revoked: bool = False
