@@ -89,7 +89,7 @@ class TestV19EnricherChain:
             result = self.index.get(tid)
             if result is not None:
                 found += 1
-                assert result.attack_id == tid
+                assert result.attack_id == tid.replace("/", ".")
 
         # At least 5 should resolve (depending on STIX bundle version)
         assert found >= 5, f"Only {found}/{len(core_new)} new techniques resolved"
