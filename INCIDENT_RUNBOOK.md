@@ -1,6 +1,13 @@
 # Incident Runbook — attack-core
 
-Operational procedures for responding to incidents affecting `attack-core` and its consumers.
+> **Reference template for a single-maintainer library.** `attack-core` is an
+> open-source Python package, not an operated service. There is **no on-call
+> rotation, no pager, and no SLA/SLO**. The response-time targets and "alert the
+> team" steps below are a **procedure a maintainer or consumer can adapt** — map
+> them to your own tooling.
+
+Reference procedures for responding to issues affecting `attack-core` and its
+consumers.
 
 ---
 
@@ -89,7 +96,7 @@ Operational procedures for responding to incidents affecting `attack-core` and i
 4. Cut a patch release.
 
 **If suspected tampering:**
-1. **Alert the team immediately** (Slack/PagerDuty).
+1. **Alert the maintainer / your team immediately** (adapt to your own alerting; there is no staffed pager for this project).
 2. Preserve the corrupted file for forensic analysis:
    ```bash
    cp /tmp/attack_core_cache/enterprise-attack.json ./evidence/tampered_bundle_$(date +%s).json
