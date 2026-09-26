@@ -1,5 +1,18 @@
 # attack-v19-core
 
+<!-- security-systems-poster -->
+## Research Poster
+
+**Security Systems / 08 — Version-Aware Normalization of Findings Against MITRE ATT&CK v19**
+
+[![Research poster](poster/poster.png)](poster/poster_36x48.pdf)
+
+> Technical research poster (36 x 48 in). Click the image for the print-resolution **[PDF](poster/poster_36x48.pdf)**.
+> Every metric on it is evidence-backed; historical/projected numbers are labeled and separated from current results.
+> Part of the *Pooja Kiran - Security Systems* engineering poster collection.
+<!-- security-systems-poster -->
+
+
 **Maintainer:** Pooja Kiran ([@poojakira](https://github.com/poojakira))
 
 Typed Python data models and O(1) lookup for MITRE ATT&CK v19. Handles ID revocations between versions so your detection rules don't silently break.
