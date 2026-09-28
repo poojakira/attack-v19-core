@@ -15,19 +15,55 @@
 
 **Maintainer:** Pooja Kiran ([@poojakira](https://github.com/poojakira))
 
-Typed Python data models and O(1) lookup for MITRE ATT&CK v19. Handles ID revocations between versions so your detection rules don't silently break.
+## Overview
 
----
+`attack-v19-core` provides typed Python (Pydantic) data models and O(1) in-memory lookup for MITRE ATT&CK v19, plus a revocation map that resolves deprecated technique IDs to their replacements across versions. It exists so detection rules and findings that reference ATT&CK IDs don't silently break when a release revokes, renames, or adds techniques. It downloads and SHA-256-verifies the official STIX bundle before building indexes.
 
-## Why This Exists
+## Verified Snapshot
 
-ATT&CK v19 revoked 22 technique IDs (29 total remaps including legacy), renamed a tactic, added a new one (TA0112, "Defense Impairment"), and introduced 48 new techniques. If your SIEM rules reference `T1562` (Impair Defenses), that ID no longer exists. It was replaced by `T1685`. Your coverage dashboard shows green but you're missing a whole tactic.
+Reproduced on current `main` (Python 3.12).
 
-I got tired of this breaking our detection pipeline every release cycle, so I built a library that absorbs the version churn. It gives you Pydantic models for every ATT&CK object type, a revocation map that resolves deprecated IDs to their replacements, and in-memory indexes for fast lookup by ID, tactic, platform, or keyword.
+| Metric | Current verified result |
+|---|---:|
+| Tests | 156 passing (108 test functions across 11 files) |
+| ATT&CK version | v19 (STIX bundle, SHA-256 verified) |
+| Lookup | O(1) by ID / tactic / platform / keyword |
+| ID remaps handled | 29 total (22 revoked in v19 + legacy) |
 
----
+## Security Problem
 
-## What's In the Box
+ATT&CK evolves every release: v19 revoked 22 technique IDs, renamed a tactic, added TA0112 ("Defense Impairment"), and introduced 48 new techniques. Detection pipelines that hard-code IDs (e.g., `T1562` → now `T1685`) show green coverage dashboards while silently missing whole tactics. This library absorbs that version churn so downstream security tools stay correct across upgrades.
+
+## Threat Model & Scope
+
+**In scope:** deterministic, offline modeling and lookup of ATT&CK v19 objects; version-aware ID resolution; integrity-verified bundle loading.
+
+**Out of scope / not claimed:** It is a data/lookup library, not a detector, SIEM, or telemetry source — it does not observe systems or generate findings on its own. Coverage is exactly the official ATT&CK v19 content it loads.
+
+## Architecture
+
+```text
+Official ATT&CK v19 STIX bundle
+      |  download + SHA-256 verify
+      v
+Pydantic models (Technique / Tactic / Mitigation / ...)
+      |
+      v
+In-memory indexes (id, tactic, platform, keyword) + revocation map
+      |
+      v
+O(1) lookup API  -->  consumed by sibling detection tools
+```
+
+## Core Capabilities
+
+- Typed Pydantic models for every ATT&CK object type
+- SHA-256-verified STIX bundle download and load
+- Revocation map resolving deprecated IDs to replacements (v19 + legacy)
+- O(1) indexes for lookup by ID, tactic, platform, or keyword
+- Compatibility shim (`attack_core`) with a deprecation path to `attack_v19_core`
+
+
 
 - Pydantic-validated models for Technique, Tactic, SubTechnique, Group, Software, Mitigation, DataSource
 - Transparent revocation resolution (v18 ID in, v19 replacement out)
