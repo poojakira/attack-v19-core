@@ -1,11 +1,11 @@
 # Verified Metrics — Poster 08
 
-MIT • Python 3.12 • HEAD 756bf03 • verified 2026-09-26. Verified for this poster on Windows / CPython 3.12.10.
+MIT • Python 3.12 • HEAD 734c633 • verified 2026-09-26. Verified for this poster on Windows / CPython 3.12.10.
 
 ## Headline cards
 - 108 — TEST FUNCTIONS
 - O(1) — LOOKUP
-Notes: 108 test_ functions across the suite (HEAD 756bf03). In-memory indexes by id/tactic/platform/keyword.
+Notes: 108 test_ functions across the suite (HEAD 734c633). In-memory indexes by id/tactic/platform/keyword.
 
 ## Verified surface
 | Item | Value |
