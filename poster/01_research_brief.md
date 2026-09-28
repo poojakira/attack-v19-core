@@ -1,5 +1,7 @@
 # Research Brief — Poster 08
 
+> Evidence status: This is a dated repository snapshot at the commit identified below. `VERIFIED_AT_SNAPSHOT` means verified for that commit and environment; it does not assert the same result on the latest `main`. Compare newer claims with the repository evidence before reuse.
+
 ## Repository
 `github.com/poojakira/attack-v19-core` (public, default branch `main`, primary language Python). MIT • Python 3.12 • HEAD 734c633 • verified 2026-09-26
 
@@ -34,11 +36,11 @@ O4 — SHA-256-verified STIX download
 ## Methodology
 1 Download (STIX) -> 2 Verify (SHA-256) -> 3 Parse (Pydantic) -> 4 Remap (revocations) -> 5 Index (O(1)) -> 6·7 Query (CLI/layer)
 
-## Current Verified Evidence + Claim Ledger
-- **VERIFIED_CURRENT** — 108 test functions across suite — Counted def test_ in tests/ (HEAD 734c633).
-- **VERIFIED_CURRENT** — v19: 22 revoked IDs, 29 total remaps, 48 new techniques — README/CHANGELOG; V19_REVOCATION_MAP resolves deprecated IDs.
-- **VERIFIED_CURRENT** — SHA-256 verification of downloaded STIX bundles — README + download.py description.
-- **VERIFIED_CURRENT** — O(1) in-memory indexes (id/tactic/platform/keyword) — README architecture + index.py.
+## Evidence at Poster Snapshot + Claim Ledger
+- **VERIFIED_AT_SNAPSHOT** — 108 test functions across suite — Counted def test_ in tests/ (HEAD 734c633).
+- **VERIFIED_AT_SNAPSHOT** — v19: 22 revoked IDs, 29 total remaps, 48 new techniques — README/CHANGELOG; V19_REVOCATION_MAP resolves deprecated IDs.
+- **VERIFIED_AT_SNAPSHOT** — SHA-256 verification of downloaded STIX bundles — README + download.py description.
+- **VERIFIED_AT_SNAPSHOT** — O(1) in-memory indexes (id/tactic/platform/keyword) — README architecture + index.py.
 - **UNSUPPORTED (disclaimed)** — ATT&CK mapping proves an attack occurred — README-consistent scope; poster states mapping != occurrence.
 
 ## Important Negative / Honest Results
