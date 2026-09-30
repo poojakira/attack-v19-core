@@ -18,3 +18,13 @@ Security-analysis library/CLI. No public web API, user database, payment handler
 
 ## Not applicable
 Admin routes, SQL tenant isolation, rate limiting, password reset, blue/green web deployment.
+
+<!-- repo-verification:start -->
+## Verification update — 2026-09-30
+
+- **Scope:** Account-wide `poojakira` repository pass covering source/configuration, CI/release workflows, security-hygiene gates, dependency/SAST controls, and documentation consistency.
+- **Remediation:** Pinned CI/release actions, including the cache action, to immutable revisions.
+- **Verification state:** The previous hardened commit completed CI, Production Gate, Security Hygiene, and Documentation Integrity successfully; the final cache-pin commit was still re-running CI at the audit snapshot.
+- **Security note:** The ATT&CK data/index controls remain versioned evidence; downstream consumers should pin the core revision they validate.
+- **Evidence boundary:** This update records repository and GitHub Actions evidence observed during the pass. It is not a claim of independent penetration testing, production deployment, or zero residual risk.
+<!-- repo-verification:end -->
