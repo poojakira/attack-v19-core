@@ -1,12 +1,19 @@
-# Reproduce the Work — Poster 08
+# Reproduce the Work - Poster 08
 
-> Evidence status: This is a dated repository snapshot at the commit identified below. `VERIFIED_AT_SNAPSHOT` means verified for that commit and environment; it does not assert the same result on the latest `main`. Compare newer claims with the repository evidence before reuse.
+**Repository:** `github.com/poojakira/attack-v19-core`  
+**Verified code snapshot:** `22cc9ee3e08406a446bf500f84ea1d8fb53a6a6d`  
+**CI run:** `36783662812`
 
-**Repository:** `github.com/poojakira/attack-v19-core` · MIT • Python 3.12 • HEAD 734c633 • verified 2026-09-26
-
+```bash
+git clone https://github.com/poojakira/attack-v19-core.git
+cd attack-v19-core
+git checkout 22cc9ee3e08406a446bf500f84ea1d8fb53a6a6d
+python -m pip install -e ".[dev]"
+pytest tests/ -q --cov=attack_v19_core --cov-report=term
 ```
-pytest tests/
-python -m attack_core lookup T1685
-```
 
-Evidence artifacts: CHANGELOG.md, MIGRATION_GUIDE.md, tests/
+Expected current-main evidence:
+
+- **165 passed**
+- **63.83% statement coverage**
+- **113 test functions across 11 files**

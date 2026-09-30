@@ -1,71 +1,58 @@
-# Research Brief — Poster 08
+# Research Brief - Poster 08
 
-> Evidence status: This is a dated repository snapshot at the commit identified below. `VERIFIED_AT_SNAPSHOT` means verified for that commit and environment; it does not assert the same result on the latest `main`. Compare newer claims with the repository evidence before reuse.
+> Evidence status: Refreshed against current code snapshot `22cc9ee3e08406a446bf500f84ea1d8fb53a6a6d` and successful CI run `36783662812` on 2026-09-30.
 
 ## Repository
-`github.com/poojakira/attack-v19-core` (public, default branch `main`, primary language Python). MIT • Python 3.12 • HEAD 734c633 • verified 2026-09-26
+
+`github.com/poojakira/attack-v19-core` - public, default branch `main`.
 
 ## Academic Project Title
+
 **Version-Aware Normalization of Findings Against MITRE ATT&CK v19**
 
 ### Subtitle
+
 Typed Data Models and Revocation-Resolving Technique Lookup for Security Tooling
 
 ## One-Sentence Contribution
-A typed ATT&CK v19 data layer that transparently resolves revoked/renamed technique IDs (22 revocations, 29 total remaps) via a revocation map over SHA-256-verified STIX bundles, giving security tooling stable O(1) lookup that survives version churn.
 
-## Problem Statement
-ATT&CK v19 revoked 22 technique IDs, renamed a tactic, added TA0112, and introduced 48 techniques. A SIEM rule referencing T1562 now points at a dead ID (replaced by T1685) — the coverage dashboard shows green while a whole tactic is unmonitored. Detection tooling needs to absorb this churn safely.
+A typed ATT&CK v19 data layer that normalizes findings across version churn by resolving revoked/renamed technique IDs through a maintained remap table over SHA-256-verified STIX data, with indexed lookup for downstream security tooling.
 
-## Threat Model
-Chain: STALE FINDING ID -> VERSION CHANGE -> SILENT COVERAGE GAP -> NORMALIZATION BOUNDARY -> V19 REPRESENTATION.
-Adversary capability: n/a — correctness risk, not an active attacker; Assumptions: official STIX bundles; SHA-256 verified; Out of scope: proving an attack occurred; detection logic itself; Residual risk: mapping ≠ evidence of compromise.
+## Method
 
-## Research / Engineering Question
-> Can security tooling keep mapping findings to ATT&CK across version churn when technique IDs are revoked, renamed, or remapped?
+1. Download/validate ATT&CK STIX data with SHA-256 verification.
+2. Parse techniques/tactics/platform metadata into typed structures.
+3. Resolve deprecated/revoked IDs through the v19 remap table.
+4. Build in-memory indexes for ID, tactic, platform, and keyword lookup.
+5. Regression-test migration and data-loader behavior across supported Python versions.
 
-## Objective
-Determine whether typed models + a revocation map can resolve deprecated ATT&CK IDs to v19 and give O(1) lookup for tooling.
+## Current Verified Evidence
 
-## Engineering Sub-Objectives
-O1 — Pydantic models per object type
-O2 — Revocation map v18→v19
-O3 — O(1) indexes (id/tactic/platform)
-O4 — SHA-256-verified STIX download
+Current-main Python 3.12 CI reports:
 
-## Methodology
-1 Download (STIX) -> 2 Verify (SHA-256) -> 3 Parse (Pydantic) -> 4 Remap (revocations) -> 5 Index (O(1)) -> 6·7 Query (CLI/layer)
+- **165 tests passed**.
+- **63.83% statement coverage**; CI gate is 60%.
+- **113 test functions across 11 test files**; parametrization expands these to 165 executed tests.
+- Current repository mapping evidence retains:
+  - **22 revoked technique IDs**
+  - **29 total remaps**
+  - **48 new techniques** for the documented v19 migration surface
+- Type checking, lint, dependency/security scanning, data download verification, and performance benchmark jobs succeeded.
 
-## Evidence at Poster Snapshot + Claim Ledger
-- **VERIFIED_AT_SNAPSHOT** — 108 test functions across suite — Counted def test_ in tests/ (HEAD 734c633).
-- **VERIFIED_AT_SNAPSHOT** — v19: 22 revoked IDs, 29 total remaps, 48 new techniques — README/CHANGELOG; V19_REVOCATION_MAP resolves deprecated IDs.
-- **VERIFIED_AT_SNAPSHOT** — SHA-256 verification of downloaded STIX bundles — README + download.py description.
-- **VERIFIED_AT_SNAPSHOT** — O(1) in-memory indexes (id/tactic/platform/keyword) — README architecture + index.py.
-- **UNSUPPORTED (disclaimed)** — ATT&CK mapping proves an attack occurred — README-consistent scope; poster states mapping != occurrence.
+## Claim Boundary
 
-## Important Negative / Honest Results
-See RESULTS panel: ATT&CK v19 change counts from README/CHANGELOG. Bars scaled to the largest category.
-
-## Limitations
-1. A data/normalization layer, not a detector.
-2. ATT&CK mapping does not prove an attack occurred.
-3. Depends on official STIX bundle availability.
-4. Deprecated attack_core shim still present (v20 removal).
-5. Coverage of future versions needs map updates.
-
-## Future Work
-• Automated v19→v20 revocation-map generation.
-• Remove deprecated attack_core shim.
-• TAXII live-sync mode.
-• Confidence-scored mapping heuristics.
-• Broader ecosystem adapter integration.
+- ATT&CK mapping/normalization does not prove an attack occurred.
+- O(1) dictionary/index lookup describes the in-memory data structure, not end-to-end system latency.
+- Future ATT&CK releases require new migration/remap evidence.
 
 ## Reproducibility
-```
-pytest tests/
-python -m attack_core lookup T1685
-```
-Evidence: CHANGELOG.md, MIGRATION_GUIDE.md, tests/
 
-## References
-[1] MITRE ATT&CK v19 · [2] OASIS STIX 2.1 · [3] MITRE ATT&CK Navigator · [4] Pydantic · [5] MITRE ATT&CK Versioning · [6] NIST AI RMF 1.0
+```bash
+git clone https://github.com/poojakira/attack-v19-core.git
+cd attack-v19-core
+git checkout 22cc9ee3e08406a446bf500f84ea1d8fb53a6a6d
+python -m pip install -e ".[dev]"
+pytest tests/ -q --cov=attack_v19_core --cov-report=term
+```
+
+Expected current CI evidence: **165 passed**, **63.83% coverage**.
