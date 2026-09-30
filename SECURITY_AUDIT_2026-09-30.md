@@ -28,3 +28,10 @@ Admin routes, SQL tenant isolation, rate limiting, password reset, blue/green we
 - **Security note:** The ATT&CK data/index controls remain versioned evidence; downstream consumers should pin the core revision they validate.
 - **Evidence boundary:** This update records repository and GitHub Actions evidence observed during the pass. It is not a claim of independent penetration testing, production deployment, or zero residual risk.
 <!-- repo-verification:end -->
+
+## Verification checkpoint — 2026-09-30
+
+- **Snapshot commit:** `bab484c518464a3be9abc9209fc3aba703684717`
+- **Status:** PARTIALLY VERIFIED
+- **Evidence:** Documentation Integrity, Security Hygiene, and Production Gate passed. The main CI workflow was still running at the verification snapshot.
+- This checkpoint is intentionally date-bounded. It does not claim zero vulnerabilities or universal production readiness.
