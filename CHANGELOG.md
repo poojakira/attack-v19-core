@@ -71,3 +71,11 @@ See [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for step-by-step migration instruct
 
 ## [0.1.0] - 2026-07-21
 - Initial MITRE ATT&CK v19 data models
+## Security maintenance — 2026-09-30
+
+- Use unique, exclusively created download temporary files and verified candidates.
+- Reject URL credentials and nonstandard HTTPS ports on downloads and redirects.
+- Validate positive download limits and convert JSON nesting failures to validation errors.
+- Honor `ATTACK_DATA_DIR` in the canonical loader while retaining explicit directory support.
+- Include the canonical package in CI static security analysis.
+- Validate the changes with 165 local passing tests and update the README evidence.

@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import tempfile
 from pathlib import Path
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, build_opener, urlopen  # noqa: F401 – urlopen kept for monkeypatching in tests
@@ -52,6 +54,14 @@ class StrictRedirectHandler(HTTPRedirectHandler):
             raise ValueError(
                 f"Redirect target hostname {parsed.hostname!r} is not in the approved host list"
             )
+        if (
+            parsed.username is not None
+            or parsed.password is not None
+            or parsed.port not in (None, 443)
+        ):
+            raise ValueError(
+                "Redirect target must not contain credentials or a non-HTTPS port"
+            )
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):  # type: ignore[override]
         self._validate_redirect_url(newurl)
@@ -94,9 +104,8 @@ def _sha256(path: Path) -> str:
 def _validate_stix_bundle(path: Path) -> None:
     """Validate a downloaded file is a well-formed STIX 2.x ATT&CK bundle.
 
-    Called AFTER SHA-256 verification passes. A hash-matching file that is not
-    a valid STIX bundle (e.g. an attacker-substituted JSON with a matching hash
-    via a prefix-collision or supply-chain attack) is rejected here.
+    Called AFTER SHA-256 verification passes. This is an additional format
+    check, not a substitute for authenticating the pinned download digest.
 
     Checks:
     1. File is valid UTF-8 JSON (raises ValueError on parse failure).
@@ -111,7 +120,7 @@ def _validate_stix_bundle(path: Path) -> None:
     try:
         with path.open("r", encoding="utf-8") as fh:
             data = json.load(fh)
-    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+    except (json.JSONDecodeError, UnicodeDecodeError, RecursionError) as exc:
         path.unlink(missing_ok=True)
         raise ValueError(f"Downloaded bundle is not valid UTF-8 JSON: {exc}") from exc
     except OSError as exc:
@@ -159,13 +168,23 @@ def _download(url: str, target: Path, *, max_bytes: int = MAX_BUNDLE_BYTES) -> N
     parsed = urlsplit(url)
     if parsed.scheme != "https" or parsed.hostname not in ALLOWED_DOWNLOAD_HOSTS:
         raise ValueError("Bundle URL must use HTTPS on an approved download host")
-    tmp = target.with_suffix(target.suffix + ".tmp")
-    tmp.unlink(missing_ok=True)
+    if (
+        parsed.username is not None
+        or parsed.password is not None
+        or parsed.port not in (None, 443)
+    ):
+        raise ValueError("Bundle URL must not contain credentials or a non-HTTPS port")
+    if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes <= 0:
+        raise ValueError("max_bytes must be a positive integer")
     opener = build_opener(StrictRedirectHandler())
+    fd, tmp_name = tempfile.mkstemp(
+        prefix=f".{target.name}.", suffix=".tmp", dir=target.parent
+    )
+    tmp = Path(tmp_name)
     try:
         # The scheme and host are allowlisted immediately above.
         # StrictRedirectHandler validates every redirect target before following.
-        with opener.open(url, timeout=60) as response, tmp.open("wb") as handle:  # nosec B310
+        with os.fdopen(fd, "wb") as handle, opener.open(url, timeout=60) as response:  # nosec B310
             total = 0
             while chunk := response.read(1024 * 1024):
                 total += len(chunk)
@@ -189,8 +208,11 @@ def ensure_attack_data(data_dir: Path, *, force: bool = False) -> None:
             print(f"OK {filename}: already present")
             continue
         print(f"Downloading {filename} from {spec['url']}")
-        candidate = target.with_suffix(target.suffix + ".candidate")
-        candidate.unlink(missing_ok=True)
+        fd, candidate_name = tempfile.mkstemp(
+            prefix=f".{filename}.", suffix=".candidate", dir=data_dir
+        )
+        os.close(fd)
+        candidate = Path(candidate_name)
         try:
             _download(spec["url"], candidate)
             actual_hash = _sha256(candidate)

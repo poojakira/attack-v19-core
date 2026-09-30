@@ -105,6 +105,61 @@ def test_v19_2_bundle_hashes_are_pinned():
     }
 
 
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://user:password@raw.githubusercontent.com/bundle",
+        "https://raw.githubusercontent.com:8443/bundle",
+    ],
+)
+def test_download_and_redirect_reject_credentials_and_ports(url, tmp_path):
+    with pytest.raises(ValueError):
+        download_attack_data._download(url, tmp_path / "bundle.json")
+    with pytest.raises(ValueError):
+        StrictRedirectHandler()._validate_redirect_url(url)
+
+
+@pytest.mark.parametrize("limit", [0, -1, True, 1.5])
+def test_download_rejects_invalid_limits(limit, tmp_path):
+    with pytest.raises(ValueError, match="positive integer"):
+        download_attack_data._download(
+            "https://raw.githubusercontent.com/example/bundle",
+            tmp_path / "bundle.json",
+            max_bytes=limit,
+        )
+
+
+def test_download_does_not_follow_predictable_temp_symlink(monkeypatch, tmp_path):
+    victim = tmp_path / "victim"
+    victim.write_bytes(b"preserve")
+    target = tmp_path / "bundle.json"
+    target.with_suffix(".json.tmp").symlink_to(victim)
+    monkeypatch.setattr(
+        download_attack_data,
+        "build_opener",
+        lambda *_: _FakeOpener(_Response(b"bundle")),
+    )
+    download_attack_data._download(
+        "https://raw.githubusercontent.com/example/bundle", target
+    )
+    assert victim.read_bytes() == b"preserve"
+    assert target.read_bytes() == b"bundle"
+    assert not list(tmp_path.glob(".bundle.json.*.tmp"))
+
+
+def test_deep_json_is_rejected_and_removed(tmp_path, monkeypatch):
+    path = tmp_path / "bundle.json"
+    path.write_text("[" * 2000 + "0" + "]" * 2000)
+
+    def reject_deep_json(_handle):
+        raise RecursionError("JSON nesting limit")
+
+    monkeypatch.setattr(download_attack_data.json, "load", reject_deep_json)
+    with pytest.raises(ValueError, match="not valid UTF-8 JSON"):
+        _validate_stix_bundle(path)
+    assert not path.exists()
+
+
 # ---------------------------------------------------------------------------
 # StrictRedirectHandler  --  redirect security unit tests
 # ---------------------------------------------------------------------------

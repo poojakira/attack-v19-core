@@ -26,7 +26,7 @@ Reproduced on current `main` (Python 3.12).
 
 | Metric | Current verified result |
 |---|---:|
-| Tests | 156 passing (108 test functions across 11 files) |
+| Tests | 165 passing locally on Python 3.12 (113 test functions across 11 files; 2026-09-30) |
 | ATT&CK version | v19 (STIX bundle, SHA-256 verified) |
 | Lookup | O(1) by ID / tactic / platform / keyword |
 | ID remaps handled | 29 total (22 revoked in v19 + legacy) |
@@ -298,7 +298,7 @@ python -m attack_core navigator --output layer.json --domain enterprise
 
 ## Security Considerations
 
-This is a security data library. It does not process untrusted user input at runtime, but it does download and parse external data. The following measures are in place:
+This is a local data library and CLI. It parses local STIX files and downloads external data; callers must treat configured data directories as trusted. The following measures are in place:
 
 **Download integrity:**
 - All STIX bundle URLs are restricted to an allowlist (`raw.githubusercontent.com` only)
@@ -326,7 +326,7 @@ This is a security data library. It does not process untrusted user input at run
 
 ## Evaluation Methods and Results
 
-**Test suite:** 108 test functions across 11 test files (156 tests after parametrization, all passing) covering:
+**Test suite:** 113 test functions across 11 test files (165 tests after parametrization, passing locally on Python 3.12 on 2026-09-30) covering:
 - Unit tests for each module (models, loader, matrix, mapping, index)
 - Integration tests that validate parsed data against official STIX bundle structure
 - CLI tests for all three commands
@@ -361,7 +361,7 @@ This is a security data library. It does not process untrusted user input at run
 | Pinned dependencies | Yes | All exact versions in pyproject.toml + uv.lock |
 | Reproducible data | Yes | SHA-256 verified STIX bundles from pinned Git tag |
 | Type safety | Yes | Pydantic models with full type annotations |
-| Test coverage | Good | 156 tests, structural assertions against official data |
+| Test coverage | Good | 165 local passing tests, structural assertions against pinned data |
 | Error handling | Good | Clear FileNotFoundError on missing data, hash mismatch raises RuntimeError |
 | CI/CD | Yes | GitHub Actions (`.github/` directory present) |
 | Documentation | Good | README, CHANGELOG, MIGRATION_GUIDE, RUNBOOK, THIRD_PARTY_NOTICES |
@@ -448,3 +448,25 @@ Keep runtime credentials outside Git. If this repository provides an `.env.examp
 Do not commit AWS access keys or session credentials, API tokens, service-account JSON, private keys, package-manager credentials, Terraform state, or secret-bearing `tfvars`. CI/deployment credentials belong in GitHub Actions secrets or the deployment provider's secret manager. AWS account IDs are identifiers; AWS access-key IDs, secret access keys, and session tokens are credentials.
 
 If a real credential is ever exposed, revoke or rotate it at the provider first, then remove it from the working tree and reachable Git history. The Security Hygiene workflow checks the current tree and reachable history for common credential formats without printing matched secret values.
+
+## Security review — 2026-09-30
+
+The current local review adds exclusively created temporary download files, rejects
+credentialed and nonstandard-port URLs before requests and redirects, and handles
+JSON nesting failures as validation errors. Download candidates remain hash-checked
+and format-checked before replacing an existing trusted cache. Bandit now scans the
+canonical package as well as the deprecated wrappers.
+
+Use `ATTACK_DATA_DIR` to select a trusted cache directory, or pass `stix_dir` directly
+to `ATTACKLoader`. Keep that directory inaccessible to untrusted local writers.
+This library exposes no HTTP service, user accounts, or upload endpoint; request rate
+limiting, authentication, and resource authorization belong to applications embedding
+it. Integrity verification is enabled by default; disabling it transfers responsibility
+for trusting local STIX content to the caller.
+
+Verified locally: 165 pytest cases passed with the three hash-pinned v19.2 bundles;
+Ruff lint/format and medium-confidence, medium-severity Bandit checks passed;
+pip-audit reported no known vulnerabilities in the isolated installed environment
+after updating its package installer. Gitleaks 8.24.3 found no matches in this clone's
+reachable Git history. These checks do not cover provider secrets, inaccessible Git
+objects, fork copies, or deployment configuration and do not establish zero risk.

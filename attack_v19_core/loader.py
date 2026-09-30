@@ -4,6 +4,7 @@ Returns fully-typed model instances.
 """
 
 import hashlib
+import os
 from pathlib import Path
 from typing import Dict, List
 from ._distutils_compat import ensure_distutils_version
@@ -37,11 +38,15 @@ def _sha256_file(path: Path) -> str:
 class ATTACKLoader:
     def __init__(
         self,
-        stix_dir: Path = _DEFAULT_STIX_DIR,
+        stix_dir: Path | None = None,
         *,
         verify_integrity: bool = True,
     ):
-        self.stix_dir = stix_dir
+        self.stix_dir = (
+            stix_dir
+            if stix_dir is not None
+            else Path(os.environ.get("ATTACK_DATA_DIR", _DEFAULT_STIX_DIR))
+        ).expanduser()
         self.verify_integrity = verify_integrity
         self._raw: Dict[str, MitreAttackData] = {}
         self._load_all()

@@ -124,12 +124,12 @@ jobs:
       - name: Static security analysis (bandit)
         run: |
           python -m pip install bandit
-          bandit -r attack_core/ \
+          bandit -r attack_core/ attack_v19_core/ \
             -c pyproject.toml \
             --severity-level medium \
             --confidence-level medium \
             -f json -o bandit-report.json || true
-          bandit -r attack_core/ \
+          bandit -r attack_core/ attack_v19_core/ \
             -c pyproject.toml \
             --severity-level high \
             --confidence-level high

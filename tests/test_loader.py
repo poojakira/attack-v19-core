@@ -1,8 +1,13 @@
 # tests/test_loader.py
 import pytest
-
 from attack_v19_core.loader import ATTACKLoader
 from attack_v19_core.models import Domain
+
+
+def test_environment_data_directory_is_used(monkeypatch, tmp_path):
+    monkeypatch.setenv("ATTACK_DATA_DIR", str(tmp_path))
+    monkeypatch.setattr(ATTACKLoader, "_load_all", lambda self: None)
+    assert ATTACKLoader().stix_dir == tmp_path
 
 
 def test_loader_missing_directory_raises_actionable_error(tmp_path):
