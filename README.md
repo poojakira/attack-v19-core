@@ -470,3 +470,13 @@ pip-audit reported no known vulnerabilities in the isolated installed environmen
 after updating its package installer. Gitleaks 8.24.3 found no matches in this clone's
 reachable Git history. These checks do not cover provider secrets, inaccessible Git
 objects, fork copies, or deployment configuration and do not establish zero risk.
+
+<!-- security-local-config:start -->
+## Secrets and local configuration
+
+- Never commit real API keys, access tokens, passwords, cloud credentials, private keys, or a populated `.env` file.
+- Local `.env` and `.env.*` files are ignored by Git. Only safe templates such as `.env.example` or `.env.sample` may be committed, and they must contain placeholder or empty values only.
+- If an integration needs credentials, create your own local `.env` file (or use your shell/secret manager) and supply **your own** API key. In GitHub Actions, use repository/environment secrets rather than hard-coding values in workflow YAML.
+- Do not copy or reuse any credential that appears in repository history, examples, tests, screenshots, logs, or documentation. Test strings are not intended to be usable credentials.
+- If a real credential is ever committed, **revoke or rotate it at the credential provider first**, then remove it from the current tree and reachable Git history. Deleting a key from GitHub does not revoke it.
+<!-- security-local-config:end -->
