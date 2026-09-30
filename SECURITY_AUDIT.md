@@ -12,7 +12,7 @@ This repository is a local data library/CLI rather than an authenticated web app
 | ID | Severity | Finding | Status |
 |---|---|---|---|
 | ATTACK-001 | Info | Downloader is the principal network trust boundary; it uses an explicit host allowlist and strict redirect handling. | Verified |
-| ATTACK-002 | Low | Local data directory is operator-controlled; integrity depends on the repository's bundle validation/download checks. | Review |
+| ATTACK-002 | Low | Local bundle integrity is verified by default on load against pinned SHA-256 values; downloads are HTTPS/host/redirect/size constrained and STIX structure is validated before replacement. Operators can explicitly disable loader integrity verification, so that opt-out remains an operational trust decision. | Verified |
 | ATTACK-003 | Info | No web/database/authentication surface exists. | N/A |
 
 ## Existing controls verified
