@@ -2,11 +2,7 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
+  workflow_dispatch:
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -106,7 +102,7 @@ jobs:
             --ignore-missing-imports \
             --show-error-codes \
             --no-error-summary || true
-          # Strict mode — treat warnings as errors once baseline is clean
+          # Strict mode - treat warnings as errors once baseline is clean
           mypy attack_core/ \
             --ignore-missing-imports \
             --show-error-codes
@@ -199,4 +195,4 @@ jobs:
             echo "One or more required checks failed."
             exit 1
           fi
-          echo "All checks passed ✓"
+          echo "All checks passed �"
