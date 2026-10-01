@@ -1,12 +1,9 @@
 # Publish to PyPI with Sigstore signing, SBOM generation, and attestation
-# Uses Trusted Publisher (OIDC) — no API tokens stored in secrets
+# Uses Trusted Publisher (OIDC) - no API tokens stored in secrets
 name: Release to PyPI
 
 on:
-  push:
-    tags:
-      - "v*"
-
+  workflow_dispatch:
 permissions:
   contents: write
   id-token: write  # Required for Trusted Publisher OIDC + Sigstore
@@ -133,7 +130,7 @@ jobs:
 
       - name: Publish to PyPI (Trusted Publisher)
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
-        # No password/token needed — uses OIDC Trusted Publisher
+        # No password/token needed - uses OIDC Trusted Publisher
 
   github-release:
     name: Create GitHub Release
