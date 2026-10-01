@@ -129,7 +129,7 @@ If a new ATT&CK version significantly increases corpus size, thresholds may need
 
 ## Regression Detection
 
-The CI pipeline (`ci.yml`) runs benchmarks on every push to `main` and on PRs:
+The CI pipeline (`ci.yml`) is manual-dispatch only for zero-cost operation. When explicitly started, it runs the benchmark validation:
 
 ```yaml
 - name: Performance benchmark

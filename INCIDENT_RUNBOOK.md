@@ -58,7 +58,7 @@ consumers.
 
 ### Prevention
 - Subscribe to MITRE ATT&CK release notifications.
-- Run nightly CI against `attack-stix-data@main` to detect breaks early.
+- Run the compatibility check manually when ATT&CK data changes; scheduled CI is intentionally disabled by default for zero-cost operation.
 - Maintain a compatibility matrix in `docs/COMPATIBILITY.md`.
 
 ---
@@ -157,7 +157,7 @@ consumers.
 5. **Notify affected consumers** if they rely on the revoked technique.
 
 ### Prevention
-- Nightly CI job: compare `V19_REVOCATION_MAP` (in `attack_core/constants.py`) against STIX bundle relationships.
+- Manual compatibility check: compare `V19_REVOCATION_MAP` (in `attack_core/constants.py`) against STIX bundle relationships; scheduled execution is intentionally disabled by default.
 - Add a `test_revocation_completeness` that fails when the map falls behind.
 - Include revocation diff in release notes.
 
