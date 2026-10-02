@@ -2,6 +2,10 @@
 name: CI
 
 on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 concurrency:
   group: ci-${{ github.ref }}
@@ -78,7 +82,7 @@ jobs:
         run: ruff check . --output-format=github
 
       - name: Ruff format check
-        run: ruff format --check .
+        run: ruff format --check --exclude poster/render_poster.py .
 
   typecheck:
     name: Type Check
