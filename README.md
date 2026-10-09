@@ -483,3 +483,12 @@ objects, fork copies, or deployment configuration and do not establish zero risk
 
 This repository separates **implementation evidence**, **public/external interoperability checks**, and **real deployment or customer evidence**. See [PRODUCT_VALIDATION.md](PRODUCT_VALIDATION.md) for the current validation ladder, reproducible checks, and the claims that are deliberately out of scope. A passing test or public-data canary is not presented as customer adoption or universal production efficacy.
 
+
+### Maintained Python quality checks
+
+Use Ruff 0.8.4 to match the repository's CI tool version. Run `ruff check .`
+and `ruff format --check .` from the repository root. These checks include maintained
+source, tests, scripts, examples, benchmarks, validation helpers, and poster generators
+where present. Ruff's standard exclusions omit version-control metadata, virtual
+environments, and build/cache directories; generated poster HTML/PDF/PNG assets are
+not Python source. Passing these static checks does not establish runtime behavior or product effectiveness.
