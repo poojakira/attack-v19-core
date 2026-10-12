@@ -1,18 +1,5 @@
 # attack-v19-core
 
-<!-- security-systems-poster -->
-## Research Poster
-
-**Security Systems / 08 — Version-Aware Normalization of Findings Against MITRE ATT&CK v19**
-
-[![Research poster](poster/poster.png)](poster/poster_36x48.pdf)
-
-> Technical research poster (36 x 48 in). Click the image for the print-resolution **[PDF](poster/poster_36x48.pdf)**.
-> Poster measurements are dated snapshots at their printed commits. Use the repository evidence files for newer results; do not read the poster as a verification of the latest `main`.
-> Every metric on it is evidence-backed; historical/projected numbers are labeled and separated from current results.
-> Part of the *Pooja Kiran - Security Systems* engineering poster collection.
-<!-- security-systems-poster -->
-
 
 **Maintainer:** Pooja Kiran ([@poojakira](https://github.com/poojakira))
 
@@ -63,7 +50,6 @@ O(1) lookup API  -->  consumed by sibling detection tools
 - Revocation map resolving deprecated IDs to replacements (v19 + legacy)
 - O(1) indexes for lookup by ID, tactic, platform, or keyword
 - Compatibility shim (`attack_core`) with a deprecation path to `attack_v19_core`
-
 
 
 - Pydantic-validated models for Technique, Tactic, SubTechnique, Group, Software, Mitigation, DataSource
@@ -408,6 +394,19 @@ This is a local data library and CLI. It parses local STIX files and downloads e
 - [INCIDENT_RUNBOOK.md](INCIDENT_RUNBOOK.md) - incident response for version breaks and hash mismatches
 - [docs/PERFORMANCE_BASELINE.md](docs/PERFORMANCE_BASELINE.md) - O(1) lookup performance baselines
 - [benchmarks/lookup_perf.py](benchmarks/lookup_perf.py) - performance regression gate
+
+<!-- security-systems-poster -->
+## Research Poster
+
+**Security Systems / 08 — Version-Aware Normalization of Findings Against MITRE ATT&CK v19**
+
+[![Research poster](poster/poster.png)](poster/poster_36x48.pdf)
+
+> Technical research poster (36 x 48 in). Click the image for the print-resolution **[PDF](poster/poster_36x48.pdf)**.
+> Poster measurements are dated snapshots at their printed commits. Use the repository evidence files for newer results; do not read the poster as a verification of the latest `main`.
+> Every metric on it is evidence-backed; historical/projected numbers are labeled and separated from current results.
+> Part of the *Pooja Kiran - Security Systems* engineering poster collection.
+<!-- security-systems-poster -->
 
 ## License and Author
 
