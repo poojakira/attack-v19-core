@@ -1,0 +1,52 @@
+{
+  "repository": "attack-v19-core",
+  "title": "Version-Aware Normalization of Findings Against MITRE ATT&CK v19",
+  "subtitle": "Typed Data Models and Revocation-Resolving Technique Lookup for Security Tooling",
+  "license": "MIT",
+  "source_commit": "591ad98911eebe3f8a681db2accc9a653d951320",
+  "test_commit": "22cc9ee3e08406a446bf500f84ea1d8fb53a6a6d",
+  "ci_run": 36783662812,
+  "ci_date": "2026-09-30",
+  "cards": [
+    {
+      "value": "165",
+      "label": "tests passed in cited CI"
+    },
+    {
+      "value": "63.83%",
+      "label": "statement coverage at cited CI"
+    },
+    {
+      "value": "29",
+      "label": "source remap entries, including 22 release revocations"
+    },
+    {
+      "value": "46",
+      "label": "new-technique entries in repository migration table"
+    }
+  ],
+  "contribution": "A typed ATT&CK v19 data layer that normalizes findings across version churn by resolving revoked/renamed technique IDs through a maintained remap table over SHA-256-verified STIX data, with indexed lookup for downstream security tooling.",
+  "methods": [
+    "Download/validate ATT&CK STIX data with SHA-256 verification.",
+    "Parse techniques/tactics/platform metadata into typed structures.",
+    "Resolve deprecated/revoked IDs through the v19 remap table.",
+    "Build in-memory indexes for ID, tactic, platform, and keyword lookup.",
+    "Regression-test migration and data-loader behavior across supported Python versions."
+  ],
+  "evidence": [
+    "Cited Python 3.12 CI: 165 passed; 63.83% statement coverage, same test job.",
+    "Current source inventory: 22 release-revocation entries, 29 total remaps and 46 V19_NEW_TECHNIQUES entries. The earlier 48 figure was not the implemented table count.",
+    "The alleged release-wide total of 48 was not independently verified from official STIX/release evidence; this poster reports the repository table only.",
+    "Loader/index code performs pinned STIX validation and lookup; local full STIX-dependent execution remains blocked by missing data."
+  ],
+  "limitations": [
+    "ATT&CK mapping/normalization does not prove an attack occurred.",
+    "O(1) dictionary/index lookup describes the in-memory data structure, not end-to-end system latency.",
+    "Future ATT&CK releases require new migration/remap evidence."
+  ],
+  "reproduction": [
+    "git checkout 22cc9ee3e08406a446bf500f84ea1d8fb53a6a6d",
+    "Install the documented development dependencies; run python -m pytest tests/ -q. Use the cited job configuration when reproducing coverage.",
+    "Benchmark data, adapters and environment requirements are separate; consult poster/13_reproducibility.md and the claim ledger."
+  ]
+}

@@ -26,17 +26,17 @@ A typed ATT&CK v19 data layer that normalizes findings across version churn by r
 4. Build in-memory indexes for ID, tactic, platform, and keyword lookup.
 5. Regression-test migration and data-loader behavior across supported Python versions.
 
-## Current Verified Evidence
+## Verified Evidence at Cited Snapshot
 
-Current-main Python 3.12 CI reports:
+Cited snapshot Python 3.12 CI reports:
 
 - **165 tests passed**.
 - **63.83% statement coverage**; CI gate is 60%.
 - **113 test functions across 11 test files**; parametrization expands these to 165 executed tests.
 - Current repository mapping evidence retains:
-  - **22 revoked technique IDs**
+  - **22 mapped release-revocation IDs**
   - **29 total remaps**
-  - **48 new techniques** for the documented v19 migration surface
+  - **46 unique entries** in the repository new-technique migration table (release-wide total not independently verified)
 - Type checking, lint, dependency/security scanning, data download verification, and performance benchmark jobs succeeded.
 
 ## Claim Boundary
@@ -55,4 +55,11 @@ python -m pip install -e ".[dev]"
 pytest tests/ -q --cov=attack_v19_core --cov-report=term
 ```
 
-Expected current CI evidence: **165 passed**, **63.83% coverage**.
+Expected cited CI evidence: **165 passed**, **63.83% coverage**.
+
+
+## Claim audit and rendered-source boundary, October 13, 2026 UTC
+
+The reviewed printed claims, source and test commit anchors, CI dates and benchmark limitations are in `verified_claims.json`. The PDF is generated from that manifest and the PNG is rasterized from the same page by `render_poster.py`. Source inventory, dated CI and separate reported experiments must not be combined into one result. Earlier artifact versions remain in Git history; these corrections do not assert production readiness.
+
+Offline poster rendering: `python -m pip install reportlab==4.4.9 PyMuPDF==1.26.6`, then `python poster/render_poster.py`. The font is bundled with the pinned ReportLab package; no browser or network fetch is used during rendering.

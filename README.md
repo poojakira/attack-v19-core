@@ -20,7 +20,7 @@ Reproduced on current `main` (Python 3.12).
 
 ## Security Problem
 
-ATT&CK evolves every release: v19 revoked 22 technique IDs, renamed a tactic, added TA0112 ("Defense Impairment"), and introduced 48 new techniques. Detection pipelines that hard-code IDs (e.g., `T1562` → now `T1685`) show green coverage dashboards while silently missing whole tactics. This library absorbs that version churn so downstream security tools stay correct across upgrades.
+ATT&CK evolves every release: v19 revoked 22 technique IDs, renamed a tactic, added TA0112 ("Defense Impairment"), and this repository maps 46 unique new-technique entries. The release-wide total is not independently verified by this audit. Detection pipelines that hard-code IDs (e.g., `T1562` → now `T1685`) show green coverage dashboards while silently missing whole tactics. This library absorbs that version churn so downstream security tools stay correct across upgrades.
 
 ## Threat Model & Scope
 
