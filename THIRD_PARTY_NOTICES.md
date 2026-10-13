@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-This project is licensed under the MIT License in `LICENSE`.
+Owner-controlled new releases are proposed under the proprietary [LICENSE](LICENSE). Versions previously published under MIT retain their existing rights; the former text is preserved in [docs/license-history/LICENSE-BEFORE-2026-10-13.txt](docs/license-history/LICENSE-BEFORE-2026-10-13.txt). These terms do not supersede the independent rights and obligations below.
 
 ## MITRE ATT&CK
 
