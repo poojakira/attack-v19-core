@@ -83,6 +83,7 @@ evidence = items(
 limits = items(
     sec(
         "Honest Boundaries",
+        "Claim Boundary",
         "Limitations",
         "Limitations & Residual Risk",
         "Not established by this repository",
