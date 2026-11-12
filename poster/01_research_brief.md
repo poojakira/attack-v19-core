@@ -1,6 +1,6 @@
 # Research Brief - Poster 08
 
-> Evidence status: Refreshed against verified code snapshot `22cc9ee3e08406a446bf500f84ea1d8fb53a6a6d` and successful CI run `36783662812` on 2026-09-30.
+> Evidence status: Historical poster snapshot at code commit `22cc9ee3e08406a446bf500f84ea1d8fb53a6a6d` and successful CI run `36783662812` on 2026-09-30.
 
 ## Repository
 
@@ -28,12 +28,12 @@ A typed ATT&CK v19 data layer that normalizes findings across version churn by r
 
 ## Current Verified Evidence
 
-Current-main Python 3.12 CI reports:
+The cited September 30 Python 3.12 CI snapshot reports:
 
 - **165 tests passed**.
 - **63.83% statement coverage**; CI gate is 60%.
 - **113 test functions across 11 test files**; parametrization expands these to 165 executed tests.
-- Current repository mapping evidence retains:
+- Mapping evidence at this snapshot retains:
   - **22 revoked technique IDs**
   - **29 total remaps**
   - **48 new techniques** for the documented v19 migration surface
@@ -52,7 +52,8 @@ git clone https://github.com/poojakira/attack-v19-core.git
 cd attack-v19-core
 git checkout 22cc9ee3e08406a446bf500f84ea1d8fb53a6a6d
 python -m pip install -e ".[dev]"
-pytest tests/ -q --cov=attack_v19_core --cov-report=term
+python scripts/download_attack_data.py
+pytest tests/ -q --cov=attack_core --cov=attack_v19_core --cov-report=term
 ```
 
-Expected current CI evidence: **165 passed**, **63.83% coverage**.
+Expected evidence at the cited snapshot: **165 passed**, **63.83% coverage**.
